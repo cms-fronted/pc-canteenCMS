@@ -23,7 +23,6 @@
 </template>
 
 <script>
-import $axios from "@/api/index";
 export default {
   data() {
     return {

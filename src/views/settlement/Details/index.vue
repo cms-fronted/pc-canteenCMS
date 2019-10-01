@@ -55,7 +55,7 @@ export default {
 .details {
   .select-title {
     float: left;
-    width: 95%;
+    width: 90%;
     display: flex;
     flex-wrap: wrap;
     .el-select {
@@ -68,12 +68,13 @@ export default {
   }
   .btn-area {
     float: right;
-    width: 5%;
+    width: 10%;
     display: flex;
     flex-direction: column;
-  }
-  .el-button {
-    margin-bottom: 10px;
+    display: block;
+    .el-button {
+      margin-bottom: 20px;
+    }
   }
 }
 </style>

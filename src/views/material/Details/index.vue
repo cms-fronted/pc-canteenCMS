@@ -4,16 +4,7 @@
     <el-divider></el-divider>
     <div class="main">
       <div class="main-header">
-        <span class="content-header">所属公司：</span>
-        <el-select v-model="value" placeholder="请选择" style="width:150px">
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value"
-          ></el-option>
-        </el-select>
-        <span class="content-header">类型：</span>
+        <span class="content-header">公司：</span>
         <el-select v-model="value" placeholder="请选择" style="width:150px">
           <el-option
             v-for="item in options"

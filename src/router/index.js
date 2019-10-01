@@ -22,13 +22,13 @@ import getTitle from '@/utils/getTitle'
 
 export const currencyRoutes = [
   {
-    path:'/login',
-    name:'Login',
+    path: '/login',
+    name: 'Login',
     component: () => import('@/views/login'),
-    meta:{
-      title:'登陆页面'
+    meta: {
+      title: '登陆页面'
     },
-    hidden:true
+    hidden: true
   },
   {
     path: '/',
@@ -255,7 +255,7 @@ export const currencyRoutes = [
         name: 'Material-details',
         component: () => import('@/views/material/Details'),
         meta: {
-          title: '材料管理明细'
+          title: '菜品材料明细'
         }
       },
       {
@@ -337,29 +337,29 @@ export const currencyRoutes = [
     ]
   },
   {
-    path:'/cofigure',
-    name:'Configure',
+    path: '/cofigure',
+    name: 'Configure',
     component: Layout,
-    meta:{
-      title:'配置',
-      icon:'el-icon-office-building'
+    meta: {
+      title: '配置',
+      icon: 'el-icon-office-building'
     },
-    children:[
+    children: [
       {
-        path:'details',
-        name:'Configuring-details',
-        meta:{
-          title:'企业明细',
+        path: 'details',
+        name: 'Configuring-details',
+        meta: {
+          title: '企业明细',
         },
-        component: ()=> import('@/views/configuring/EnterpriseDetails')
+        component: () => import('@/views/configuring/EnterpriseDetails')
       },
       {
-        path:'manage',
-        name:'Configuring-manage',
-        meta:{
-          title:'企业管理',
+        path: 'manage',
+        name: 'Configuring-manage',
+        meta: {
+          title: '企业管理',
         },
-        component: ()=>import('@/views/configuring/EnterpriseManage')
+        component: () => import('@/views/configuring/EnterpriseManage')
       }
     ]
   }
@@ -384,7 +384,7 @@ export function resetRouter() {
   const reset = creatRouter()
   router.matcher = reset.matcher
 }
- 
+
 // router.beforeEach(async (to, from, next) => {
 //   document.title = getTitle(to.meta.title)
 //   if (to.path === '/login') {

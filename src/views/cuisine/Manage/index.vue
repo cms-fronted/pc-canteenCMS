@@ -33,7 +33,7 @@
             ></el-option>
           </el-select>
           <el-button type="primary" plain>查询</el-button>
-          <el-button type="primary">添加</el-button>
+          <el-button type="primary" @click="addCuisine">添加</el-button>
         </div>
         <div class="main-content">
           <el-card :body-style="{ padding:0, }" v-for="o in 5" :key="o">
@@ -43,27 +43,39 @@
             <div style="padding: 14px;">
               <ul class="main-title">
                 <li>名称：</li>
-                <li>类型</li>
+                <li>类型：</li>
                 <li>餐次：</li>
                 <li>价格：</li>
                 <li>主厨：</li>
               </ul>
-              <div class="bottom clearfix"></div>
+              <div class="btns">
+                <el-button size="small" type="primary" @click="editCuisine">编辑</el-button>
+                <el-button size="small" type="primary">删除</el-button>
+                <el-button size="small" type="primary" @click="handleClick(o)">上架</el-button>
+              </div>
+              <!-- <div class="bottom clearfix"></div> -->
             </div>
           </el-card>
         </div>
+        <el-pagination
+          background
+          layout="prev, pager, next"
+          :total="1000"
+          @current-change="handleClickPage"
+        ></el-pagination>
       </div>
     </div>
-    <cuisine-dialog :visible="visible" />  
+    <cuisine-dialog :visible="visible" @closeDialog="closeDialog" :editData="editData" />
   </div>
 </template>
 
 <script>
-import CuisineDialog from './dialog'
+import CuisineDialog from "./dialog";
 export default {
   data() {
     return {
-      visible:true,
+      visible: false,
+      editData: {},
       options: [
         {
           value: "选项1",
@@ -72,18 +84,6 @@ export default {
         {
           value: "选项2",
           label: "双皮奶"
-        },
-        {
-          value: "选项3",
-          label: "蚵仔煎"
-        },
-        {
-          value: "选项4",
-          label: "龙须面"
-        },
-        {
-          value: "选项5",
-          label: "北京烤鸭"
         }
       ],
       value: "",
@@ -95,17 +95,48 @@ export default {
       ]
     };
   },
-  components:{CuisineDialog}
+  components: { CuisineDialog },
+  methods: {
+    handleClick(o) {
+      console.log(o)
+    },
+    closeDialog(val) {
+      this.visible = val;
+    },
+    addCuisine() {
+      this.visible = true;
+    },
+    editCuisine() {
+      this.editData = Object.assign({},this.editData, {
+        name: "111",
+        price: 12,
+        chef: "2e2awq",
+        desc: "211"
+      });
+      this.visible = true;
+    },
+
+    handleClickPage(e) {
+      console.log(e);
+    },
+    handleNext(e) {
+      console.log(e);
+    },
+    handlePrev(e) {
+      console.log(e);
+    }
+  }
 };
 </script>
 
 <style lang="scss" scoped>
 .manage {
-
-
   .main {
     height: 100%;
-
+    .el-pagination {
+      position: absolute;
+      left: 40%;
+    }
     .main-content {
       display: flex;
       width: 100%;
@@ -130,10 +161,16 @@ export default {
           justify-content: center;
           align-items: flex-start;
           img {
-            max-width: 100%;
-            max-height: 100%;
+            width: 100%;
+            height: 100%;
             object-fit: contain;
           }
+        }
+        .btns {
+          width:100%;
+          margin-top: 10px;
+          display: flex;
+          justify-content: center;
         }
         .clearfix:before,
         .clearfix:after {

@@ -1,8 +1,9 @@
 module.exports = {
   devServer: {
+    historyApiFallback: true,
     proxy: {
-      '/api': {
-        target: 'http://canteen.tonglingok.com/api/v1/',
+      '/v1': {
+        target: 'http://canteen.tonglingok.com/api',
         ws: true,
         changeOrigin: true
       },

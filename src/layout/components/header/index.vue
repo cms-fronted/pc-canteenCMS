@@ -2,7 +2,7 @@
   <div class="header">
     <div class="header_l">
          <a href="javascript:;" class="logoLink"
-        ><img src="./logo.png" alt="logo" />CMS后台管理系统</a
+        ><img src="./logo.png" alt="logo" />饭堂后台管理系统</a
       >
     </div>
     <div class="header_r">
