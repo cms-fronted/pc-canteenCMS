@@ -29,14 +29,14 @@
           <i class="el-icon-key"></i>
         </div>
         <el-form ref="loginForm" :rules="rules" :model="ruleForm">
-          <el-form-item prop="username">
-            <el-input placeholder="请输入账号" prefix-icon="el-icon-user" v-model="ruleForm.username"></el-input>
+          <el-form-item prop="account">
+            <el-input placeholder="请输入账号" prefix-icon="el-icon-user" v-model="ruleForm.account"></el-input>
           </el-form-item>
-          <el-form-item prop="password">
+          <el-form-item prop="passwd">
             <el-input
               placeholder="请输入密码"
               prefix-icon="el-icon-lock"
-              v-model="ruleForm.password"
+              v-model="ruleForm.passwd"
               show-password
             ></el-input>
           </el-form-item>
@@ -56,8 +56,8 @@ export default {
       text: "向右滑动",
       showSlide: false,
       ruleForm: {
-        username: "admin",
-        password: "123456"
+        account: "zml",
+        passwd: "a111111"
       },
       rules: {
         user: [
@@ -93,24 +93,40 @@ export default {
       });
     },
     _login() {
-      this.$store
-        .dispatch("user/_login", this.ruleForm)
+      this.$axios
+        .post("/v1/token/admin", this.ruleForm)
         .then(res => {
-          if (!res.data.success) {
+          if (res.data.code == 200) {
+            this.GLOBAL_ROLE.rule = res.data.rule;
+            this.GLOBAL_ROLE.token = res.data.token;
+            this.GLOBAL_ROLE.grade = res.data.grade;
             this.refresh();
-          } else {
-            console.log(this.$route.query.route);
-            this.$router.push('/')
+            this.$router.push("/");
             if (this.notifyObj) {
               this.notifyObj.close();
             }
             this.notifyObj = null;
           }
         })
-        .catch(error => {
-          this.refresh();
-          this.$message.error(error);
-        });
+        .catch(err => console.log(err));
+      // this.$store
+      //   .dispatch("user/_login", this.ruleForm)
+      //   .then(res => {
+      //     if (!res.data.success) {
+      //       this.refresh();
+      //     } else {
+      //       console.log(this.$route.query.route);
+      //       this.$router.push('/')
+      //       if (this.notifyObj) {
+      //         this.notifyObj.close();
+      //       }
+      //       this.notifyObj = null;
+      //     }
+      //   })
+      //   .catch(error => {
+      //     this.refresh();
+      //     this.$message.error(error);
+      //   });
     },
     shopTip() {
       this.notifyObj = this.$notify({

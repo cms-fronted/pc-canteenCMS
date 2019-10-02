@@ -64,10 +64,11 @@ export default {
       this.$emit("close", false);
     },
     handleClick() {
+      console.log(this.GLOBAL_ROLE)
       let data = this.formdata;
       Object.assign(data, { c_id: 1 });
       this.$axios
-        .post("/material/save", data)
+        .post("/v1/material/save", data)
         .then(res => {
           this.doClose();
           this.$message.success("添加成功");
