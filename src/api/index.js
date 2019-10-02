@@ -9,7 +9,8 @@ const $axios = axios.create({
   // 设置超时时间
   timeout: 30000,
   // 基础url，会在请求url中自动添加前置链接
-  baseURL: process.env.VUE_APP_BASE_API
+  // baseURL: process.env.VUE_APP_BASE_API,
+  withCredentials: true
 })
 Vue.prototype.$http = axios // 并发请求
 // 在全局请求和响应拦截器中添加请求状态
@@ -21,7 +22,7 @@ $axios.interceptors.request.use(
     loading = Loading.service({ text: '拼命加载中' })
     const token = store.getters.token
     if (token) {
-      config.headers.Authorization = token // 请求头部添加token
+      config.headers.token = token // 请求头部添加token
     }
     return config
   },

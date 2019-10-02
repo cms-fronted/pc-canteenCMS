@@ -5,12 +5,16 @@ import router, { resetRouter } from '@/router'
 const state = {
   token: localStorage.getItem('token') ? localStorage.getItem('token') : '', // 认证凭证'
   userName: '',
+  grade: '',
+  rule: '',
   roles: [],
   introduce: ''
 }
 const mutations = {
   SET_TOKEN(state, val) {
-    state.token = val
+    state.token = val.token
+    state.grade = val.grade
+    state.rule = val.rule
     localStorage.setItem('token', val)
   },
   DEL_TOKEN(state) {
@@ -38,13 +42,13 @@ const actions = {
         .then(res => {
           console.log('请求成功')
           if (res.code === 200) {
-            if (res.data.success) {
+            // if (res.data.success) {
               // Message.success(res.data.msg)
               commit('SET_TOKEN', res.data.token)
               commit('SET_NAME',res.data.userName)
-            } else {
-              // Message.error(res.data.msg)
-            }
+            // } else {
+            //   // Message.error(res.data.msg)
+            // }
             resolve(res)
           }
         })

@@ -33,6 +33,7 @@
 </template>
 
 <script>
+import $axios from "@/api/index";
 export default {
   data() {
     return {
@@ -64,12 +65,13 @@ export default {
       this.$emit("close", false);
     },
     handleClick() {
-      console.log(this.GLOBAL_ROLE)
+      console.log(this.GLOBAL_ROLE);
       let data = this.formdata;
       Object.assign(data, { c_id: 1 });
-      this.$axios
+      $axios
         .post("/v1/material/save", data)
         .then(res => {
+          console.log(res);
           this.doClose();
           this.$message.success("添加成功");
           this.$refs["addMaterialForm"].resetFields();

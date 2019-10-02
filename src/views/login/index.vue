@@ -93,40 +93,26 @@ export default {
       });
     },
     _login() {
-      this.$axios
-        .post("/v1/token/admin", this.ruleForm)
+      this.$store
+        .dispatch("user/_login", this.ruleForm)
         .then(res => {
-          if (res.data.code == 200) {
-            this.GLOBAL_ROLE.rule = res.data.rule;
-            this.GLOBAL_ROLE.token = res.data.token;
-            this.GLOBAL_ROLE.grade = res.data.grade;
+          console.log(res.data.code === 200);
+          console.log(res);
+          if (!res.data.code == '200') {
             this.refresh();
-            this.$router.push("/");
+          } else {
+            console.log(this.$route.query.route);
+            this.$router.push('/')
             if (this.notifyObj) {
               this.notifyObj.close();
             }
             this.notifyObj = null;
           }
         })
-        .catch(err => console.log(err));
-      // this.$store
-      //   .dispatch("user/_login", this.ruleForm)
-      //   .then(res => {
-      //     if (!res.data.success) {
-      //       this.refresh();
-      //     } else {
-      //       console.log(this.$route.query.route);
-      //       this.$router.push('/')
-      //       if (this.notifyObj) {
-      //         this.notifyObj.close();
-      //       }
-      //       this.notifyObj = null;
-      //     }
-      //   })
-      //   .catch(error => {
-      //     this.refresh();
-      //     this.$message.error(error);
-      //   });
+        .catch(error => {
+          this.refresh();
+          this.$message.error(error);
+        });
     },
     shopTip() {
       this.notifyObj = this.$notify({
