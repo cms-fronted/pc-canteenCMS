@@ -155,7 +155,7 @@ export const currencyRoutes = [
         name: 'Recharge-record',
         component: () => import('@/views/recharge/record'),
         meta: {
-          title: '充值记录查询'
+          title: '充值记录明细'
         },
       },
       {
@@ -163,7 +163,7 @@ export const currencyRoutes = [
         name: 'Recharge-card-balance',
         component: () => import('@/views/recharge/cardBalance'),
         meta: {
-          title: '现金充值'
+          title: '饭卡余额查询'
         },
       }
     ]
