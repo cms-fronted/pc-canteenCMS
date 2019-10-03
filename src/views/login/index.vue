@@ -96,9 +96,7 @@ export default {
       this.$store
         .dispatch("user/_login", this.ruleForm)
         .then(res => {
-          console.log(res.data.code === 200);
-          console.log(res);
-          if (!res.data.code == '200') {
+          if (!res.code == '200') {
             this.refresh();
           } else {
             console.log(this.$route.query.route);
