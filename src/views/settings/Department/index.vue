@@ -37,15 +37,10 @@
             <el-table-column label="姓名" prop="username"></el-table-column>
             <el-table-column label="手机号码" prop="phone"></el-table-column>
             <el-table-column label="卡号" prop="card_num"></el-table-column>
-            <el-table-column
-              label="二维码有效周期"
-              prop="expiry_date"
-            ></el-table-column>
+            <el-table-column label="二维码有效周期" prop="expiry_date"></el-table-column>
             <el-table-column label="新增人员" prop="new">
               <template slot-scope="scoped">
-                <el-button size="mini" @click="edit(scoped.row)"
-                  >新增</el-button
-                >
+                <el-button size="mini" @click="edit(scoped.row)">新增</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -53,12 +48,7 @@
       </div>
     </div>
 
-    <el-dialog
-      title="新增员工"
-      width="30%"
-      :visible.sync="addVisible"
-      :close-on-click-modal="false"
-    >
+    <el-dialog title="新增员工" width="30%" :visible.sync="addVisible" :close-on-click-modal="false">
       <el-form :model="addFormData" label-width="100px">
         <el-form-item label="归属饭堂">
           <el-radio-group v-model="addFormData.c_id">
@@ -81,7 +71,7 @@
           <el-input v-model="addFormData.card_num"></el-input>
         </el-form-item>
         <el-form-item label="手机号码">
-          <el-input v-model="addFormData.phone"> </el-input>
+          <el-input v-model="addFormData.phone"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -123,7 +113,9 @@ export default {
     };
   },
   computed: {
-    ...mapState[("grade", "role")]
+    ...mapState({
+      role: state => state.user.role
+    })
   },
   created() {
     this.fetchTreeData();
@@ -131,13 +123,11 @@ export default {
   },
   methods: {
     handleNodeClick(data) {
-      console.log(data);
     },
     fetchTreeData() {
       this.$axios
         .get("/v1/departments?c_id=2")
         .then(res => {
-          console.log(res.data.data);
           this.treeData = res.data.data;
         })
         .catch(err => console.log(err));
@@ -146,7 +136,6 @@ export default {
       this.$axios
         .get("/v1/staffs?page=1&size=10&c_id=2&d_id=4")
         .then(res => {
-          console.log(res);
           this.tabledata = Array.from(res.data.data.data);
         })
         .catch(err => console.log(err));
