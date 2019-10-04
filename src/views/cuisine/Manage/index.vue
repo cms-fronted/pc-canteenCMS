@@ -36,9 +36,9 @@
           <el-button type="primary" @click="addCuisine">添加</el-button>
         </div>
         <div class="main-content">
-          <el-card :body-style="{ padding:0, }" v-for="o in 5" :key="o">
+          <el-card :body-style="{ padding: 0 }" v-for="o in 5" :key="o">
             <div class="image">
-              <img :src="fil[o%fil.length]" alt />
+              <img :src="fil[o % fil.length]" alt />
             </div>
             <div style="padding: 14px;">
               <ul class="main-title">
@@ -49,9 +49,13 @@
                 <li>主厨：</li>
               </ul>
               <div class="btns">
-                <el-button size="small" type="primary" @click="editCuisine">编辑</el-button>
+                <el-button size="small" type="primary" @click="editCuisine"
+                  >编辑</el-button
+                >
                 <el-button size="small" type="primary">删除</el-button>
-                <el-button size="small" type="primary" @click="handleClick(o)">上架</el-button>
+                <el-button size="small" type="primary" @click="handleClick(o)"
+                  >上架</el-button
+                >
               </div>
               <!-- <div class="bottom clearfix"></div> -->
             </div>
@@ -65,7 +69,11 @@
         ></el-pagination>
       </div>
     </div>
-    <cuisine-dialog :visible="visible" @closeDialog="closeDialog" :editData="editData" />
+    <cuisine-dialog
+      :visible="visible"
+      @closeDialog="closeDialog"
+      :editData="editData"
+    />
   </div>
 </template>
 
@@ -98,7 +106,7 @@ export default {
   components: { CuisineDialog },
   methods: {
     handleClick(o) {
-      console.log(o)
+      console.log(o);
     },
     closeDialog(val) {
       this.visible = val;
@@ -107,7 +115,7 @@ export default {
       this.visible = true;
     },
     editCuisine() {
-      this.editData = Object.assign({},this.editData, {
+      this.editData = Object.assign({}, this.editData, {
         name: "111",
         price: 12,
         chef: "2e2awq",
@@ -141,10 +149,10 @@ export default {
       display: flex;
       width: 100%;
       .main-title {
-        font-size: 18px;
+        font-size: 16px;
       }
       .el-card {
-        width: 100%;
+        width: 19%;
         margin: 0 10px;
         .time {
           font-size: 13px;
@@ -167,7 +175,7 @@ export default {
           }
         }
         .btns {
-          width:100%;
+          width: 100%;
           margin-top: 10px;
           display: flex;
           justify-content: center;
