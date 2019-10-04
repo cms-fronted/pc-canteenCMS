@@ -49,13 +49,9 @@
                 <li>主厨：</li>
               </ul>
               <div class="btns">
-                <el-button size="small" type="primary" @click="editCuisine"
-                  >编辑</el-button
-                >
+                <el-button size="small" type="primary" @click="editCuisine">编辑</el-button>
                 <el-button size="small" type="primary">删除</el-button>
-                <el-button size="small" type="primary" @click="handleClick(o)"
-                  >上架</el-button
-                >
+                <el-button size="small" type="primary" @click="handleClick(o)">上架</el-button>
               </div>
               <!-- <div class="bottom clearfix"></div> -->
             </div>
@@ -69,11 +65,7 @@
         ></el-pagination>
       </div>
     </div>
-    <cuisine-dialog
-      :visible="visible"
-      @closeDialog="closeDialog"
-      :editData="editData"
-    />
+    <cuisine-dialog :visible="visible" @closeDialog="closeDialog" :editData="editData" />
   </div>
 </template>
 
@@ -82,7 +74,9 @@ import CuisineDialog from "./dialog";
 export default {
   data() {
     return {
+      page: 1,
       visible: false,
+      cuisineList: [],
       editData: {},
       options: [
         {
@@ -105,6 +99,22 @@ export default {
   },
   components: { CuisineDialog },
   methods: {
+    fetchCuisineList(page) {
+      this.$axios
+        .get("/v1/foods", {
+          params: {
+            page: page,
+            size: 5,
+            f_type: 1,
+            menu_ids: "1",
+            dinner_ids: "1",
+            canteen_ids: "1",
+            company_ids: "1"
+          }
+        })
+        .then(res => console.log(res))
+        .catch(err => console.log(err));
+    },
     handleClick(o) {
       console.log(o);
     },

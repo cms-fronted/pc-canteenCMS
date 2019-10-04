@@ -1,5 +1,12 @@
 <template>
-  <el-dialog title="菜品管理" :visible.sync="isOpen" class="diaForm" width="40%" @close="handleClose">
+  <el-dialog
+    title="菜品管理"
+    :visible.sync="isOpen"
+    class="diaForm"
+    :show="show"
+    width="40%"
+    @close="handleClose"
+  >
     <el-select v-model="value" placeholder="请选择" style="width:120px">
       <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
     </el-select>
@@ -10,18 +17,18 @@
       <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
     </el-select>
     <el-form ref="cuisineManageForm" :model="formdata" :rules="rules" label-width="80px">
-      <el-form-item label="菜品名称" prop="name" >
+      <el-form-item label="菜品名称" prop="name">
         <el-input type="text" v-model="formdata.name"></el-input>
       </el-form-item>
-      <el-form-item label="菜品单价" prop="price" >
+      <el-form-item label="菜品单价" prop="price">
         <el-input type="text" v-model="formdata.price"></el-input>
       </el-form-item>
-      <el-form-item label="主厨" prop="chef" >
+      <el-form-item label="主厨" prop="chef">
         <el-input type="text" v-model="formdata.chef"></el-input>
       </el-form-item>
-      <el-form-item label="介绍" prop="desc" >
+      <!-- <el-form-item label="介绍" prop="desc" >
         <el-input type="text" v-model="formdata.desc"></el-input>
-      </el-form-item>
+      </el-form-item>-->
       <el-form-item label="图片" prop="img_url">
         <div class="imgs">
           <el-upload
@@ -70,11 +77,11 @@ export default {
       ],
       value: "",
       formdata: {
-        name:'',
-        price:'',
-        desc:'',
-        chef:'',
-        img_url:''
+        name: "",
+        price: "",
+        desc: "",
+        chef: "",
+        img_url: ""
       },
       rules: {},
       isOpen: this.visible,
@@ -85,15 +92,13 @@ export default {
   },
   watch: {
     visible(val) {
-      this.formdata = this.editData
+      this.formdata = Object.assign({}, this.formdata, this.editData);
       this.isOpen = val;
-    },
-
+    }
   },
   methods: {
     handleClick() {
-      this.$refs['cuisineManageForm'].resetFields();
-      
+      this.$refs["cuisineManageForm"].resetFields();
     },
     handleClose() {
       this.$emit("closeDialog", false);
