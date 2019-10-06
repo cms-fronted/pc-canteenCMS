@@ -39,6 +39,7 @@
             :on-preview="handlePictureCardPreview"
             :on-remove="handleRemove"
             :on-success="handleSuccess"
+            :class="{hide:hideUpload}"
           >
             <i class="el-icon-plus"></i>
           </el-upload>
@@ -102,6 +103,7 @@ export default {
     },
     handleClose() {
       this.$emit("closeDialog", false);
+      this.formdata = {};
     },
     handleRemove(file, fileList) {
       console.log(file, fileList);

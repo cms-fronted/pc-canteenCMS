@@ -42,7 +42,9 @@ import {
   Divider,
   Image,
   Radio,
-  RadioGroup
+  RadioGroup,
+  Checkbox,
+  CheckboxGroup,
 } from "element-ui";
 Message.install = () => {
   Vue.prototype.$message = Message;
@@ -54,6 +56,8 @@ Notification.install = () => {
   Vue.prototype.$notify = Notification;
 };
 
+Vue.use(Checkbox);
+Vue.use(CheckboxGroup);
 Vue.use(RadioGroup);
 Vue.use(Radio);
 Vue.use(Image);

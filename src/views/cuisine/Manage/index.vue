@@ -119,6 +119,7 @@ export default {
       console.log(o);
     },
     closeDialog(val) {
+      this.editData = {};
       this.visible = val;
     },
     addCuisine() {

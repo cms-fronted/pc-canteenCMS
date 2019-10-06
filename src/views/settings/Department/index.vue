@@ -40,7 +40,10 @@
             <el-table-column label="二维码有效周期" prop="expiry_date"></el-table-column>
             <el-table-column label="新增人员" prop="new">
               <template slot-scope="scoped">
-                <el-button size="mini" @click="edit(scoped.row)">新增</el-button>
+                <el-button size="mini" @click="edit(scoped.row)">编辑</el-button>
+                <el-button size="mini" @click="edit(scoped.row)">移动</el-button>
+                <el-button size="mini" @click="edit(scoped.row)">删除</el-button>
+                <el-button size="mini" @click="edit(scoped.row)">生成二维码</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -49,29 +52,40 @@
     </div>
 
     <el-dialog title="新增员工" width="30%" :visible.sync="addVisible" :close-on-click-modal="false">
-      <el-form :model="addFormData" label-width="100px">
-        <el-form-item label="归属饭堂">
-          <el-radio-group v-model="addFormData.c_id">
-            <el-radio :label="1">A饭堂</el-radio>
-            <el-radio :label="2">B饭堂</el-radio>
-            <el-radio :label="3">C饭堂</el-radio>
-          </el-radio-group>
+      <el-form :model="addFormData" ref="addFormData" label-width="100px">
+        <el-form-item label="归属饭堂" prop="canteens">
+          <!-- <el-radio-group v-model="addFormData.canteens" @change="selectCanteens">
+            <el-radio label="2">大饭堂</el-radio>
+            <el-radio label="3">饭堂1</el-radio>
+            <el-radio label="4">饭堂2</el-radio>
+          </el-radio-group>-->
+          <el-checkbox-group v-model="canteens" @change="chooseCanteen">
+            <el-checkbox :label="2">大饭堂</el-checkbox>
+            <el-checkbox :label="3">饭堂1</el-checkbox>
+            <el-checkbox :label="4">饭堂2</el-checkbox>
+          </el-checkbox-group>
         </el-form-item>
-        <el-form-item label="人员类型">
+        <el-form-item label="人员类型" prop="t_id">
           <el-select v-model="addFormData.t_id">
             <el-option
-              v-for="item in options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
+              v-for="item in roleOptions"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
             ></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="员工编号">
-          <el-input v-model="addFormData.card_num"></el-input>
+        <el-form-item label="员工编号" prop="code">
+          <el-input v-model="addFormData.code"></el-input>
         </el-form-item>
-        <el-form-item label="手机号码">
+        <el-form-item label="员工姓名" prop="username">
+          <el-input v-model="addFormData.username"></el-input>
+        </el-form-item>
+        <el-form-item label="手机号码" prop="phone">
           <el-input v-model="addFormData.phone"></el-input>
+        </el-form-item>
+        <el-form-item label="卡号" prop="card_num">
+          <el-input v-model="addFormData.card_num"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -84,18 +98,21 @@
 
 <script>
 import { mapState } from "vuex";
+import $axios from "@/api/index";
 export default {
   data() {
     return {
       addVisible: false,
+      canteens: [],
       addFormData: {
-        c_id: "",
+        company_id: 2,
+        canteens: [],
         d_id: "",
         t_id: "",
         code: "",
-        name: "",
         phone: "",
-        card_num: ""
+        card_num: "",
+        username: ""
       },
       treeData: [],
       defaultProps: {
@@ -109,7 +126,8 @@ export default {
           label: "黄金糕"
         }
       ],
-      tabledata: []
+      tabledata: [],
+      roleOptions: []
     };
   },
   computed: {
@@ -120,23 +138,43 @@ export default {
   created() {
     this.fetchTreeData();
     this.fetchTabledata();
+    this.getRole();
   },
   methods: {
+    chooseCanteen(val) {
+      this.addFormData.canteens = [];
+      let _canteen = [];
+      val.forEach(item => {
+        _canteen.push({
+          canteen_id: item
+        });
+      });
+      this.addFormData.canteens = JSON.stringify(_canteen);
+    },
     handleNodeClick(data) {
+      this.addFormData.d_id = data.id;
+    },
+    getRole() {
+      $axios
+        .get("/v1/role/types")
+        .then(res => {
+          this.roleOptions = res.data.data;
+        })
+        .catch(err => console.log(err));
     },
     fetchTreeData() {
-      this.$axios
+      $axios
         .get("/v1/departments?c_id=2")
         .then(res => {
-          this.treeData = res.data.data;
+          this.treeData = Array.from(res.data);
         })
         .catch(err => console.log(err));
     },
     fetchTabledata() {
-      this.$axios
-        .get("/v1/staffs?page=1&size=10&c_id=2&d_id=4")
+      $axios
+        .get("/v1/staffs?page=1&size=10&c_id=2&d_id=3")
         .then(res => {
-          this.tabledata = Array.from(res.data.data.data);
+          this.tabledata = Array.from(res.data.data);
         })
         .catch(err => console.log(err));
     },
@@ -150,7 +188,16 @@ export default {
       this.addVisible = false;
     },
     _add() {
-      console.log(this.addFormData);
+      $axios
+        .post("/v1/department/staff/save", this.addFormData)
+        .then(res => {
+          if (res.msg == "ok") {
+            this.addVisible = false;
+            this.$message.success("添加成功");
+            this.$refs.addFormData.resetFields();
+          }
+        })
+        .catch(err => console.log(err));
     }
   }
 };
