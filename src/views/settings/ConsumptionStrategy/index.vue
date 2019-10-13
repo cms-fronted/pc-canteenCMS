@@ -9,73 +9,12 @@
       border
       style="width: 100%"
     >
-      <!--:span-method="objectSpanMethod"-->
-      <!-- <el-table-column type="expand">
-        <template slot-scope="props">
-          <el-table :data="props.row.detail" style="width:100%">
-            <el-table-column prop="number" label="次数类型" align="center"></el-table-column>
-            <el-table-column prop="satus" label="消费状态" align="center">
-              <template slot-scope="scope">
-                <ul>
-                  <li
-                    v-for="(item,index) in scope.row.strategy"
-                    :key="index"
-                    style="height:36px;line-height:36px"
-                  >
-                    {{item.satus | consumptionType}}
-                    <hr
-                      style="margin:0; margin-left:-10px; border: none; height:1px; background-color:#EBEEF5; width:110%"
-                    />
-                  </li>
-                </ul>
-              </template>
-            </el-table-column>
-            <el-table-column label="金额" align="center">
-              <template slot-scope="scope">
-                <ul>
-                  <li
-                    v-for="(item,index) in scope.row.strategy"
-                    :key="index"
-                    style="height:36px;line-height:36px"
-                  >
-                    标准金额:{{item.money}}元
-                    附加金额:{{item.money}}元
-                    <hr
-                      style="margin:0; margin-left:-10px; border: none; height:1px; background-color:#EBEEF5; width:110%"
-                    />
-                  </li>
-                </ul>
-              </template>
-            </el-table-column>
-          </el-table>
-        </template>
-      </el-table-column>-->
-      <el-table-column prop="canteen" label="消费地点" width="180">
-        <!-- <template slot-scope="scope">
-          <span>{{scope.row.canteen.name}}</span>
-        </template>-->
-      </el-table-column>
-      <el-table-column prop="role" label="人员类型" width="180">
-        <!-- <template slot-scope="scope">
-          <span>{{scope.row.role.name}}</span>
-        </template>-->
-      </el-table-column>
-      <el-table-column prop="dinner" label="餐饮">
-        <!-- <template slot-scope="scope">
-          <span>{{scope.row.dinner.name}}</span>
-        </template>-->
-      </el-table-column>
-      <el-table-column prop="unordered_meals" label="免订餐就餐">
-        <!-- <template slot-scope="scope">
-          <span>{{scope.row.unordered_meals}}</span>
-        </template>-->
-      </el-table-column>
+      <el-table-column prop="canteen" label="消费地点" width="180"></el-table-column>
+      <el-table-column prop="role" label="人员类型" width="180"></el-table-column>
+      <el-table-column prop="dinner" label="餐饮"></el-table-column>
+      <el-table-column prop="unordered_meals" label="免订餐就餐"></el-table-column>
       <el-table-column prop="no_meals_ordered" label="未定餐允许就餐"></el-table-column>
-      <el-table-column prop="consumption_count" label="允许消费次数">
-        <!-- <template slot-scope="scope">
-          <span>{{scope.row.consumption_count }}</span>
-        </template>-->
-      </el-table-column>
+      <el-table-column prop="consumption_count" label="允许消费次数"></el-table-column>
       <el-table-column prop="status" label="消费状态">
         <template slot-scope="scope">
           <span>{{scope.row.status | consumptionType}}</span>
@@ -215,7 +154,6 @@ export default {
     handleData() {
       let _data = [];
       this.budgetList.forEach(i => {
-        console.log(i);
         i.detail.forEach(j => {
           j.strategy.forEach(k => {
             _data.push({
