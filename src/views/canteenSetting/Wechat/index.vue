@@ -51,6 +51,18 @@
           <el-button type="primary" @click="handleConfirm">确 定</el-button>
         </span>
       </el-dialog>
+      <!-- 删除时温馨提示 -->
+      <el-dialog
+        title="温馨提示"
+        :visible.sync="TipDialogVisible"
+        width="30%"
+      >
+        <span>确定删除该类型吗？</span>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="TipDialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="confirmDelete">确 定</el-button>
+        </span>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -68,6 +80,8 @@ export default {
         name: ""
       },
       tableList: [],
+      TipDialogVisible: false,
+      currentGoodsId : ""
     }
   },
   created(){
@@ -95,8 +109,12 @@ export default {
         .post("/v1/category/save",this.goodsForm)
         .then(res => {
           this.AddVisible = false;
+          this.goodsForm = {
+            c_id: "",
+            name: ""
+          }
           this.fetchTableList();
-          alert("增加商品类型成功");
+          // alert("增加商品类型成功");
         })
         .catch(err => console.log(err));
     },
@@ -108,22 +126,28 @@ export default {
       };
     },
     handleEdit(val){
+      
+
       console.log(val);
     },
     handleDelete(val){
+      this.currentGoodsId = val.id;
+      this.TipDialogVisible = true;
+    },
+    confirmDelete(){
       $axios
         .post("/v1/category/delete",{
-          id: val.id
+          id: this.currentGoodsId
         })
         .then(res => {
           console.log(res);
-          // confirm 可能需要换成 dialog
-          confirm("确定要删除该类型吗？");
+          this.TipDialogVisible = false;
           this.fetchTableList();
-          // alert("增加商品类型成功");
+          alert("你已成功删除");
         })
         .catch(err => console.log(err));
     }
+    // TipDialogVisible = false
   }
 }
 </script>
