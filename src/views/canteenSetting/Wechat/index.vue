@@ -33,7 +33,7 @@
         </div>
       </div>
       <el-dialog :visible.sync="AddVisible" title="增加商品类型">
-        <el-form ref="addgoodsForm" label-width="100px">
+        <el-form ref="addGoodsForm" label-width="100px">
           <el-form-item label="公司">
             <el-select
               placeholder="请选择"
@@ -49,6 +49,28 @@
         <span slot="footer" class="dialog-footer">
           <el-button @click="handleClose">取 消</el-button>
           <el-button type="primary" @click="handleConfirm">确 定</el-button>
+        </span>
+      </el-dialog>
+      <!-- 更改商品类型  dialog-->
+      <el-dialog :visible.sync="reviseVisible" title="更改商品类型">
+        <el-form ref="reviseGoodsForm" label-width="100px">
+          <el-form-item label="公司">
+            <el-select
+              placeholder="请选择"
+              v-model="currentCompanyId"
+              disabled
+            >
+              <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="商品类型">
+            <el-input placeholder="请输入" v-model="reviseForm.name"></el-input>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="reviseVisible = false">取 消</el-button>
+           <!-- @click="handleConfirm" -->
+          <el-button type="primary" @click="ConfirmRevise">确 定</el-button>
         </span>
       </el-dialog>
       <!-- 删除时温馨提示 -->
@@ -79,9 +101,15 @@ export default {
         c_id: "",
         name: ""
       },
+      reviseForm:{
+        id: "",
+        name: ""
+      },
       tableList: [],
       TipDialogVisible: false,
-      currentGoodsId : ""
+      currentGoodsId : "",
+      reviseVisible: false,
+      currentCompanyId: ""
     }
   },
   created(){
@@ -126,9 +154,19 @@ export default {
       };
     },
     handleEdit(val){
-      
-
-      console.log(val);
+      this.reviseForm.id = val.id;
+      this.reviseForm.name = val.name;
+      this.currentCompanyId = val.c_id;
+      this.reviseVisible = true;
+    },
+    ConfirmRevise(){
+      $axios
+        .post("/v1/category/update",this.reviseForm)
+        .then(res => {
+          this.reviseVisible = false;
+          this.fetchTableList();
+        })
+        .catch(err => console.log(err));
     },
     handleDelete(val){
       this.currentGoodsId = val.id;
@@ -140,14 +178,12 @@ export default {
           id: this.currentGoodsId
         })
         .then(res => {
-          console.log(res);
           this.TipDialogVisible = false;
           this.fetchTableList();
           alert("你已成功删除");
         })
         .catch(err => console.log(err));
     }
-    // TipDialogVisible = false
   }
 }
 </script>
