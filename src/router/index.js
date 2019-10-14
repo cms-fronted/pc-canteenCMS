@@ -362,6 +362,34 @@ export const currencyRoutes = [
         component: () => import('@/views/configuring/EnterpriseManage')
       }
     ]
+  },
+  {
+    path: '/canteenSetting',
+    name: 'CanteenSetting',
+    redirect: '/canteenSetting/wechat',
+    component: Layout,
+    meta: {
+      title: '小卖部设置',
+      icon: 'el-icon-coffee'
+    },
+    children: [
+      {
+        path: 'wechat',
+        name: 'CanteenSetting-wechat',
+        component: () => import('@/views/canteenSetting/Wechat'),
+        meta: {
+          title: '微信端设置'
+        },
+      },
+      {
+        path: 'supplier',
+        name: 'CanteenSetting-supplier',
+        component: () => import('@/views/canteenSetting/SupplierManagement'),
+        meta: {
+          title: '供应商管理'
+        },
+      }
+    ]
   }
 ]
 export const asyncRoutes = [
