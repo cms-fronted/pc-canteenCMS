@@ -6,8 +6,8 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build"
   },
-  "proxy":{
-    "/v1":"http://canteen.tonglingok.com/api/v1/"
+  "proxy": {
+    "/v1": "http://canteen.tonglingok.com/api/v1/"
   },
   "dependencies": {
     "animate.css": "^3.7.2",
