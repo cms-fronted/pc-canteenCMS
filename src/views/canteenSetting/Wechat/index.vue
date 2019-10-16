@@ -16,7 +16,7 @@
           </div>
           <div class="btn-area">
             <el-button type="primary" @click="fetchTableList">查询商品类型</el-button>
-            <el-button type="primary" @click="AddVisible = true">增加商品类型</el-button>
+            <el-button type="primary" @click="addGoods">增加商品类型</el-button>
           </div>
         </div>
         <div class="main-content">
@@ -32,48 +32,19 @@
           </el-table>
         </div>
       </div>
-      <!--  -->
-      <el-dialog :visible.sync="AddVisible" title="增加商品类型" class="add-goods-form">
-        <el-form ref="addGoodsForm" label-width="100px">
-          <el-form-item label="公司">
-            <el-select
-              placeholder="请选择"
-              v-model="goodsForm.c_id"
-            >
-              <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="商品类型">
-            <el-input placeholder="请输入" v-model="goodsForm.name" style="width: 217px;"></el-input>
-          </el-form-item>
-        </el-form>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="handleClose">取 消</el-button>
-          <el-button type="primary" @click="handleConfirm">确 定</el-button>
-        </span>
-      </el-dialog>
-      <!-- 更改商品类型  dialog-->
-      <el-dialog :visible.sync="reviseVisible" title="更改商品类型">
-        <el-form ref="reviseGoodsForm" label-width="100px">
-          <el-form-item label="公司">
-            <el-select
-              placeholder="请选择"
-              v-model="currentCompanyId"
-              disabled
-            >
-              <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
-            </el-select>
-          </el-form-item>
-          <el-form-item label="商品类型">
-            <el-input placeholder="请输入" v-model="reviseForm.name"></el-input>
-          </el-form-item>
-        </el-form>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="reviseVisible = false">取 消</el-button>
-           <!-- @click="handleConfirm" -->
-          <el-button type="primary" @click="ConfirmRevise">确 定</el-button>
-        </span>
-      </el-dialog>
+      <!-- 增加商品类型弹窗  -->
+      <add-dialog 
+        :visible="AddVisible" 
+        @closeDialog1="closeDialog1" 
+        :editData="goodsForm"
+      ></add-dialog>
+      <!-- 更改商品类型弹窗 -->
+      <revise-dialog 
+        :visible="reviseVisible" 
+        @closeDialog2="closeDialog2" 
+        :editData="reviseForm"
+        :c_id="currentCompanyId"
+      ></revise-dialog>
       <!-- 删除时温馨提示 -->
       <el-dialog
         title="温馨提示"
@@ -92,6 +63,8 @@
 
 <script>
 import $axios from "@/api/index";
+import AddDialog from "./dialog1";
+import ReviseDialog from "./dialog2";
 export default {
   data(){
     return {
@@ -110,9 +83,10 @@ export default {
       TipDialogVisible: false,
       currentGoodsId : "",
       reviseVisible: false,
-      currentCompanyId: ""
+      currentCompanyId: "",
     }
   },
+  components: { AddDialog,ReviseDialog },
   created(){
     this.fetchCompanyList();
   },
@@ -133,51 +107,11 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    handleConfirm(){
-      $axios
-        .post("/v1/category/save",this.goodsForm)
-        .then(res => {
-          this.AddVisible = false;
-          this.goodsForm = {
-            c_id: "",
-            name: ""
-          };
-          this.fetchTableList();
-          if(res.msg === 'ok'){
-            this.$message({
-              type: "success",
-              message: "添加成功!"
-            });
-          }else {
-            this.$message({
-              type: "info",
-              message: "操作失败"
-            })
-          }
-        })
-        .catch(err => console.log(err));
-    },
-    handleClose(){
-      this.AddVisible = false;
-      this.goodsForm = {
-        c_id: "",
-        name: ""
-      };
-    },
     handleEdit(val){
       this.reviseForm.id = val.id;
       this.reviseForm.name = val.name;
       this.currentCompanyId = val.c_id;
       this.reviseVisible = true;
-    },
-    ConfirmRevise(){
-      $axios
-        .post("/v1/category/update",this.reviseForm)
-        .then(res => {
-          this.reviseVisible = false;
-          this.fetchTableList();
-        })
-        .catch(err => console.log(err));
     },
     handleDelete(val){
       this.currentGoodsId = val.id;
@@ -191,19 +125,47 @@ export default {
         .then(res => {
           this.TipDialogVisible = false;
           this.fetchTableList();
-          if(res.msg === 'ok'){
-            this.$message({
-              type: "success",
-              message: "你已成功删除!"
-            });
-          }else {
-            this.$message({
-              type: "info",
-              message: "操作失败"
-            })
-          }
+          this.sendMessage(res.msg);
         })
         .catch(err => console.log(err));
+    },
+    addGoods(){
+      this.AddVisible = true;
+    },
+    sendMessage(msg){
+      if(msg === 'ok'){
+        this.$message({
+          type: "success",
+          message: "操作成功!"
+        });
+      }else {
+        this.$message({
+          type: "info",
+          message: "操作失败"
+        })
+      }
+    },
+    closeDialog1(val,msg){
+      this.goodsForm = {
+        c_id: "",
+        name: ""
+      };
+      this.AddVisible = val;
+      if(msg === 'ok'){
+        this.fetchTableList();
+        this.sendMessage(msg);
+      }
+    },
+    closeDialog2(val,msg){
+      this.reviseForm = {
+        id: "",
+        name: ""
+      };
+      this.reviseVisible = val;
+      if(msg === 'ok'){
+        this.fetchTableList();
+        this.sendMessage(msg);
+      }
     }
   }
 }
