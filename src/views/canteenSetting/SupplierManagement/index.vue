@@ -32,51 +32,16 @@
             </el-table-column>
           </el-table>
         </div>
-        <!-- 新增供应商 -->
-        <el-dialog :visible.sync="addSupplierVisible" title="新增供应商">
-          <el-form ref="addSupplierForm" label-width="100px">
-            <el-form-item label="公司">
-              <el-select
-                placeholder="请选择"
-                v-model="addSupplierForm.c_id"
-                style="width: 265px;"
-              >
-                <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="供应商">
-              <el-input placeholder="请输入" v-model="addSupplierForm.name"></el-input>
-            </el-form-item>
-            <el-form-item label="账号">
-              <el-input placeholder="请输入" v-model="addSupplierForm.account"></el-input>
-            </el-form-item>
-            <el-form-item label="密码">
-              <el-input placeholder="请输入" type="password" v-model="addSupplierForm.pwd"></el-input>
-            </el-form-item>
-          </el-form>
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="addSupplierVisible = false">取 消</el-button>
-            <el-button type="primary" @click="addSupplier">确 定</el-button>
-          </span>
-        </el-dialog>
-        <!-- 更新供应商 -->
-        <el-dialog :visible.sync="reviseSupplierVisible" title="编辑供应商">
-          <el-form ref="ReviseSupplierForm" label-width="100px">
-            <el-form-item label="供应商">
-              <el-input placeholder="请输入" v-model="reviseSupplierForm.name"></el-input>
-            </el-form-item>
-            <el-form-item label="账号">
-              <el-input placeholder="请输入" v-model="reviseSupplierForm.account"></el-input>
-            </el-form-item>
-            <el-form-item label="密码">
-              <el-input placeholder="请输入" v-model="reviseSupplierForm.pwd" type="password"></el-input>
-            </el-form-item>
-          </el-form>
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="reviseSupplierVisible = false">取 消</el-button>
-            <el-button type="primary" @click="reviseSupplier">确 定</el-button>
-          </span>
-        </el-dialog>
+        <add-dialog 
+          :visible="addVisible" 
+          @closeDialog1="closeDialog1" 
+          :editData="addSupplierForm"
+        ></add-dialog>
+        <revise-dialog 
+          :visible="reviseVisible" 
+          @closeDialog2="closeDialog2" 
+          :editData="reviseSupplierForm"
+        ></revise-dialog>
         <!-- 删除时温馨提示 -->
         <el-dialog
           title="温馨提示"
@@ -96,6 +61,8 @@
 
 <script>
 import $axios from "@/api/index";
+import AddDialog from "./dialog1";
+import ReviseDialog from "./dialog2";
 export default {
   data(){
     return {
@@ -114,12 +81,13 @@ export default {
         "account": "",
         "pwd": ""
       },
-      addSupplierVisible: false,
-      reviseSupplierVisible: false,
+      addVisible: false,
+      reviseVisible: false,
       TipDialogVisible: false,
       currentSupplierId: ""
     }
   },
+  components: { AddDialog,ReviseDialog },
   created(){
     this.fetchCompanyList();
   },
@@ -141,45 +109,13 @@ export default {
         .catch(err => console.log(err));
     },
     showAddSupplier(){
-      this.addSupplierVisible = true;
-    },
-    addSupplier(){
-       $axios
-        .post('/v1/supplier/save',this.addSupplierForm)
-        .then(res => {
-          this.addSupplierVisible = false;
-          this.addSupplierForm = {
-            "c_id": "",
-            "name": "",
-            "account": "",
-            "pwd": ""
-          }
-          this.sendMessage(res.msg);
-          this.fetchSupplierList();
-        })
-        .catch(err => console.log(err));
+      this.addVisible = true;
     },
     handleEdit(val){
-      this.reviseSupplierVisible = true;
+      this.reviseVisible = true;
       this.reviseSupplierForm.id = val.id;
       this.reviseSupplierForm.name = val.name;
       this.reviseSupplierForm.account = val.account;
-    },
-    reviseSupplier(){
-      $axios
-        .post('/v1/supplier/update',this.reviseSupplierForm)
-        .then(res => {
-          this.reviseSupplierVisible = false;
-          this.reviseSupplierForm = {
-            "id": "",
-            "name": "",
-            "account": "",
-            "pwd": ""
-          }
-          this.fetchSupplierList();
-          this.sendMessage(res.msg);
-        })
-        .catch(err => console.log(err));
     },
     handleDelete(val){
       this.currentSupplierId = val.id;
@@ -209,6 +145,32 @@ export default {
           message: "操作失败"
         })
       }
+    },
+    closeDialog1(val,msg){
+      this.addSupplierForm = {
+        "c_id": "",
+        "name": "",
+        "account": "",
+        "pwd": ""
+      }
+      this.addVisible = val;
+      if(msg === 'ok'){
+        this.fetchSupplierList();
+        this.sendMessage(msg);
+      }
+    },
+    closeDialog2(val,msg){
+      this.reviseSupplierForm = {
+        "id": "",
+        "name": "",
+        "account": "",
+        "pwd": ""
+      }
+      this.reviseVisible = val;
+      if(msg === 'ok'){
+        this.fetchSupplierList();
+        this.sendMessage(msg);
+      }
     }
   }
 }
@@ -227,14 +189,6 @@ export default {
         }
       }
     }
-    
-    // .el-dialog__wrapper{
-    //   .el-form-item{
-    //     .el-input{
-    //       width: 217px;
-    //     }
-    //   }
-    // }
   }
   .supplier{
       .el-dialog__wrapper{
