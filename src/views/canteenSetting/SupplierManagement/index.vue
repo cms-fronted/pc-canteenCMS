@@ -39,6 +39,7 @@
               <el-select
                 placeholder="请选择"
                 v-model="addSupplierForm.c_id"
+                style="width: 265px;"
               >
                 <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
               </el-select>
@@ -50,7 +51,7 @@
               <el-input placeholder="请输入" v-model="addSupplierForm.account"></el-input>
             </el-form-item>
             <el-form-item label="密码">
-              <el-input placeholder="请输入" v-model="addSupplierForm.pwd"></el-input>
+              <el-input placeholder="请输入" type="password" v-model="addSupplierForm.pwd"></el-input>
             </el-form-item>
           </el-form>
           <span slot="footer" class="dialog-footer">
@@ -68,7 +69,7 @@
               <el-input placeholder="请输入" v-model="reviseSupplierForm.account"></el-input>
             </el-form-item>
             <el-form-item label="密码">
-              <el-input placeholder="请输入" v-model="reviseSupplierForm.pwd"></el-input>
+              <el-input placeholder="请输入" v-model="reviseSupplierForm.pwd" type="password"></el-input>
             </el-form-item>
           </el-form>
           <span slot="footer" class="dialog-footer">
@@ -146,7 +147,6 @@ export default {
        $axios
         .post('/v1/supplier/save',this.addSupplierForm)
         .then(res => {
-          console.log(res);
           this.addSupplierVisible = false;
           this.addSupplierForm = {
             "c_id": "",
@@ -154,6 +154,7 @@ export default {
             "account": "",
             "pwd": ""
           }
+          this.sendMessage(res.msg);
           this.fetchSupplierList();
         })
         .catch(err => console.log(err));
@@ -168,7 +169,6 @@ export default {
       $axios
         .post('/v1/supplier/update',this.reviseSupplierForm)
         .then(res => {
-          console.log(res);
           this.reviseSupplierVisible = false;
           this.reviseSupplierForm = {
             "id": "",
@@ -177,6 +177,7 @@ export default {
             "pwd": ""
           }
           this.fetchSupplierList();
+          this.sendMessage(res.msg);
         })
         .catch(err => console.log(err));
     },
@@ -192,9 +193,22 @@ export default {
         .then(res => {
           this.TipDialogVisible = false;
           this.fetchSupplierList();
-          alert("你已成功删除");
+          this.sendMessage(res.msg);
         })
         .catch(err => console.log(err));
+    },
+    sendMessage(msg){
+      if(msg === 'ok'){
+        this.$message({
+          type: "success",
+          message: "操作成功!"
+        });
+      }else {
+        this.$message({
+          type: "info",
+          message: "操作失败"
+        })
+      }
     }
   }
 }
@@ -213,6 +227,7 @@ export default {
         }
       }
     }
+    
     // .el-dialog__wrapper{
     //   .el-form-item{
     //     .el-input{
@@ -221,4 +236,11 @@ export default {
     //   }
     // }
   }
+  .supplier{
+      .el-dialog__wrapper{
+        .el-dialog{
+          width: 30%;
+        }
+      }
+    }
 </style>
