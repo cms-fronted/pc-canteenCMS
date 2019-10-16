@@ -32,7 +32,8 @@
           </el-table>
         </div>
       </div>
-      <el-dialog :visible.sync="AddVisible" title="增加商品类型">
+      <!--  -->
+      <el-dialog :visible.sync="AddVisible" title="增加商品类型" class="add-goods-form">
         <el-form ref="addGoodsForm" label-width="100px">
           <el-form-item label="公司">
             <el-select
@@ -43,7 +44,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="商品类型">
-            <el-input placeholder="请输入" v-model="goodsForm.name"></el-input>
+            <el-input placeholder="请输入" v-model="goodsForm.name" style="width: 217px;"></el-input>
           </el-form-item>
         </el-form>
         <span slot="footer" class="dialog-footer">
@@ -140,9 +141,19 @@ export default {
           this.goodsForm = {
             c_id: "",
             name: ""
-          }
+          };
           this.fetchTableList();
-          // alert("增加商品类型成功");
+          if(res.msg === 'ok'){
+            this.$message({
+              type: "success",
+              message: "添加成功!"
+            });
+          }else {
+            this.$message({
+              type: "info",
+              message: "操作失败"
+            })
+          }
         })
         .catch(err => console.log(err));
     },
@@ -180,7 +191,17 @@ export default {
         .then(res => {
           this.TipDialogVisible = false;
           this.fetchTableList();
-          alert("你已成功删除");
+          if(res.msg === 'ok'){
+            this.$message({
+              type: "success",
+              message: "你已成功删除!"
+            });
+          }else {
+            this.$message({
+              type: "info",
+              message: "操作失败"
+            })
+          }
         })
         .catch(err => console.log(err));
     }
@@ -189,6 +210,13 @@ export default {
 </script>
 
 <style lang="scss" scpoed>
+  .wechat{
+    .el-dialog__wrapper{
+      .el-dialog{
+        width: 30%;
+      }
+    }
+  }
   .main{
     .main-header{
       display: flex;
