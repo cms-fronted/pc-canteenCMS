@@ -5,12 +5,13 @@
         <el-select
           placeholder="请选择"
           v-model="goodsForm.c_id"
+          style="width: 265px;"
         >
           <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="商品类型">
-        <el-input placeholder="请输入" v-model="goodsForm.name" style="width: 217px;"></el-input>
+        <el-input placeholder="请输入" v-model="goodsForm.name"></el-input>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">

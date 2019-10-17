@@ -31,7 +31,6 @@
               </template>
             </el-table-column>
           </el-table>
-          <!--  @pagination="xxx" -->
           <pagination v-show="total > 10" :total="total" :page.sync="page" @pagination="getList"></pagination>
         </div>
         <add-dialog 

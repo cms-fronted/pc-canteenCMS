@@ -30,14 +30,7 @@
               </template>
             </el-table-column>
           </el-table>
-          <div class="pagination-container">
-            <el-pagination
-              v-show="total > 10"
-              background
-              layout="prev, pager, next"
-              :total="total"
-              @current-change="handleClickPage">
-            </el-pagination>
+          <pagination v-show="total > 10" :total="total" :page.sync="page" @pagination="getList"></pagination>
           </div>
         </div>
       </div>
@@ -74,6 +67,7 @@
 import $axios from "@/api/index";
 import AddDialog from "./dialog1";
 import ReviseDialog from "./dialog2";
+import Pagination from '@/components/Pagination'
 export default {
   data(){
     return {
@@ -94,10 +88,10 @@ export default {
       reviseVisible: false,
       currentCompanyId: "",
       total: 0,
-      current_page: 1
+      page: 1,
     }
   },
-  components: { AddDialog,ReviseDialog },
+  components: { AddDialog,ReviseDialog,Pagination },
   created(){
     this.fetchCompanyList();
   },
@@ -112,7 +106,7 @@ export default {
     },
     fetchTableList(){
       $axios
-        .get(`/v1/categories?c_id=${this.company_id}&page=${this.current_page}&size=10`)
+        .get(`/v1/categories?c_id=${this.company_id}&page=${this.page}&size=10`)
         .then(res => {
           this.tableList = Array.from(res.data.data);
           this.total = res.data.total;
@@ -179,8 +173,8 @@ export default {
         this.sendMessage(msg);
       }
     },
-    handleClickPage(val){
-      this.current_page = val;
+    getList(val){
+      this.page = val;
       this.fetchTableList();
     }
   }
@@ -188,13 +182,6 @@ export default {
 </script>
 
 <style lang="scss" scpoed>
-  .wechat{
-    .el-dialog__wrapper{
-      .el-dialog{
-        width: 30%;
-      }
-    }
-  }
   .main{
     .main-header{
       display: flex;
@@ -207,13 +194,10 @@ export default {
         }
       }
     }
-    .pagination-container{
-      width: 100%;
-      display: flex;
-      justify-content: center;
-    }
-    .el-pagination {
-      margin-top: 15px;
+  }
+  .el-dialog__wrapper{
+    .el-dialog{
+      width: 30%;
     }
   }
 </style>

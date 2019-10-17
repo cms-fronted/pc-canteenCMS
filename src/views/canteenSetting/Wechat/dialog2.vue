@@ -5,6 +5,7 @@
         <el-select
           placeholder="请选择"
           v-model="company_id"
+          style="width: 265px;"
         >
           <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
