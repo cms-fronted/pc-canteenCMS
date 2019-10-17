@@ -30,6 +30,15 @@
               </template>
             </el-table-column>
           </el-table>
+          <div class="pagination-container">
+            <el-pagination
+              v-show="total > 10"
+              background
+              layout="prev, pager, next"
+              :total="total"
+              @current-change="handleClickPage">
+            </el-pagination>
+          </div>
         </div>
       </div>
       <!-- 增加商品类型弹窗  -->
@@ -84,6 +93,8 @@ export default {
       currentGoodsId : "",
       reviseVisible: false,
       currentCompanyId: "",
+      total: 0,
+      current_page: 1
     }
   },
   components: { AddDialog,ReviseDialog },
@@ -101,9 +112,10 @@ export default {
     },
     fetchTableList(){
       $axios
-        .get(`/v1/categories?c_id=${this.company_id}&page=1&size=10`)
+        .get(`/v1/categories?c_id=${this.company_id}&page=${this.current_page}&size=10`)
         .then(res => {
           this.tableList = Array.from(res.data.data);
+          this.total = res.data.total;
         })
         .catch(err => console.log(err));
     },
@@ -166,6 +178,10 @@ export default {
         this.fetchTableList();
         this.sendMessage(msg);
       }
+    },
+    handleClickPage(val){
+      this.current_page = val;
+      this.fetchTableList();
     }
   }
 }
@@ -190,6 +206,14 @@ export default {
           text-align: center;
         }
       }
+    }
+    .pagination-container{
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+    .el-pagination {
+      margin-top: 15px;
     }
   }
 </style>

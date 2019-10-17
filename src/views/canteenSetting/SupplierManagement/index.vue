@@ -31,6 +31,8 @@
               </template>
             </el-table-column>
           </el-table>
+          <!--  @pagination="xxx" -->
+          <pagination v-show="total > 10" :total="total" :page.sync="page" @pagination="getList"></pagination>
         </div>
         <add-dialog 
           :visible="addVisible" 
@@ -63,6 +65,7 @@
 import $axios from "@/api/index";
 import AddDialog from "./dialog1";
 import ReviseDialog from "./dialog2";
+import Pagination from '@/components/Pagination'
 export default {
   data(){
     return {
@@ -84,10 +87,12 @@ export default {
       addVisible: false,
       reviseVisible: false,
       TipDialogVisible: false,
-      currentSupplierId: ""
+      currentSupplierId: "",
+      page: 1,
+      total: 0
     }
   },
-  components: { AddDialog,ReviseDialog },
+  components: { AddDialog,ReviseDialog,Pagination },
   created(){
     this.fetchCompanyList();
   },
@@ -102,9 +107,10 @@ export default {
     },
     fetchSupplierList(){
       $axios
-        .get(`/v1/suppliers?c_id=${this.company_id}&page=1&size=10`)
+        .get(`/v1/suppliers?c_id=${this.company_id}&page=${this.page}&size=10`)
         .then(res => {
           this.supplierList = Array.from(res.data.data);
+          this.total = res.data.total;
         })
         .catch(err => console.log(err));
     },
@@ -171,6 +177,10 @@ export default {
         this.fetchSupplierList();
         this.sendMessage(msg);
       }
+    },
+    getList(val){
+      this.page = val;
+      this.fetchSupplierList();
     }
   }
 }
