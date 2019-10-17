@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :visible.sync="isOpen" title="新增供应商">
+  <el-dialog :visible.sync="isOpen" title="新增供应商"  @close="handleClose">
     <el-form ref="addSupplierForm" label-width="100px">
       <el-form-item label="公司">
         <el-select
@@ -69,15 +69,6 @@ export default {
         .post('/v1/supplier/save',this.addSupplierForm)
         .then(res => {
           this.$emit("closeDialog1", false, res.msg);
-        //   this.addVisible = false;
-          /* this.addSupplierForm = {
-            "c_id": "",
-            "name": "",
-            "account": "",
-            "pwd": ""
-          } */
-        //   this.sendMessage(res.msg);
-        //   this.fetchSupplierList();
         })
         .catch(err => console.log(err));
     }

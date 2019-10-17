@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :visible.sync="isOpen" title="编辑供应商">
+  <el-dialog :visible.sync="isOpen" title="编辑供应商"  @close="handleClose">
     <el-form ref="ReviseSupplierForm" label-width="100px">
       <el-form-item label="供应商">
         <el-input placeholder="请输入" v-model="reviseSupplierForm.name"></el-input>
