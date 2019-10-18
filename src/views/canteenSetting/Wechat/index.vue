@@ -47,18 +47,6 @@
         :editData="reviseForm"
         :c_id="currentCompanyId"
       ></revise-dialog>
-      <!-- 删除时温馨提示 -->
-      <el-dialog
-        title="温馨提示"
-        :visible.sync="TipDialogVisible"
-        width="30%"
-      >
-        <span>确定删除该类型吗？</span>
-        <span slot="footer" class="dialog-footer">
-          <el-button @click="TipDialogVisible = false">取 消</el-button>
-          <el-button type="primary" @click="confirmDelete">确 定</el-button>
-        </span>
-      </el-dialog>
     </div>
   </div>
 </template>
@@ -83,7 +71,6 @@ export default {
         name: ""
       },
       tableList: [],
-      TipDialogVisible: false,
       currentGoodsId : "",
       reviseVisible: false,
       currentCompanyId: "",
@@ -121,19 +108,22 @@ export default {
     },
     handleDelete(val){
       this.currentGoodsId = val.id;
-      this.TipDialogVisible = true;
-    },
-    confirmDelete(){
-      $axios
-        .post("/v1/category/delete",{
-          id: this.currentGoodsId
-        })
-        .then(res => {
-          this.TipDialogVisible = false;
-          this.fetchTableList();
-          this.sendMessage(res.msg);
-        })
-        .catch(err => console.log(err));
+      this.$confirm("确定删除该类型吗？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() =>{
+          $axios
+            .post("/v1/category/delete",{
+              id: this.currentGoodsId
+            })
+            .then(res => {
+              this.fetchTableList();
+              this.sendMessage(res.msg);
+            })
+            .catch(err => console.log(err));
+        }).catch((err) => {});
     },
     addGoods(){
       this.AddVisible = true;

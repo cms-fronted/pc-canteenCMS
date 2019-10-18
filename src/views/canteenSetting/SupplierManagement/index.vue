@@ -43,18 +43,6 @@
           @closeDialog2="closeDialog2" 
           :editData="reviseSupplierForm"
         ></revise-dialog>
-        <!-- 删除时温馨提示 -->
-        <el-dialog
-          title="温馨提示"
-          :visible.sync="TipDialogVisible"
-          width="30%"
-        >
-          <span>确定删除该供应商吗？</span>
-          <span slot="footer" class="dialog-footer">
-            <el-button @click="TipDialogVisible = false">取 消</el-button>
-            <el-button type="primary" @click="confirmDelete">确 定</el-button>
-          </span>
-        </el-dialog>
       </div>
     </div>
   </div>
@@ -85,7 +73,6 @@ export default {
       },
       addVisible: false,
       reviseVisible: false,
-      TipDialogVisible: false,
       currentSupplierId: "",
       page: 1,
       total: 0
@@ -124,19 +111,22 @@ export default {
     },
     handleDelete(val){
       this.currentSupplierId = val.id;
-      this.TipDialogVisible = true;
-    },
-    confirmDelete(){
-      $axios
-        .post("/v1/supplier/delete",{
-          id: this.currentSupplierId
-        })
-        .then(res => {
-          this.TipDialogVisible = false;
-          this.fetchSupplierList();
-          this.sendMessage(res.msg);
-        })
-        .catch(err => console.log(err));
+      this.$confirm("确定删除该供应商吗？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() =>{
+          $axios
+            .post("/v1/supplier/delete",{
+              id: this.currentSupplierId
+            })
+            .then(res => {
+              this.fetchSupplierList();
+              this.sendMessage(res.msg);
+            })
+            .catch(err => console.log(err));
+        }).catch((err) => {});
     },
     sendMessage(msg){
       if(msg === 'ok'){
