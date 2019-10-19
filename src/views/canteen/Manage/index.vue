@@ -15,10 +15,11 @@
           <!-- @change="getCanteenList(company_id)" -->
             <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
-          <span class="content-header">消费地点：</span>
+          <!-- 消费地点可能不需要 -->
+          <!-- <span class="content-header">消费地点：</span>
           <el-select v-model="canteen_id" placeholder="请选择" style="width:150px">
             <el-option v-for="item in canteenList" :key="item.id" :label="item.name" :value="item.id"></el-option>
-          </el-select>
+          </el-select> -->
           <span class="content-header">供应商：</span>
           <el-select v-model="supplier_id" placeholder="请选择" style="width:150px">
             <el-option v-for="item in supplierList" :key="item.id" :label="item.name" :value="item.id"></el-option>
@@ -33,7 +34,7 @@
           </div>
         </div>
         <div class="main-content">
-          <el-table style="width:100%" :data="tabledata">
+          <el-table style="width:100%" :data="tabledata" show-summary border :summary-method="getSummaries">
             <el-table-column label="图片">
               <template slot-scope="props">
                 <div style="text-align:center">
@@ -48,13 +49,14 @@
             </el-table-column>
             <el-table-column label="名称" prop="name"></el-table-column>
             <el-table-column label="类型" prop="category"></el-table-column>
-            <el-table-column label="单价"></el-table-column>
+            <el-table-column label="单位" prop="unit"></el-table-column>
+            <el-table-column label="单价" prop="price"></el-table-column>
             <el-table-column label="供应商" prop="supplier"></el-table-column>
             <el-table-column label="库存" prop="stock"></el-table-column>
             <el-table-column label="操作">
               <template slot-scope="props">
                 <el-button size="mini" @click="handleEdit(props.$index, props.row)">编辑</el-button>
-                <el-button size="mini" type="danger">删除</el-button>
+                <el-button size="mini" type="danger" @click="deleteGoods(props.$index, props.row)">删除</el-button>
                 <el-button size="mini" class="option" @click="withdraw(props.$index, props.row)">下架</el-button>
                 <el-button size="mini" class="option" @click="storage(props.row)">入库</el-button>
               </template>
@@ -142,6 +144,7 @@ export default {
       storageFormVisible: false,
       storageCount: "",
       currentProductId: "",
+      total: 2,
       tabledata: [
         {
           product_id: 6,
@@ -201,12 +204,9 @@ export default {
     },
     getSupplierList(id){
       this.supplier_id = "";
-      // .get(`/v1/suppliers?c_id=${id}&page=1&size=10`)
-      // /v1/company/suppliers?page=1&size=10
       $axios
-        .get(`/v1/suppliers?c_id=${id}&page=1&size=10`)
+        .get(`/v1/company/suppliers?company_id=${id}&page=1&size=10`)
         .then(res => {
-          // console.log(res);
           this.supplierList = res.data.data;
         })
         .catch(err => console.log(err));
@@ -214,24 +214,36 @@ export default {
     getCategoryList(id){
       this.category_id = "";
       $axios
-        .get(`/v1/categories?c_id=${id}&page=1&size=10`)
+        .get(`/v1/company/categories?company_id=${id}&page=1&size=10`)
         .then(res => {
-          this.categoryList = res.data.data;
+          this.categoryList = res.data;
         })
         .catch(err => console.log(err));
     },
     fetchTableList(){
-      console.log(1);
       // /v1/shop/cms/products?$supplier_id&category_id=1&page=1&size=10
+      // company_id=${this.company_id}&
       console.log(this.supplier_id);
       console.log(this.category_id);
       $axios
         .get(`/v1/shop/cms/products?supplier_id=${this.supplier_id}&category_id=${this.category_id}&page=1&size=10`)
         .then(res => {
+          console.log('res');
           console.log(res);
+          this.total = res.data.total;
         })
         .catch(err => console.log(err));
 
+    },
+    getSummaries(param){
+      
+      const { columns, data } = param;
+      console.log({ columns, data });
+      const sums = [];
+      sums[0] = '合计';
+      sums[7] = this.total + '种';
+      console.log(sums);
+      return sums;
     },
     handleClose(){
       this.visible = false;
@@ -246,7 +258,9 @@ export default {
       $axios
         .post(`/v1/shop/product/save`,addForm)
         .then(res => {
-          console.log(addForm);
+          console.log(res);
+          this.sendMessage(res.msg);
+          this.visible = false;
         })
         .catch(err => console.log(err));
     },
@@ -285,6 +299,27 @@ export default {
             .post("/v1/shop/product/handel",{
               "id": this.supplier_id,
               "state": 2,
+            })
+            .then(res => {
+              console.log(res);
+              // this.tabledata.splice(index,1,0);
+              this.sendMessage(res.msg);
+            })
+            .catch(err => console.log(err));
+        }).catch((err) => {});
+    },
+    deleteGoods(index, row){
+      console.log(index, row);
+      this.$confirm("请问确定删除该商品吗？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() =>{
+          $axios
+            .post("/v1/shop/product/handel",{
+              "id": this.supplier_id,
+              "state": 3,
             })
             .then(res => {
               console.log(res);
@@ -336,20 +371,27 @@ export default {
 
 <style  lang="scss" scpoed>
   .main{
+    .main-header{
+      display: flex;
+      align-items: center;
+      // justify-content: space-between;
+    }
     .main-content{
       .el-table{
         th,td{
           text-align: center;
+          
         }
       }
     }
     .main-content{
       .el-button{
         margin-left: 5px;
-      }
-      .el-button.option{
         margin-top: 5px;
       }
+      /* .el-button.option{
+        margin-top: 5px;
+      } */
     }
   }
 </style>
