@@ -87,13 +87,16 @@
         <el-button type="primary" @click="handleClick">确 定</el-button>
       </span>
     </el-dialog>
-    <!-- <revise-dialog
-      :title="title"
-      :editData="testdata"
-      :visible="testVisible"
+    <!-- test 编辑弹窗 -->
+    <revise-dialog
+      :title="reviseFormTitle"
+      :editData="reviseForm"
+      :visible="reviseVisible"
+      :disabled="true"
+      :reivseParam="reivseParam"
       @closeDialog="closeDialog"
       @confirmRevise="confirmRevise"
-    ></revise-dialog>  -->
+    ></revise-dialog> 
     <el-dialog title="入库" :visible.sync="storageFormVisible">
       <el-form>
         <el-form-item label="入库数量" label-width="80px">
@@ -135,14 +138,16 @@ export default {
         count: "",
         image : ""
       },
-      testdata: {
+      reviseForm: {
         name: "",
         price: "",
         unit: "",
-        count: "",
+        stock: "",
         image : ""
       },
-      testVisible: false,
+      reviseFormTitle: "编辑商品",
+      reviseVisible: false,
+      reivseParam: {},
       storageFormVisible: false,
       storageCount: "",
       currentProductId: "",
@@ -186,7 +191,7 @@ export default {
         .get(`/v1/shop/cms/products?supplier_id=${this.supplier_id}&category_id=${this.category_id}&page=1&size=10`)
         .then(res => {
           this.tabledata = Array.from(res.data.data);
-          console.log(this.tabledata)
+          // console.log(this.tabledata)
           this.total = res.data.total;
         })
         .catch(err => console.log(err));
@@ -210,18 +215,20 @@ export default {
         "supplier_id": this.supplier_id,
         "category_id": this.category_id,
       },this.formdata);
-      $axios
+      this.sendPostRequest("/v1/shop/product/save",addForm);
+      this.visible = false;
+      /* $axios
         .post(`/v1/shop/product/save`,addForm)
         .then(res => {
           this.sendMessage(res.msg);
           this.visible = false;
           this.fetchTableList();
         })
-        .catch(err => console.log(err));
+        .catch(err => console.log(err)); */
     },
     storage(row){
       this.storageFormVisible = true;
-      console.log(row);
+      // console.log(row);
       this.currentProductId = row.product_id;
     },
     cancelStorage(){
@@ -230,20 +237,14 @@ export default {
     },
     confirmStorage(){
       this.storageFormVisible = false;
-      $axios
-        .post('/v1/shop/stock/save',{
-          "product_id": this.currentProductId,
-          "count": this.storageCount
-        })
-        .then(res => {
-          this.fetchTableList();
-          this.sendMessage(res.msg);
-          this.storageCount = "";
-        })
-        .catch(err => console.log(err));
+      this.sendPostRequest("/v1/shop/stock/save",{
+        "product_id": this.currentProductId,
+        "count": this.storageCount
+      });
+      this.storageCount = "";
     },
     withdraw(index, row){
-      console.log(index, row);
+      // console.log(index, row);
       this.$confirm("请问确定下架该商品吗？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -274,16 +275,10 @@ export default {
         }).catch((err) => {});
     },
     changeState(id,state){
-      $axios
-        .post("/v1/shop/product/handel",{
-          "id": id,
-          "state": state,
-        })
-        .then(res => {
-          this.sendMessage(res.msg);
-          this.fetchTableList();
-        })
-        .catch(err => console.log(err));
+      this.sendPostRequest("/v1/shop/product/handel",{
+        "id": id,
+        "state": state,
+      });
     },
     sendMessage(msg){
       if(msg === 'ok'){
@@ -299,9 +294,19 @@ export default {
       }
     },
     handleEdit(index, row) {
-      this.visible = true;
-      this.title = "编辑商品";
-      console.log(index, row);
+      this.reviseVisible = true;
+      this.reviseForm = {
+        name: row.name,
+        price: row.price,
+        unit: row.unit,
+        stock: row.stock,
+        image : row.image
+      };
+      this.reivseParam = {
+        "id": row.product_id,
+        "supplier_id": this.supplier_id,
+        "category_id": this.category_id,
+      };
     },
     handleAdd() {
       this.visible = true;
@@ -321,9 +326,22 @@ export default {
         console.log(this.formdata.image);
       }
     },
-    // test
-    closeDialog(){
-
+    closeDialog(val){
+      this.reviseVisible = val;
+    },
+    confirmRevise(val){
+      this.reviseVisible = false;
+      this.sendPostRequest("/v1/shop/product/update",val);
+    },
+    // 专门负责发送 post 请求
+    sendPostRequest(url,data){
+      $axios
+        .post(url,data)
+        .then(res => {
+          this.sendMessage(res.msg);
+          this.fetchTableList();
+        })
+        .catch(err => console.log(err));
     }
   }
 };
@@ -334,7 +352,6 @@ export default {
     .main-header{
       display: flex;
       align-items: center;
-      // justify-content: space-between;
     }
     .main-content{
       .el-table{
