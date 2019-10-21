@@ -5,21 +5,6 @@
       <el-divider></el-divider>
       <div class="main">
         <div class="main-header">
-          <span class="content-header">所属公司：</span>
-          <el-select
-            v-model="company_id"
-            placeholder="请选择"
-            style="width:150px"
-            @change="getList(company_id)"
-          >
-          <!-- @change="getCanteenList(company_id)" -->
-            <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
-          </el-select>
-          <!-- 消费地点可能不需要 -->
-          <!-- <span class="content-header">消费地点：</span>
-          <el-select v-model="canteen_id" placeholder="请选择" style="width:150px">
-            <el-option v-for="item in canteenList" :key="item.id" :label="item.name" :value="item.id"></el-option>
-          </el-select> -->
           <span class="content-header">供应商：</span>
           <el-select v-model="supplier_id" placeholder="请选择" style="width:150px">
             <el-option v-for="item in supplierList" :key="item.id" :label="item.name" :value="item.id"></el-option>
@@ -40,8 +25,8 @@
                 <div style="text-align:center">
                   <img
                     style="height:100px;"
-                    src="http://canteen.tonglingok.com/static/image/20190923/e88f560bd4bce780c8410bc5d503c7fa.jpg"
-                    :alt="props.name"
+                    :src="props.row.image"
+                    :alt="props.row.name"
                     srcset
                   />
                 </div>
@@ -57,7 +42,8 @@
               <template slot-scope="props">
                 <el-button size="mini" @click="handleEdit(props.$index, props.row)">编辑</el-button>
                 <el-button size="mini" type="danger" @click="deleteGoods(props.$index, props.row)">删除</el-button>
-                <el-button size="mini" class="option" @click="withdraw(props.$index, props.row)">下架</el-button>
+                <el-button size="mini" class="option" @click="upbuild(props.$index, props.row)" v-if="props.row.state === 2">上架</el-button>
+                <el-button size="mini" class="option" @click="withdraw(props.$index, props.row)" v-if="props.row.state === 1">下架</el-button>
                 <el-button size="mini" class="option" @click="storage(props.row)">入库</el-button>
               </template>
             </el-table-column>
@@ -101,22 +87,30 @@
         <el-button type="primary" @click="handleClick">确 定</el-button>
       </span>
     </el-dialog>
+    <!-- <revise-dialog
+      :title="title"
+      :editData="testdata"
+      :visible="testVisible"
+      @closeDialog="closeDialog"
+      @confirmRevise="confirmRevise"
+    ></revise-dialog>  -->
     <el-dialog title="入库" :visible.sync="storageFormVisible">
-    <el-form>
-      <el-form-item label="入库数量" label-width="80px">
-        <el-input v-model="storageCount"></el-input>
-      </el-form-item>
-    </el-form>
-    <div slot="footer" class="dialog-footer">
-      <el-button @click="cancelStorage">取 消</el-button>
-      <el-button type="primary" @click="confirmStorage">确 定</el-button>
-    </div>
-  </el-dialog>
+      <el-form>
+        <el-form-item label="入库数量" label-width="80px">
+          <el-input v-model="storageCount"></el-input>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="cancelStorage">取 消</el-button>
+        <el-button type="primary" @click="confirmStorage">确 定</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import $axios from "@/api/index";
+import ReviseDialog from "./dialog";
 export default {
   data() {
     return {
@@ -127,10 +121,10 @@ export default {
         category: ""
       },
       companyList: [],
-      company_id: "",
-      canteen_id: "",
+      // company_id: "",
+      // canteen_id: "",
       supplier_id: "",
-      canteenList: [],
+      // canteenList: [],
       supplierList: [],
       category_id: "",
       categoryList: [],
@@ -141,32 +135,19 @@ export default {
         count: "",
         image : ""
       },
+      testdata: {
+        name: "",
+        price: "",
+        unit: "",
+        count: "",
+        image : ""
+      },
+      testVisible: false,
       storageFormVisible: false,
       storageCount: "",
       currentProductId: "",
       total: 2,
-      tabledata: [
-        {
-          product_id: 6,
-          image: "/static/image",
-          name: "鸡蛋2",
-          category: "生鲜",
-          unit: "元/500g",
-          price: "100.0",
-          stock: "100",
-          supplier: "供应商1"
-        },
-        {
-          product_id: 5,
-          image: "/static/image",
-          name: "鸡蛋1",
-          category: "生鲜",
-          unit: "元/500g",
-          price: "100.0",
-          stock: "100",
-          supplier: "供应商1"
-        }
-      ],
+      tabledata: [],
       visible: false,
       title: "",
       dialogVisible: false,
@@ -174,62 +155,38 @@ export default {
       limit: 1
     };
   },
+  components:{
+    ReviseDialog
+  },
   created() {
-    this.fetchCompanyList();
+    this.getSupplierList();
+    this.getCategoryList();
   },
   methods: {
-    fetchCompanyList(){
-      $axios
-      .get("/v1/companies")
-      .then(res => {
-        this.companyList = Array.from(res.data.data);
-      })
-      .catch(err => console.log(err));
-    },
-    getList(id){
-      this.getCanteenList(id);
-      this.getSupplierList(id);
-      this.getCategoryList(id);
-    },
-    getCanteenList(id){
-      this.canteen_id = "";
-      $axios
-        .get("/v1/canteens/company", {
-          company_id: id
-        })
-        .then(res => {
-          this.canteenList = res.data.canteens;
-        })
-        .catch(err => console.log(err));
-    },
-    getSupplierList(id){
+    getSupplierList(){
       this.supplier_id = "";
       $axios
-        .get(`/v1/company/suppliers?company_id=${id}&page=1&size=10`)
+        .get("/v1/company/suppliers?page=1&size=10")
         .then(res => {
           this.supplierList = res.data.data;
         })
         .catch(err => console.log(err));
     },
-    getCategoryList(id){
+    getCategoryList(){
       this.category_id = "";
       $axios
-        .get(`/v1/company/categories?company_id=${id}&page=1&size=10`)
+        .get("/v1/company/categories?&page=1&size=10")
         .then(res => {
           this.categoryList = res.data;
         })
         .catch(err => console.log(err));
     },
     fetchTableList(){
-      // /v1/shop/cms/products?$supplier_id&category_id=1&page=1&size=10
-      // company_id=${this.company_id}&
-      console.log(this.supplier_id);
-      console.log(this.category_id);
       $axios
         .get(`/v1/shop/cms/products?supplier_id=${this.supplier_id}&category_id=${this.category_id}&page=1&size=10`)
         .then(res => {
-          console.log('res');
-          console.log(res);
+          this.tabledata = Array.from(res.data.data);
+          console.log(this.tabledata)
           this.total = res.data.total;
         })
         .catch(err => console.log(err));
@@ -238,11 +195,10 @@ export default {
     getSummaries(param){
       
       const { columns, data } = param;
-      console.log({ columns, data });
+      // console.log({ columns, data });
       const sums = [];
       sums[0] = '合计';
       sums[7] = this.total + '种';
-      console.log(sums);
       return sums;
     },
     handleClose(){
@@ -251,16 +207,15 @@ export default {
     handleClick(){
       let addForm = {};
       Object.assign(addForm,{
-        "company_id": this.company_id,
         "supplier_id": this.supplier_id,
         "category_id": this.category_id,
       },this.formdata);
       $axios
         .post(`/v1/shop/product/save`,addForm)
         .then(res => {
-          console.log(res);
           this.sendMessage(res.msg);
           this.visible = false;
+          this.fetchTableList();
         })
         .catch(err => console.log(err));
     },
@@ -281,7 +236,7 @@ export default {
           "count": this.storageCount
         })
         .then(res => {
-          console.log(res);
+          this.fetchTableList();
           this.sendMessage(res.msg);
           this.storageCount = "";
         })
@@ -295,39 +250,40 @@ export default {
         type: "warning"
       })
         .then(() =>{
-          $axios
-            .post("/v1/shop/product/handel",{
-              "id": this.supplier_id,
-              "state": 2,
-            })
-            .then(res => {
-              console.log(res);
-              // this.tabledata.splice(index,1,0);
-              this.sendMessage(res.msg);
-            })
-            .catch(err => console.log(err));
+          this.changeState(row.product_id,2);
         }).catch((err) => {});
     },
     deleteGoods(index, row){
-      console.log(index, row);
       this.$confirm("请问确定删除该商品吗？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       })
         .then(() =>{
-          $axios
-            .post("/v1/shop/product/handel",{
-              "id": this.supplier_id,
-              "state": 3,
-            })
-            .then(res => {
-              console.log(res);
-              // this.tabledata.splice(index,1,0);
-              this.sendMessage(res.msg);
-            })
-            .catch(err => console.log(err));
+          this.changeState(row.product_id,3);
         }).catch((err) => {});
+    },
+    upbuild(index, row){
+      this.$confirm("请问确定上架该商品吗？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() =>{
+          this.changeState(row.product_id,1);
+        }).catch((err) => {});
+    },
+    changeState(id,state){
+      $axios
+        .post("/v1/shop/product/handel",{
+          "id": id,
+          "state": state,
+        })
+        .then(res => {
+          this.sendMessage(res.msg);
+          this.fetchTableList();
+        })
+        .catch(err => console.log(err));
     },
     sendMessage(msg){
       if(msg === 'ok'){
@@ -364,6 +320,10 @@ export default {
         this.formdata.image = res.data.url;
         console.log(this.formdata.image);
       }
+    },
+    // test
+    closeDialog(){
+
     }
   }
 };
@@ -389,9 +349,6 @@ export default {
         margin-left: 5px;
         margin-top: 5px;
       }
-      /* .el-button.option{
-        margin-top: 5px;
-      } */
     }
   }
 </style>
