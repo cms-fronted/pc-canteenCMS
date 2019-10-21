@@ -11,7 +11,8 @@
         <el-input v-model="formdata.price"></el-input>
       </el-form-item>
       <el-form-item label="库存">
-        <el-input v-model="formdata.stock" :disabled="disabled"></el-input>
+        <el-input v-model="formdata.stock" v-if="formdata.stock" :disabled="disabled"></el-input>
+        <el-input v-model="formdata.count" v-else :disabled="disabled"></el-input>
       </el-form-item>
       <el-form-item label="图片">
         <el-upload
@@ -38,7 +39,6 @@
 </template>
 
 <script>
-// import $axios from "@/api/index";
 export default {
   props: {
     title: {
@@ -53,7 +53,8 @@ export default {
     disabled: {
       type: Boolean,
       default: false
-    }
+    },
+    state: String
   },
   data() {
     return {
@@ -74,38 +75,42 @@ export default {
     },
     handlePictureCardPreview(file){
       this.dialogImageUrl = file.url;
-      // console.log('file.url')
-      // console.log(file.url)
+      console.log('this.dialogImageUrl')
+      console.log(this.dialogImageUrl)
       this.dialogVisible = true;
     },
     handleRemove(file, fileList){
       // console.log(file, fileList);
     },
     handleSuccess(res, file, fileList){
-      // console.log(res);
       if(res.code === 200){
         this.formdata.image = res.data.url;
       }
     },
     handleClick(){
-      this.requiredParam = Object.assign({},this.param, this.formdata);
-      this.formdata = {}
-      // console.log('this.requiredParam');
-      // console.log(this.requiredParam);
-      this.$emit('confirmRevise',this.requiredParam);
+      if(this.state === 'revise'){
+        this.requiredParam = Object.assign({},this.param, this.formdata);
+        this.formdata = {};
+        this.$emit('confirm',this.requiredParam);
+      }else if(this.state === 'add'){
+        this.$emit('confirm',this.formdata);
+        this.formdata = {};
+      }
+      
     }
   },
   watch: {
     visible(val){
       this.formdata = Object.assign({},this.formdata, this.editData);
       this.isOpen = val;
+      this.dialogImageUrl = this.formdata.image;
+      // this.dialogVisible = true;
+      console.log(this.formdata)
+      console.log(this.dialogImageUrl)
     },
     reivseParam(val){
       this.param = Object.assign({},this.param, this.reivseParam);
-    },
-    /* editData(val){
-
-    } */
+    }
   }
 };
 </script>

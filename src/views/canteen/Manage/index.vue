@@ -51,51 +51,23 @@
         </div>
       </div>
     </div>
-    <el-dialog :visible.sync="visible" :title="title">
-      <el-form label-width="80px">
-        <el-form-item label="商品名称">
-          <el-input v-model="formdata.name"></el-input>
-        </el-form-item>
-        <el-form-item label="菜品单位">
-          <el-input v-model="formdata.unit"></el-input>
-        </el-form-item>
-        <el-form-item label="菜品单价">
-          <el-input v-model="formdata.price"></el-input>
-        </el-form-item>
-        <el-form-item label="库存">
-          <el-input v-model="formdata.count"></el-input>
-        </el-form-item>
-        <el-form-item label="图片">
-          <el-upload
-            action="http://canteen.tonglingok.com/api/v1/image/upload"
-            list-type="picture-card"
-            name="image"
-            :limit="limit"
-            :on-preview="handlePictureCardPreview"
-            :on-remove="handleRemove"
-            :on-success="handleSuccess"
-          >
-            <i class="el-icon-plus"></i>
-          </el-upload>
-          <el-dialog :visible.sync="dialogVisible">
-            <img width="100%" :src="dialogImageUrl" alt />
-          </el-dialog>
-        </el-form-item>
-      </el-form>
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="handleClose">取 消</el-button>
-        <el-button type="primary" @click="handleClick">确 定</el-button>
-      </span>
-    </el-dialog>
-    <!-- test 编辑弹窗 -->
+    <add-dialog
+      :title="addFormTitle"
+      :editData="addForm"
+      :visible="addVisible"
+      state="add"
+      @closeDialog="closeAddDialog"
+      @confirm="confirmAdd"
+    ></add-dialog> 
     <revise-dialog
       :title="reviseFormTitle"
       :editData="reviseForm"
       :visible="reviseVisible"
       :disabled="true"
+      state="revise"
       :reivseParam="reivseParam"
-      @closeDialog="closeDialog"
-      @confirmRevise="confirmRevise"
+      @closeDialog="closeReviseDialog"
+      @confirm="confirmRevise"
     ></revise-dialog> 
     <el-dialog title="入库" :visible.sync="storageFormVisible">
       <el-form>
@@ -114,24 +86,15 @@
 <script>
 import $axios from "@/api/index";
 import ReviseDialog from "./dialog";
+import AddDialog from "./dialog";
 export default {
   data() {
     return {
-      queryform: {
-        company: "",
-        address: "",
-        supplier: "",
-        category: ""
-      },
-      companyList: [],
-      // company_id: "",
-      // canteen_id: "",
       supplier_id: "",
-      // canteenList: [],
       supplierList: [],
       category_id: "",
       categoryList: [],
-      formdata: {
+      addForm: {
         name: "",
         price: "",
         unit: "",
@@ -153,21 +116,50 @@ export default {
       currentProductId: "",
       total: 2,
       tabledata: [],
-      visible: false,
-      title: "",
-      dialogVisible: false,
-      dialogImageUrl: "",
-      limit: 1
+      addVisible: false,
+      addFormTitle: "新增商品"
     };
   },
   components:{
-    ReviseDialog
+    ReviseDialog,AddDialog
   },
   created() {
     this.getSupplierList();
     this.getCategoryList();
   },
   methods: {
+    /* 公用方法*/
+    // 专门负责发送 post 请求
+    sendPostRequest(url,data){
+      $axios
+        .post(url,data)
+        .then(res => {
+          this.sendMessage(res.msg);
+          this.fetchTableList();
+        })
+        .catch(err => console.log(err));
+    },
+    sendMessage(msg){
+      if(msg === 'ok'){
+        this.$message({
+          type: "success",
+          message: "操作成功!"
+        });
+      }else {
+        this.$message({
+          type: "info",
+          message: "操作失败"
+        })
+      }
+    },
+    // 封装方法 changeState 处理商品状态
+    changeState(id,state){
+      this.sendPostRequest("/v1/shop/product/handel",{
+        "id": id,
+        "state": state,
+      });
+    },
+    // 获取相关数据列表
     getSupplierList(){
       this.supplier_id = "";
       $axios
@@ -186,112 +178,23 @@ export default {
         })
         .catch(err => console.log(err));
     },
+    // 获取商品类型列表和处理
     fetchTableList(){
       $axios
         .get(`/v1/shop/cms/products?supplier_id=${this.supplier_id}&category_id=${this.category_id}&page=1&size=10`)
         .then(res => {
           this.tabledata = Array.from(res.data.data);
-          // console.log(this.tabledata)
           this.total = res.data.total;
         })
         .catch(err => console.log(err));
-
     },
     getSummaries(param){
-      
-      const { columns, data } = param;
+      // const { columns, data } = param;
       // console.log({ columns, data });
       const sums = [];
       sums[0] = '合计';
       sums[7] = this.total + '种';
       return sums;
-    },
-    handleClose(){
-      this.visible = false;
-    },
-    handleClick(){
-      let addForm = {};
-      Object.assign(addForm,{
-        "supplier_id": this.supplier_id,
-        "category_id": this.category_id,
-      },this.formdata);
-      this.sendPostRequest("/v1/shop/product/save",addForm);
-      this.visible = false;
-      /* $axios
-        .post(`/v1/shop/product/save`,addForm)
-        .then(res => {
-          this.sendMessage(res.msg);
-          this.visible = false;
-          this.fetchTableList();
-        })
-        .catch(err => console.log(err)); */
-    },
-    storage(row){
-      this.storageFormVisible = true;
-      // console.log(row);
-      this.currentProductId = row.product_id;
-    },
-    cancelStorage(){
-      this.storageFormVisible = false;
-      this.storageCount = ""
-    },
-    confirmStorage(){
-      this.storageFormVisible = false;
-      this.sendPostRequest("/v1/shop/stock/save",{
-        "product_id": this.currentProductId,
-        "count": this.storageCount
-      });
-      this.storageCount = "";
-    },
-    withdraw(index, row){
-      // console.log(index, row);
-      this.$confirm("请问确定下架该商品吗？", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() =>{
-          this.changeState(row.product_id,2);
-        }).catch((err) => {});
-    },
-    deleteGoods(index, row){
-      this.$confirm("请问确定删除该商品吗？", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() =>{
-          this.changeState(row.product_id,3);
-        }).catch((err) => {});
-    },
-    upbuild(index, row){
-      this.$confirm("请问确定上架该商品吗？", "提示", {
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        type: "warning"
-      })
-        .then(() =>{
-          this.changeState(row.product_id,1);
-        }).catch((err) => {});
-    },
-    changeState(id,state){
-      this.sendPostRequest("/v1/shop/product/handel",{
-        "id": id,
-        "state": state,
-      });
-    },
-    sendMessage(msg){
-      if(msg === 'ok'){
-        this.$message({
-          type: "success",
-          message: "操作成功!"
-        });
-      }else {
-        this.$message({
-          type: "info",
-          message: "操作失败"
-        })
-      }
     },
     handleEdit(index, row) {
       this.reviseVisible = true;
@@ -309,39 +212,78 @@ export default {
       };
     },
     handleAdd() {
-      this.visible = true;
-      this.title = "新增商品";
+      this.addVisible = true;
     },
-    handleRemove(file, fileList) {
-      console.log(file, fileList);
-    },
-    handlePictureCardPreview(file) {
-      this.dialogImageUrl = file.url;
-      this.dialogVisible = true;
-    },
-    handleSuccess(res, file, fileList) {
-      if (res.code === 200) {
-        // this.formdata.img_url = res.data.url;
-        this.formdata.image = res.data.url;
-        console.log(this.formdata.image);
-      }
-    },
-    closeDialog(val){
+    // 处理编辑商品弹窗
+    closeReviseDialog(val){
       this.reviseVisible = val;
     },
     confirmRevise(val){
       this.reviseVisible = false;
       this.sendPostRequest("/v1/shop/product/update",val);
     },
-    // 专门负责发送 post 请求
-    sendPostRequest(url,data){
-      $axios
-        .post(url,data)
-        .then(res => {
-          this.sendMessage(res.msg);
-          this.fetchTableList();
-        })
-        .catch(err => console.log(err));
+    // 处理添加商品弹窗
+    closeAddDialog(val){
+      this.addVisible = val;
+    },
+    confirmAdd(formData){
+      let addForm = {};
+      Object.assign(addForm,{
+        "supplier_id": this.supplier_id,
+        "category_id": this.category_id,
+      },formData);
+      this.sendPostRequest("/v1/shop/product/save",addForm);
+      this.addVisible = false;
+    },
+    // 入库处理
+    storage(row){
+      this.storageFormVisible = true;
+      this.currentProductId = row.product_id;
+    },
+    cancelStorage(){
+      this.storageFormVisible = false;
+      this.storageCount = "";
+    },
+    confirmStorage(){
+      this.storageFormVisible = false;
+      this.sendPostRequest("/v1/shop/stock/save",{
+        "product_id": this.currentProductId,
+        "count": this.storageCount
+      });
+      this.storageCount = "";
+    },
+    // 下架处理
+    withdraw(index, row){
+      this.$confirm("请问确定下架该商品吗？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() =>{
+          this.changeState(row.product_id,2);
+        }).catch((err) => {});
+    },
+    // 删除处理
+    deleteGoods(index, row){
+      this.$confirm("请问确定删除该商品吗？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() =>{
+          this.changeState(row.product_id,3);
+        }).catch((err) => {});
+    },
+    // 上架处理
+    upbuild(index, row){
+      this.$confirm("请问确定上架该商品吗？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() =>{
+          this.changeState(row.product_id,1);
+        }).catch((err) => {});
     }
   }
 };
