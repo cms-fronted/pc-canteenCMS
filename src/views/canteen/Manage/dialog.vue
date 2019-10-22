@@ -23,11 +23,12 @@
           :on-preview="handlePictureCardPreview"
           :on-remove="handleRemove"
           :on-success="handleSuccess"
+          :file-list="fileList"
         >
           <i class="el-icon-plus"></i>
         </el-upload>
         <el-dialog :visible.sync="dialogVisible">
-          <img width="100%" :src="dialogImageUrl" alt />
+          <img width="100%" :src="dialogImageUrl" alt/>
         </el-dialog>
       </el-form-item>
     </el-form>
@@ -65,7 +66,8 @@ export default {
       dialogImageUrl: "",
       limit: 1,
       param: {},
-      requiredParam: {}
+      requiredParam: {},
+      fileList: []
     }
   },
   methods: {
@@ -75,38 +77,46 @@ export default {
     },
     handlePictureCardPreview(file){
       this.dialogImageUrl = file.url;
-      console.log('this.dialogImageUrl')
-      console.log(this.dialogImageUrl)
       this.dialogVisible = true;
     },
     handleRemove(file, fileList){
-      // console.log(file, fileList);
+      // console.log(file,fileList);
     },
     handleSuccess(res, file, fileList){
       if(res.code === 200){
         this.formdata.image = res.data.url;
+        console.log(file)
       }
     },
     handleClick(){
       if(this.state === 'revise'){
         this.requiredParam = Object.assign({},this.param, this.formdata);
-        this.formdata = {};
         this.$emit('confirm',this.requiredParam);
+        this.formdata = {};
+        this.fileList = [];
+        console.log('点击确定时,有没有问题？')
+        console.log(this.fileList)
       }else if(this.state === 'add'){
         this.$emit('confirm',this.formdata);
         this.formdata = {};
       }
-      
+    },
+    initImageUrl(){
+      this.fileList = [];
+      let imgData = Object.assign({},this.formdata);
+      imgData['url'] = imgData['image'];
+      delete imgData['image'];
+      this.fileList.push(imgData);
+      // imgData = null;
     }
   },
   watch: {
     visible(val){
       this.formdata = Object.assign({},this.formdata, this.editData);
       this.isOpen = val;
-      this.dialogImageUrl = this.formdata.image;
-      // this.dialogVisible = true;
-      console.log(this.formdata)
-      console.log(this.dialogImageUrl)
+      if(this.visible && this.state === 'revise'){
+        this.initImageUrl();
+      }
     },
     reivseParam(val){
       this.param = Object.assign({},this.param, this.reivseParam);
