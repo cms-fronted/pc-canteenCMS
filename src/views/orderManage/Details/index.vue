@@ -39,8 +39,7 @@
         </div>
       </div>
       <div class="main-content">
-        <el-table style="width:100%" :data="tableData" border>
-        </el-table>
+        <el-table style="width:100%" :data="tableData" border></el-table>
       </div>
     </div>
   </div>

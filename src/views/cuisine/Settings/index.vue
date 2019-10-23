@@ -146,7 +146,9 @@ export default {
           count: this.menuForm.number,
           status: this.menuForm.status
         });
+        console.log(this.detail);
         this.menuForm.detail = JSON.stringify(this.detail);
+        console.log(this.menuForm.detail);
         this.listObj.push({ category: "", disabled: false });
       }
     },

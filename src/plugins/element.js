@@ -29,6 +29,7 @@ import {
   TabPane,
   Timeline,
   TimelineItem,
+  TimeSelect,
   Card,
   Pagination,
   Notification,
@@ -56,6 +57,7 @@ Notification.install = () => {
   Vue.prototype.$notify = Notification;
 };
 
+Vue.use(TimeSelect);
 Vue.use(Checkbox);
 Vue.use(CheckboxGroup);
 Vue.use(RadioGroup);

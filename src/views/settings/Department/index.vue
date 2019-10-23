@@ -152,6 +152,7 @@ export default {
       this.addFormData.canteens = JSON.stringify(_canteen);
     },
     handleNodeClick(data) {
+      console.log(data);
       this.addFormData.d_id = data.id;
     },
     getRole() {
@@ -172,7 +173,7 @@ export default {
     },
     fetchTabledata() {
       $axios
-        .get("/v1/staffs?page=1&size=10&c_id=2&d_id=3")
+        .get("/v1/staffs?page=1&size=10&c_id=2&d_id=0")
         .then(res => {
           this.tabledata = Array.from(res.data.data);
         })
