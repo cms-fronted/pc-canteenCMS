@@ -8,23 +8,31 @@
           <div class="select-title">
             <el-form :inline="true" :model="formdata">
               <el-form-item label="开始时间">
-                <el-date-picker v-model="formdata.begin_time" style="width:200px" type="datetime"></el-date-picker>
+                <el-date-picker v-model="formdata.time_begin" style="width:200px" type="datetime"></el-date-picker>
               </el-form-item>
               <el-form-item label="结束时间">
-                <el-date-picker v-model="formdata.end_time" style="width:200px" type="datetime"></el-date-picker>
+                <el-date-picker v-model="formdata.time_end" style="width:200px" type="datetime"></el-date-picker>
               </el-form-item>
               <el-form-item label="公司">
-              <el-select v-model="value" placeholder="请选择公司">
+                <!-- @change="getCanteenList(company_id)" -->
+              <el-select v-model="company_id" placeholder="请选择公司" >
                 <el-option
-                  v-for="item in options"
+                  v-for="item in companyList"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="消费地点">
+              <el-select v-model="canteen_id" placeholder="请选择消费地点">
+                <el-option
+                  v-for="item in canteenList"
                   :key="item.value"
                   :label="item.label"
                   :value="item.value"
                 ></el-option>
               </el-select>
-            </el-form-item>
-            <el-form-item label="消费地点">
-              <el-input placeholder="请输入消费地点"></el-input>
             </el-form-item>
             </el-form>
           </div>
@@ -43,21 +51,50 @@
 </template>
 
 <script>
+import $axios from "@/api/index";
 export default {
   data(){
     return {
       formdata: {
-        begin_time: "",
-        end_time: "",
-        place: ""
+        time_begin: "",
+        time_end: ""
       },
-      value: "",
+      company_id: "",
+      companyList: "",
+      canteen_id: "",
+      canteenList: "",
       options: [
         {
           value: "公司1",
           label: "公司1"
         }
       ]
+    }
+  },
+  created(){
+    this.fetchCompanyList();
+    // this.getCanteenList();
+    
+  },
+  methods:{
+    fetchCompanyList(){
+      // get('/v1/companies')
+      $axios.
+        get('/v1/manager/companies?name="周兵一级企业"')
+        .then(res => {
+          console.log(res)
+          // this.companyList = Array.from(res.data.data);
+        })
+        .catch(error => console.log(err));
+    },
+    getCanteenList(){
+      this.canteen_id = "";
+      $axios
+        .get('/v1/canteens')
+        .then(res => {
+          
+        })
+        .catch(error => console.log(err));
     }
   }
 }
