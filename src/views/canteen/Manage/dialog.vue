@@ -73,7 +73,8 @@ export default {
   methods: {
     handleClose(){
       this.$emit('closeDialog',false);
-      this.formdata = {}
+      this.formdata = {};
+      this.fileList = [];
     },
     handlePictureCardPreview(file){
       this.dialogImageUrl = file.url;
@@ -94,8 +95,6 @@ export default {
         this.$emit('confirm',this.requiredParam);
         this.formdata = {};
         this.fileList = [];
-        console.log('点击确定时,有没有问题？')
-        console.log(this.fileList)
       }else if(this.state === 'add'){
         this.$emit('confirm',this.formdata);
         this.formdata = {};
@@ -107,7 +106,6 @@ export default {
       imgData['url'] = imgData['image'];
       delete imgData['image'];
       this.fileList.push(imgData);
-      // imgData = null;
     }
   },
   watch: {
