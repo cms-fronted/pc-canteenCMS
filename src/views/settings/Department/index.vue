@@ -54,11 +54,6 @@
     <el-dialog title="新增员工" width="30%" :visible.sync="addVisible" :close-on-click-modal="false">
       <el-form :model="addFormData" ref="addFormData" label-width="100px">
         <el-form-item label="归属饭堂" prop="canteens">
-          <!-- <el-radio-group v-model="addFormData.canteens" @change="selectCanteens">
-            <el-radio label="2">大饭堂</el-radio>
-            <el-radio label="3">饭堂1</el-radio>
-            <el-radio label="4">饭堂2</el-radio>
-          </el-radio-group>-->
           <el-checkbox-group v-model="canteens" @change="chooseCanteen">
             <el-checkbox :label="2">大饭堂</el-checkbox>
             <el-checkbox :label="3">饭堂1</el-checkbox>
@@ -184,6 +179,12 @@ export default {
     },
     edit(val) {
       console.log(val);
+      $axios
+        .post("/v1/department/staff/update", {
+          id: 365,
+          cancel_canteens: JSON.stringify([19])
+        })
+        .then(res => console.log(res));
     },
     handleClose() {
       this.addVisible = false;

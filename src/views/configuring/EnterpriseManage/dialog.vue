@@ -1,11 +1,11 @@
 <template>
   <div>
-    <el-dialog :visible="isOpen" width="90%" title="新增饭堂" center @close="handleClose">
-      <!-- 新增餐次信息对话框 -->
+    <el-dialog :visible.sync="isOpen" width="90%" :title="dialogTitle" center @close="handleClose">
+      <!-- 餐次信息对话框 -->
       <el-dialog
         center
         width="40%"
-        :visible="dinnersVisible"
+        :visible.sync="dinnersVisible"
         append-to-body
         @close="dinnersVisible = false"
       >
@@ -69,11 +69,38 @@
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
-          <el-button @click="addVisible = false">取 消</el-button>
+          <el-button @click="dinnersVisible = false">取 消</el-button>
           <el-button type="primary" @click="_addDinner">确定</el-button>
         </div>
       </el-dialog>
 
+      <!-- 硬件信息对话框 -->
+      <el-dialog
+        :visible.sync="addProductVisible"
+        width="40%"
+        @close="addProductVisible = false"
+        append-to-body
+        title="新增硬件"
+      >
+        <el-form ref="productForm" :model="productForm" label-width="80px">
+          <el-form-item label="设备名称" prop="name">
+            <el-input v-model="productForm.name"></el-input>
+          </el-form-item>
+          <el-form-item label="设备号" prop="code">
+            <el-input v-model="productForm.code"></el-input>
+          </el-form-item>
+          <el-form-item label="编号" prop="number">
+            <el-input v-model="productForm.number"></el-input>
+          </el-form-item>
+          <el-form-item label="密码" prop="pwd">
+            <el-input v-model="productForm.pwd"></el-input>
+          </el-form-item>
+        </el-form>
+        <div slot="footer" class="dialog-footer">
+          <el-button @click="addProductVisible = false">取 消</el-button>
+          <el-button type="primary" @click="_submitProductInfo">确 定</el-button>
+        </div>
+      </el-dialog>
       <el-row :gutter="20">
         <el-col :span="10">
           <el-card class="box-card">
@@ -98,13 +125,14 @@
           </el-card>
         </el-col>
         <el-col :span="14">
+          <!--饭堂设置-->
           <el-card body-style="paddingBottom: 5px">
             <div slot="header" class="clearfix">
               <span>饭堂设置</span>
             </div>
             <span style="margin-right: 8px">
               饭堂名称
-              <el-input v-model="canteens" size="small" style="width:200px;"></el-input>
+              <el-input v-model="canteens" size="small" style="width:200px;" :disabled="isEdit"></el-input>
             </span>
             <el-button
               type="primary"
@@ -136,10 +164,8 @@
                 </template>
               </el-table-column>
             </el-table>
-            <!-- <div style="textAlign:center;marginTop: 5px">
-              <el-button @click="submitDetail" size="small">提交</el-button>
-            </div>-->
           </el-card>
+          <!--账户设置-->
           <el-card class="box-card" body-style="paddingBottom: 5px">
             <div slot="header" class="clearfix">账户设置</div>
             <el-form ref="accountForm" :model="accountForm">
@@ -181,11 +207,34 @@
               </el-form-item>
             </el-form>
           </el-card>
+          <!--硬件设置-->
+          <el-card class="box-card" body-style="paddingBottom: 5px">
+            <div slot="header" class="clearfix">
+              <span>硬件设置</span>
+              <el-button
+                style="float: right; padding: 3px 0"
+                type="text"
+                @click="addNewProduct"
+              >添加硬件</el-button>
+            </div>
+            <el-table :data="productData" style="width:100%" size="mini">
+              <el-table-column label="编号" prop="number"></el-table-column>
+              <el-table-column label="设备名称" prop="name"></el-table-column>
+              <el-table-column label="设备号" prop="code"></el-table-column>
+              <el-table-column label="密码" prop="pwd"></el-table-column>
+              <el-table-column label="操作">
+                <template slot-scope="scoped">
+                  <el-button size="small" type="text">编辑</el-button>
+                  <el-button size="small" type="text" @click="_delete(scoped.row)">删除</el-button>
+                </template>
+              </el-table-column>
+            </el-table>
+          </el-card>
         </el-col>
       </el-row>
       <div slot="footer" class="dialog-footer">
         <el-button @click="handleClose">取 消</el-button>
-        <el-button type="primary" @click="_addOptions">确定</el-button>
+        <el-button type="primary" @click="_submitOptions">确定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -202,10 +251,19 @@ const weekOptions = [
   { label: "周日", value: 6 }
 ];
 export default {
+  props: ["visible", "company_id", "dialogTitle", "isEdit", "formdata"],
   data() {
     return {
       isOpen: false,
       dinnersVisible: false,
+      addProductVisible: false,
+      productForm: {
+        c_id: "",
+        name: "",
+        code: "",
+        number: "",
+        pwd: ""
+      },
       checkAll: { system: false, shop: false, canteen: false },
       modulesCheckbox: { system: [], canteen: [], shop: [] }, //每一个功能模块对应的id
       checkedModules: {
@@ -241,10 +299,10 @@ export default {
         clean_time: "08:00",
         limit_money: 1
       },
-      dataTable: []
+      dataTable: [],
+      productData: []
     };
   },
-  props: ["visible", "company_id"],
   watch: {
     visible(val) {
       this.isOpen = val;
@@ -323,14 +381,16 @@ export default {
         .then(res => {
           this.canteens = "";
           this.canteen_id = res.data.canteen_id;
+          this.$message.success("饭堂创建成功，请继续操作");
         });
     },
     _addDinner() {
+      //添加残次信息
       this.dataTable.push({ ...this.dinnerForm });
       this.$refs.dinnerForm.resetFields();
       this.dinnersVisible = false;
     },
-    _addOptions() {
+    _submitOptions() {
       let data = {};
       data.dinners = JSON.stringify(this.dataTable);
       data.c_id = this.canteen_id;
@@ -338,7 +398,9 @@ export default {
       $axios
         .post("/v1/canteen/configuration/save", data)
         .then(res => {
-          console.log(res);
+          this.$message.success("设置成功");
+          this.dataTable.length = 0;
+          this.handleClose();
         })
         .catch(err => console.log(err));
     },
@@ -346,7 +408,6 @@ export default {
       this.$emit("closeAdd", false);
     },
     changeDay(val) {
-      console.log(val);
       this.accountForm.clean_day = val > 31 ? 31 : val;
     },
     _delete(row) {
@@ -354,8 +415,19 @@ export default {
         return item.name != row.name;
       });
     },
-    submitDetail() {
-      console.log(111);
+    addNewProduct() {
+      this.addProductVisible = true;
+    },
+    _submitProductInfo() {
+      this.productForm.c_id = this.formdata.id || this.canteen_id;
+      $axios
+        .post("v1/canteen/saveMachine", this.productForm)
+        .then(res => {
+          this.$refs.productForm.resetFields();
+          this.addProductVisible = false;
+          this.$message.success("添加成功");
+        })
+        .catch(err => console.log(err));
     }
   }
 };
