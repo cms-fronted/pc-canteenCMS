@@ -177,10 +177,6 @@ export default {
 
 <style lang="scss" scpoed>
   .main{
-    .main-header{
-      display: flex;
-      justify-content: space-between;
-    }
     .main-content{
       .el-table{
         th,td{
