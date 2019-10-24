@@ -68,6 +68,7 @@ export default {
       console.log(this.GLOBAL_ROLE);
       let data = this.formdata;
       Object.assign(data, { c_id: 1 });
+      // console.log('我被执行了')
       $axios
         .post("/v1/material/save", data)
         .then(res => {
@@ -75,6 +76,7 @@ export default {
           this.doClose();
           this.$message.success("添加成功");
           this.$refs["addMaterialForm"].resetFields();
+          this.$emit("confirm",res.msg);
         })
         .catch(err => console.log(err));
     }

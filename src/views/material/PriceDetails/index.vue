@@ -36,7 +36,7 @@
         <el-button type="primary" @click="handleClick({},'_add','新增材料')">添加</el-button>
       </div>
       <div class="main-content">
-        <el-table style="width:100%; font-size:14px" :data="tableData">
+        <el-table style="width:100%; font-size:14px" :data="tableData" border>
           <el-table-column prop="id" label="序号" width="200px"></el-table-column>
           <el-table-column prop="name" label="材料名称"></el-table-column>
           <el-table-column label="单价/元">
@@ -49,6 +49,7 @@
             </template>
           </el-table-column>
         </el-table>
+        <pagination v-show="total > 10" :total="total" :page.sync="page" @pagination="getList"></pagination>
       </div>
     </div>
     <handle-dialog
@@ -58,6 +59,7 @@
       :editFormdata="editFormdata"
       :title="dialogTitle"
       @close="closeDialog"
+      @confirm="confirmUpdate"
     />
   </div>
 </template>
@@ -65,6 +67,7 @@
 <script>
 import HandleDialog from "./dialog";
 import $axios from "@/api/index";
+import Pagination from '@/components/Pagination'
 export default {
   data() {
     return {
@@ -72,26 +75,15 @@ export default {
       companyList: [],
       canteen_id: "",
       canteenList: [],
-      tableData: [
-        {
-          id: 5,
-          name: "生姜",
-          price: 20,
-          unit: "kg",
-          state: 1,
-          create_time: "2019-08-16 10:27:50",
-          canteen_id: 6,
-          company_id: 3,
-          canteen: "饭堂1",
-          company: "企业A"
-        }
-      ],
+      tableData: [],
       keyword: "",
       editType: "",
       dialogTitle: "",
       visible: false,
       editFormdata: {},
-      result: []
+      result: [],
+      total: 0,
+      page: 1,
     };
   },
   created(){
@@ -121,18 +113,16 @@ export default {
           })
           temp = temp.slice(0,-1)
           this.companyList.unshift({id:temp,name:'全部'})
-          console.log(temp)
         })
         .catch(error => console.log(err));
     },
     fetchCanteenList(id){
+      this.canteenList = [];
       if(typeof id === 'string' && id.indexOf(',')){
-        // console.log(typeof id)
-        // console.log('hhh')
-        console.log(id)
-        this.canteenList.unshift({id:'all',name:'全部'})
-        // this.canteen_id = '全部'
+        this.canteenList.unshift({id:'',name:'全部'})
+        this.canteen_id = ''
       }else{
+        this.canteen_id = '';
         $axios
         .get(`/v1/canteens?company_id=${id}`)
         .then(res => {
@@ -144,18 +134,22 @@ export default {
     },
     fetchTableList(){
       $axios
-        .get(`/v1/materials?page=1&size=10&key=${this.keyword}&canteen_ids=${this.canteen_id}&company_ids=${this.company_ids}`)
+        .get(`/v1/materials?page=${this.page}&size=10&key=${this.keyword}&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`)
         .then(res => {
-          console.log(res)
-          // tableData
+          this.tableData = res.data.data;
+          this.total = res.data.total;
         })
         .catch(error => console.log(err));
     },
     handleClick(row = {}, type, title) {
+      // handleClick({},'_add','新增材料')
+      // handleClick(scope.row,'_edit','编辑材料')
       this.visible = true;
       this.dialogTitle = title;
+      // 编辑类型为
       this.editType = type;
       Object.assign(this.editFormdata, {}, row);
+      console.log(this.editFormdata)
     },
 
     _delete(row) {
@@ -186,19 +180,49 @@ export default {
             .catch(err => console.log(err));
         })
     },
+    getList(val){
+      this.page = val;
+      this.fetchTableList();
+    },
     closeDialog(val) {
       this.visible = val;
       this.editFormdata = {};
     },
     deriveData(){
-
+      // 导出 excel
+      console.log('导出')
+      console.log('this.keyword:',this.keyword)
+      console.log('this.canteen_id:',this.canteen_id)
+      console.log('this.company_id:',this.company_id)
+      $axios
+        .get(`/v1/material/export?key=${this.keyword}&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`)
+        .then(res => {
+          console.log(res)
+          console.log(res.data.url);
+          // console.log(this.tableData)
+        })
+        .catch(error => console.log(err));
+    },
+    confirmUpdate(val){
+      if(val === 'ok'){
+        this.fetchTableList();
+      }
     }
   },
   components: {
-    HandleDialog
+    HandleDialog,Pagination
   }
 };
 </script>
 
-<style>
+<style  lang="scss" scoped>
+  .main{
+    .main-content{
+      .el-table{
+        th,td{
+          text-align: center;
+        }
+      }
+    }
+  }
 </style>
