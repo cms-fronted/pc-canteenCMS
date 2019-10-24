@@ -5,20 +5,16 @@
       <el-divider></el-divider>
       <div class="main">
         <div class="main-header">
-          <div class="">
-            <span class="content-header">供应商：</span>
-            <el-select v-model="supplier_id" placeholder="请选择" style="width:150px">
-              <el-option v-for="item in supplierList" :key="item.id" :label="item.name" :value="item.id"></el-option>
-            </el-select>
-            <span class="content-header">类型：</span>
-            <el-select v-model="category_id" placeholder="请选择" style="width:150px">
-              <el-option v-for="item in categoryList" :key="item.id" :label="item.name" :value="item.id"></el-option>
-            </el-select>
-          </div>
-          <div class="btn-area">
-            <el-button type="primary" @click="fetchTableList">查询</el-button>
-            <el-button type="primary" @click="handleAdd">增加</el-button>
-          </div>
+          <span class="content-header">供应商：</span>
+          <el-select v-model="supplier_id" placeholder="请选择" style="width:150px">
+            <el-option v-for="item in supplierList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          </el-select>
+          <span class="content-header">类型：</span>
+          <el-select v-model="category_id" placeholder="请选择" style="width:150px">
+            <el-option v-for="item in categoryList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          </el-select>
+          <el-button type="primary" @click="fetchTableList">查询</el-button>
+          <el-button type="primary" @click="handleAdd">增加</el-button>
         </div>
         <div class="main-content">
           <el-table style="width:100%" :data="tabledata" show-summary border :summary-method="getSummaries">
@@ -293,10 +289,6 @@ export default {
 
 <style  lang="scss" scpoed>
   .main{
-    .main-header{
-      display: flex;
-      align-items: center;
-    }
     .main-content{
       .el-table{
         th,td{
