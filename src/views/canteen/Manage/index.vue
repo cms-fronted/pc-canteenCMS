@@ -5,14 +5,24 @@
       <el-divider></el-divider>
       <div class="main">
         <div class="main-header">
-          <div class="">
+          <div class>
             <span class="content-header">供应商：</span>
             <el-select v-model="supplier_id" placeholder="请选择" style="width:150px">
-              <el-option v-for="item in supplierList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+              <el-option
+                v-for="item in supplierList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              ></el-option>
             </el-select>
             <span class="content-header">类型：</span>
             <el-select v-model="category_id" placeholder="请选择" style="width:150px">
-              <el-option v-for="item in categoryList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+              <el-option
+                v-for="item in categoryList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              ></el-option>
             </el-select>
           </div>
           <div class="btn-area">
@@ -21,16 +31,17 @@
           </div>
         </div>
         <div class="main-content">
-          <el-table style="width:100%" :data="tabledata" show-summary border :summary-method="getSummaries">
+          <el-table
+            style="width:100%"
+            :data="tabledata"
+            show-summary
+            border
+            :summary-method="getSummaries"
+          >
             <el-table-column label="图片">
               <template slot-scope="props">
                 <div style="text-align:center">
-                  <img
-                    style="height:100px;"
-                    :src="props.row.image"
-                    :alt="props.row.name"
-                    srcset
-                  />
+                  <img style="height:100px;" :src="props.row.image" :alt="props.row.name" srcset />
                 </div>
               </template>
             </el-table-column>
@@ -43,9 +54,23 @@
             <el-table-column label="操作">
               <template slot-scope="props">
                 <el-button size="mini" @click="handleEdit(props.$index, props.row)">编辑</el-button>
-                <el-button size="mini" type="danger" @click="deleteGoods(props.$index, props.row)">删除</el-button>
-                <el-button size="mini" class="option" @click="upbuild(props.$index, props.row)" v-if="props.row.state === 2">上架</el-button>
-                <el-button size="mini" class="option" @click="withdraw(props.$index, props.row)" v-if="props.row.state === 1">下架</el-button>
+                <el-button
+                  size="mini"
+                  type="danger"
+                  @click="deleteGoods(props.$index, props.row)"
+                >删除</el-button>
+                <el-button
+                  size="mini"
+                  class="option"
+                  @click="upbuild(props.$index, props.row)"
+                  v-if="props.row.state === 2"
+                >上架</el-button>
+                <el-button
+                  size="mini"
+                  class="option"
+                  @click="withdraw(props.$index, props.row)"
+                  v-if="props.row.state === 1"
+                >下架</el-button>
                 <el-button size="mini" class="option" @click="storage(props.row)">入库</el-button>
               </template>
             </el-table-column>
@@ -60,7 +85,7 @@
       state="add"
       @closeDialog="closeAddDialog"
       @confirm="confirmAdd"
-    ></add-dialog> 
+    ></add-dialog>
     <revise-dialog
       :title="reviseFormTitle"
       :editData="reviseForm"
@@ -70,7 +95,7 @@
       :reivseParam="reivseParam"
       @closeDialog="closeReviseDialog"
       @confirm="confirmRevise"
-    ></revise-dialog> 
+    ></revise-dialog>
     <el-dialog title="入库" :visible.sync="storageFormVisible">
       <el-form>
         <el-form-item label="入库数量" label-width="80px">
@@ -101,14 +126,14 @@ export default {
         price: "",
         unit: "",
         count: "",
-        image : ""
+        image: ""
       },
       reviseForm: {
         name: "",
         price: "",
         unit: "",
         stock: "",
-        image : ""
+        image: ""
       },
       reviseFormTitle: "编辑商品",
       reviseVisible: false,
@@ -122,8 +147,9 @@ export default {
       addFormTitle: "新增商品"
     };
   },
-  components:{
-    ReviseDialog,AddDialog
+  components: {
+    ReviseDialog,
+    AddDialog
   },
   created() {
     this.getSupplierList();
@@ -132,37 +158,37 @@ export default {
   methods: {
     /* 公用方法*/
     // 专门负责发送 post 请求
-    sendPostRequest(url,data){
+    sendPostRequest(url, data) {
       $axios
-        .post(url,data)
+        .post(url, data)
         .then(res => {
           this.sendMessage(res.msg);
           this.fetchTableList();
         })
         .catch(err => console.log(err));
     },
-    sendMessage(msg){
-      if(msg === 'ok'){
+    sendMessage(msg) {
+      if (msg === "ok") {
         this.$message({
           type: "success",
           message: "操作成功!"
         });
-      }else {
+      } else {
         this.$message({
           type: "info",
           message: "操作失败"
-        })
+        });
       }
     },
     // 封装方法 changeState 处理商品状态
-    changeState(id,state){
-      this.sendPostRequest("/v1/shop/product/handel",{
-        "id": id,
-        "state": state,
+    changeState(id, state) {
+      this.sendPostRequest("/v1/shop/product/handel", {
+        id: id,
+        state: state
       });
     },
     // 获取相关数据列表
-    getSupplierList(){
+    getSupplierList() {
       this.supplier_id = "";
       $axios
         .get("/v1/company/suppliers?page=1&size=10")
@@ -171,7 +197,7 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    getCategoryList(){
+    getCategoryList() {
       this.category_id = "";
       $axios
         .get("/v1/company/categories?&page=1&size=10")
@@ -181,21 +207,23 @@ export default {
         .catch(err => console.log(err));
     },
     // 获取商品类型列表和处理
-    fetchTableList(){
+    fetchTableList() {
       $axios
-        .get(`/v1/shop/cms/products?supplier_id=${this.supplier_id}&category_id=${this.category_id}&page=1&size=10`)
+        .get(
+          `/v1/shop/cms/products?supplier_id=${this.supplier_id}&category_id=${this.category_id}&page=1&size=10`
+        )
         .then(res => {
           this.tabledata = Array.from(res.data.data);
           this.total = res.data.total;
         })
         .catch(err => console.log(err));
     },
-    getSummaries(param){
+    getSummaries(param) {
       // const { columns, data } = param;
       // console.log({ columns, data });
       const sums = [];
-      sums[0] = '合计';
-      sums[7] = this.total + '种';
+      sums[0] = "合计";
+      sums[7] = this.total + "种";
       return sums;
     },
     handleEdit(index, row) {
@@ -205,110 +233,118 @@ export default {
         price: row.price,
         unit: row.unit,
         stock: row.stock,
-        image : row.image
+        image: row.image
       };
       this.reivseParam = {
-        "id": row.product_id,
-        "supplier_id": this.supplier_id,
-        "category_id": this.category_id,
+        id: row.product_id,
+        supplier_id: this.supplier_id,
+        category_id: this.category_id
       };
     },
     handleAdd() {
       this.addVisible = true;
     },
     // 处理编辑商品弹窗
-    closeReviseDialog(val){
+    closeReviseDialog(val) {
       this.reviseVisible = val;
     },
-    confirmRevise(val){
+    confirmRevise(val) {
       this.reviseVisible = false;
-      this.sendPostRequest("/v1/shop/product/update",val);
+      this.sendPostRequest("/v1/shop/product/update", val);
     },
     // 处理添加商品弹窗
-    closeAddDialog(val){
+    closeAddDialog(val) {
       this.addVisible = val;
     },
-    confirmAdd(formData){
+    confirmAdd(formData) {
       let addForm = {};
-      Object.assign(addForm,{
-        "supplier_id": this.supplier_id,
-        "category_id": this.category_id,
-      },formData);
-      this.sendPostRequest("/v1/shop/product/save",addForm);
+      Object.assign(
+        addForm,
+        {
+          supplier_id: this.supplier_id,
+          category_id: this.category_id
+        },
+        formData
+      );
+      this.sendPostRequest("/v1/shop/product/save", addForm);
       this.addVisible = false;
     },
     // 入库处理
-    storage(row){
+    storage(row) {
       this.storageFormVisible = true;
       this.currentProductId = row.product_id;
     },
-    cancelStorage(){
+    cancelStorage() {
       this.storageFormVisible = false;
       this.storageCount = "";
     },
-    confirmStorage(){
+    confirmStorage() {
       this.storageFormVisible = false;
-      this.sendPostRequest("/v1/shop/stock/save",{
-        "product_id": this.currentProductId,
-        "count": this.storageCount
+      this.sendPostRequest("/v1/shop/stock/save", {
+        product_id: this.currentProductId,
+        count: this.storageCount
       });
       this.storageCount = "";
     },
     // 下架处理
-    withdraw(index, row){
+    withdraw(index, row) {
       this.$confirm("请问确定下架该商品吗？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       })
-        .then(() =>{
-          this.changeState(row.product_id,2);
-        }).catch((err) => {});
+        .then(() => {
+          this.changeState(row.product_id, 2);
+        })
+        .catch(err => {});
     },
     // 删除处理
-    deleteGoods(index, row){
+    deleteGoods(index, row) {
       this.$confirm("请问确定删除该商品吗？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       })
-        .then(() =>{
-          this.changeState(row.product_id,3);
-        }).catch((err) => {});
+        .then(() => {
+          this.changeState(row.product_id, 3);
+        })
+        .catch(err => {});
     },
     // 上架处理
-    upbuild(index, row){
+    upbuild(index, row) {
       this.$confirm("请问确定上架该商品吗？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       })
-        .then(() =>{
-          this.changeState(row.product_id,1);
-        }).catch((err) => {});
+        .then(() => {
+          this.changeState(row.product_id, 1);
+        })
+        .catch(err => {});
     }
   }
 };
 </script>
 
 <style  lang="scss" scpoed>
-  .main{
-    .main-header{
-      display: flex;
-      align-items: center;
-    }
-    .main-content{
-      .el-table{
-        th,td{
-          text-align: center;
-        }
-      }
-    }
-    .main-content{
-      .el-button{
-        margin-left: 5px;
-        margin-top: 5px;
+.main {
+  .main-header {
+    display: flex;
+    align-items: center;
+  }
+  .main-content {
+    .el-table {
+      th,
+      td {
+        text-align: center;
       }
     }
   }
+  .main-content {
+    .el-button {
+      margin-left: 5px;
+      margin-top: 5px;
+    }
+  }
+}
 </style>

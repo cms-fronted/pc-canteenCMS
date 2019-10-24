@@ -48,7 +48,6 @@
         :c_id="currentCompanyId"
       ></revise-dialog>
     </div>
-  </div>
 </template>
 
 <script>
