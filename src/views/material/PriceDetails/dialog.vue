@@ -58,6 +58,9 @@ export default {
     },
     editFormdata: {
       type: Object
+    },
+    type: {
+      type: String
     }
   },
   methods: {
@@ -67,18 +70,36 @@ export default {
     handleClick() {
       console.log(this.GLOBAL_ROLE);
       let data = this.formdata;
-      Object.assign(data, { c_id: 1 });
-      // console.log('我被执行了')
+      if(this.type === '_add'){
+        this.sendPostRequest("/v1/material/save", data);
+        this.$refs["addMaterialForm"].resetFields();
+      }else{
+        const {id,name,price,unit} = data;
+        this.sendPostRequest("/v1/material/update", {id,name,price,unit});
+      }
+    },
+    sendPostRequest(url,data){
       $axios
-        .post("/v1/material/save", data)
+        .post(url,data)
         .then(res => {
-          console.log(res);
           this.doClose();
-          this.$message.success("添加成功");
-          this.$refs["addMaterialForm"].resetFields();
+          this.sendMessage(res.msg);
           this.$emit("confirm",res.msg);
         })
         .catch(err => console.log(err));
+    },
+    sendMessage(msg){
+      if(msg === 'ok'){
+        this.$message({
+          type: "success",
+          message: "操作成功!"
+        });
+      }else {
+        this.$message({
+          type: "info",
+          message: "操作失败"
+        })
+      }
     }
   }
 };

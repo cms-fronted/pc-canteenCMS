@@ -32,9 +32,24 @@
         ></el-input>
         <el-button type="primary" plain style="margin-left:0" @click="fetchTableList">查询</el-button>
         <el-button type="primary" @click="deriveData">导出</el-button>
-        <el-button type="primary">批量导入</el-button>
-        <el-button type="primary" @click="handleClick({},'_add','新增材料')">添加</el-button>
+        <el-upload
+            class="upload-excel"
+            ref="upload"
+            :limit="limit"
+            :headers="header"
+            :show-file-list="false"
+            accept=".xls,.xlsx"
+            action="/v1/material/upload"
+            :on-success='handleSuccess'
+            :data="{c_id:canteen_id}"
+            name="materials"
+            >
+            <el-button type="primary">批量导入</el-button>
+        </el-upload>
+        <el-button type="primary" @click="handleClick({c_id:canteen_id},'_add','新增材料')">添加</el-button>
       </div>
+      <!-- 共有{{total}}条记录 -->
+      
       <div class="main-content">
         <el-table style="width:100%; font-size:14px" :data="tableData" border>
           <el-table-column prop="id" label="序号" width="200px"></el-table-column>
@@ -68,9 +83,13 @@
 import HandleDialog from "./dialog";
 import $axios from "@/api/index";
 import Pagination from '@/components/Pagination'
+import store from '@/store'
 export default {
   data() {
     return {
+      header: {
+        token: store.getters.token
+      },
       company_id: "",
       companyList: [],
       canteen_id: "",
@@ -84,13 +103,28 @@ export default {
       result: [],
       total: 0,
       page: 1,
+      limit: 1,
+      
     };
   },
   created(){
     this.fetchCompanyList();
-    // this.fetchCanteenList();
   },
   methods: {
+    sendMessage(msg){
+      if(msg === 'ok'){
+        this.$message({
+          type: "success",
+          message: "操作成功!"
+        });
+      }else {
+        this.$message({
+          type: "info",
+          message: "操作失败"
+        })
+      }
+    },
+    // 数组扁平化
     flatten(arr){
       for(var i = 0, len = arr.length; i < len; i++){
         this.companyList.push({id:arr[i].id, name:arr[i].name})
@@ -104,7 +138,6 @@ export default {
         .get('/v1/admin/companies')
         .then(res => {
           this.flatten(res.data);
-          // 需要有全部这个选项 id:1,2,3 name:"全部"
           let temp = '';
           this.companyList.forEach((item,index) => {
             if(index <= this.companyList.length){
@@ -130,7 +163,6 @@ export default {
         })
         .catch(error => console.log(err));
       }
-      
     },
     fetchTableList(){
       $axios
@@ -142,18 +174,12 @@ export default {
         .catch(error => console.log(err));
     },
     handleClick(row = {}, type, title) {
-      // handleClick({},'_add','新增材料')
-      // handleClick(scope.row,'_edit','编辑材料')
       this.visible = true;
       this.dialogTitle = title;
-      // 编辑类型为
       this.editType = type;
       Object.assign(this.editFormdata, {}, row);
-      console.log(this.editFormdata)
     },
-
     _delete(row) {
-      console.log(row);
       this.$confirm("此操作将永久删除, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -165,6 +191,7 @@ export default {
               id: row.id
             })
             .then(res => {
+              this.fetchTableList();
               if (res.data.msg == "ok") {
                 this.$message({
                   type: "success",
@@ -189,17 +216,15 @@ export default {
       this.editFormdata = {};
     },
     deriveData(){
-      // 导出 excel
-      console.log('导出')
-      console.log('this.keyword:',this.keyword)
-      console.log('this.canteen_id:',this.canteen_id)
-      console.log('this.company_id:',this.company_id)
       $axios
         .get(`/v1/material/export?key=${this.keyword}&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`)
         .then(res => {
-          console.log(res)
-          console.log(res.data.url);
-          // console.log(this.tableData)
+          if(this.tableData.length > 0){
+            let aTag = document.createElement('a');
+            aTag.download = '材料价格明细';
+            aTag.href = res.data.url;
+            aTag.click();
+          }
         })
         .catch(error => console.log(err));
     },
@@ -207,6 +232,10 @@ export default {
       if(val === 'ok'){
         this.fetchTableList();
       }
+    },
+    handleSuccess(res, file, fileList){
+      this.sendMessage(res.msg);
+      this.fetchTableList();
     }
   },
   components: {
@@ -223,6 +252,9 @@ export default {
           text-align: center;
         }
       }
+    }
+    .upload-excel{
+      display: inline-block;
     }
   }
 </style>
