@@ -49,7 +49,7 @@
         <el-button type="primary" @click="handleClick({c_id:canteen_id},'_add','新增材料')">添加</el-button>
       </div>
       <!-- 共有{{total}}条记录 -->
-      
+      <div class="total" v-show="total > 0"><span>共有 <strong>{{total}}</strong> 条记录</span></div>
       <div class="main-content">
         <el-table style="width:100%; font-size:14px" :data="tableData" border>
           <el-table-column prop="id" label="序号" width="200px"></el-table-column>
@@ -255,6 +255,12 @@ export default {
     }
     .upload-excel{
       display: inline-block;
+    }
+    .total{
+      display: flex;
+      justify-content: flex-end;
+      font-size: 14px;
+      margin-top: 10px;
     }
   }
 </style>
