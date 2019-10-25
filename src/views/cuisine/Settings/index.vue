@@ -4,18 +4,23 @@
     <el-divider></el-divider>
     <div class="main">
       <div class="main-header">
-        <span class="content-header">所属公司：</span>
+        <span class="content-header">公司：</span>
         <el-select
           v-model="company_id"
           placeholder="请选择"
           style="width:150px"
-          @change="getCanteenList(company_id)"
+          @change="getLocationList(company_id)"
         >
           <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
         <span class="content-header">消费地点：</span>
         <el-select v-model="canteen_id" placeholder="请选择" style="width:150px">
-          <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          <el-option
+            v-for="item in locationList"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          ></el-option>
         </el-select>
         <el-button @click="AddVisible = true">新增</el-button>
         <el-button @click="fetchTableList">查询</el-button>
@@ -48,30 +53,29 @@
     <el-dialog :visible.sync="AddVisible" title="新增菜单">
       <el-form ref="addMenuForm" :model="menuForm" label-width="100px">
         <el-form-item label="饭堂">
-          <el-select
-            v-model="menuForm.c_id"
-            placeholder="请选择"
-            @change="getCanteenDetail(menuForm.c_id)"
-          >
-            <el-option v-for="item in options" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          <el-select v-model="menuForm.c_id" placeholder="请选择" @change="getDinnersList">
+            <el-option
+              v-for="item in locationList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="餐次">
-          <el-checkbox-group v-model="menuForm.name">
-            <el-checkbox v-for="item in canteen_detail" :label="item.id" :key="item.id">{{item.name}}</el-checkbox>
-            <!-- <el-checkbox :label="1">早餐</el-checkbox> -->
-            <!-- <el-checkbox :label="2">午餐</el-checkbox> -->
-            <!-- <el-checkbox :label="3">晚餐</el-checkbox> -->
-            <!-- <el-checkbox :label="4">宵夜</el-checkbox> -->
+          <el-checkbox-group v-model="menuForm.d_id">
+            <el-checkbox v-for="item in dinnerList" :label="item.id" :key="item.id">{{item.name}}</el-checkbox>
           </el-checkbox-group>
         </el-form-item>
-        <el-form-item label="菜类名称">
-          <el-input
-            v-for="(item, index) in listObj"
-            :key="index"
-            :disabled="item.disabled"
-            v-model="item.category"
-          ></el-input>
+        <el-form-item label="菜类">
+          <div v-for="(item, index) in listObj" :key="index" style="margin:5px 0">
+            <el-input v-model="item.category" :disabled="item.disabled" style="width:150px"></el-input>
+            <el-button
+              @click.prevent="removeInput(item)"
+              icon="el-icon-delete"
+              style="marginLeft:5px"
+            ></el-button>
+          </div>
           <el-button @click="addListObjItem">添加</el-button>
         </el-form-item>
         <el-form-item label="选菜数量状态">
@@ -94,27 +98,27 @@
 
 <script>
 import $axios from "@/api/index";
-import { async } from "q";
+import { flatten } from "@/utils/flatternArr";
 export default {
   data() {
     return {
       companyList: [],
       company_id: "",
       canteen_id: "",
-      canteen_detail: [],
+      dinnerList: [],
       listObj: [{ category: "", disabled: false }],
       AddVisible: false,
       isMoving: true,
       detail: [],
       menuForm: {
         c_id: "",
-        name: [],
+        d_id: [],
         status: 1,
         dinner_name: "",
         number: 0,
         detail: []
       },
-      options: [],
+      locationList: [],
       tableList: [],
       spanArr: [], //二维数组，用于存放单元格合并规则
       position: 0 //用于存储相同项的开始index
@@ -124,21 +128,71 @@ export default {
     listObj: function() {}
   },
   created() {
-    // this.getCanteenList();
-    this.fetchCompanyList();
+    this.getCompanies();
   },
   methods: {
-    fetchCompanyList() {
+    getCompanies() {
       $axios
-        .get("/v1/companies")
+        .get("/v1/admin/companies")
         .then(res => {
-          this.companyList = Array.from(res.data.data);
+          let arr = res.data;
+          let allCompanies = [];
+          let companiesList = flatten(arr);
+          companiesList.forEach(element => {
+            let id = element.id;
+            allCompanies.push(id);
+          });
+          allCompanies = allCompanies.join(",");
+          companiesList.unshift({
+            name: "全部",
+            id: allCompanies
+          });
+          this.companyList = companiesList;
         })
         .catch(err => console.log(err));
+    },
+    getLocationList(company_id) {
+      this.menuForm.c_id = "";
+      this.menuForm.dinner_id = "";
+      this.menuForm.m_id = "";
+      this.canteen_id = "";
+      if (!isNaN(company_id)) {
+        $axios
+          .get(`/v1/company/consumptionLocation?company_id=${company_id}`)
+          .then(res => {
+            this.locationList = Array.from(res.data.canteen);
+          })
+          .catch(err => console.log(err));
+      } else {
+        this.locationList = [];
+        this.categoryList = [];
+        this.dinnersList = [];
+      }
+    },
+    getDinnersList(canteen_id) {
+      $axios
+        .get(`/v1/canteen/dinners?canteen_id=${canteen_id}`)
+        .then(res => {
+          this.dinnerList = Array.from(res.data);
+        })
+        .catch(err => console.log(err));
+    },
+    removeInput(item) {
+      var index = this.listObj.indexOf(item);
+      let len = this.listObj.length;
+      if (index !== -1) {
+        this.listObj.splice(index, 1);
+        this.detail.splice(index, 1);
+        this.menuForm.detail = JSON.stringify(this.detail);
+      }
     },
     addListObjItem() {
       /*新增input框*/
       let len = this.listObj.length;
+      if (len == 0) {
+        this.listObj.push({ category: "", disabled: false });
+        return;
+      }
       if (!!this.listObj[len - 1].category) {
         this.listObj[len - 1].disabled = true;
         this.detail.push({
@@ -146,15 +200,14 @@ export default {
           count: this.menuForm.number,
           status: this.menuForm.status
         });
-        console.log(this.detail);
         this.menuForm.detail = JSON.stringify(this.detail);
-        console.log(this.menuForm.detail);
         this.listObj.push({ category: "", disabled: false });
       }
     },
     handleClose() {
       this.AddVisible = false;
       this.listObj = [{ category: "", disabled: false }];
+      this.dinnerList = [];
       this.menuForm = {
         c_id: "",
         name: [],
@@ -162,13 +215,15 @@ export default {
         dinner_name: "",
         number: 0,
         detail: []
-      }; 
+      };
       this.isMoving = true;
     },
     handleClick() {
+      console.log(this.menuForm);
+      // return;
       $axios
         .post("/v1/menu/save", this.menuForm)
-        .then(res => console.log(res))
+        .then(res => console.log())
         .catch(err => console.log(err));
     },
     changeStatus() {
@@ -177,10 +232,13 @@ export default {
     },
     fetchTableList() {
       $axios
-        .get(`/v1/menus/company?company_id=${this.company_id}&canteen_id=${this.canteen_id}`)
+        .get(
+          `/v1/menus/company?company_id=${this.company_id}&canteen_id=${this.canteen_id}`
+        )
         .then(res => {
           let _data = Array.from(res.data.data);
           let _list = [];
+          console.log(_data);
           _data.forEach(i => {
             i.dinner.forEach(j => {
               j.menus.forEach(k => {
@@ -203,24 +261,14 @@ export default {
           this.rowspan(1, "company_name");
           this.rowspan(2, "canteen_name");
           this.rowspan(3, "category_name");
+          console.log(this.tableList);
         })
         .catch(err => console.log(err));
-    },
-    getCanteenList(id) {
-      this.canteen_id = "";
-      this.menuForm.c_id = "";
-      $axios
-        .get("/v1/canteens/company", {
-          company_id: id
-        })
-        .then(res => {
-          this.options = res.data.canteens;
-        });
     },
     getCanteenDetail(canteen_id) {
       $axios
         .get(`/v1/menus/canteen?canteen_id=${canteen_id}`)
-        .then(res => this.canteen_detail = Array.from(res.data))
+        .then(res => (this.canteen_detail = Array.from(res.data)))
         .catch(err => console.log(err));
     },
     handleEdit(val) {
@@ -229,7 +277,6 @@ export default {
     rowspan(idx, prop) {
       this.spanArr[idx] = [];
       this.position = 0;
-      console.log(this.tableList);
       this.tableList.forEach((item, index) => {
         if (index === 0) {
           this.spanArr[idx].push(1);

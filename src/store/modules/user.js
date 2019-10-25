@@ -1,4 +1,4 @@
-import { login, getInfo } from "@/api/login";
+import { login, getInfo, producerLogin } from "@/api/login";
 import { Message } from "element-ui";
 import router, { resetRouter } from "@/router";
 
@@ -51,15 +51,29 @@ const actions = {
           console.log("请求成功");
           console.log(res);
           if (res.code == "200") {
-            // if (res.data.success) {
-            // Message.success(res.data.msg)
             commit("SET_TOKEN", res.data.token);
             commit("SET_ROLE", res.data.role);
             commit("SET_GRADE", res.data.grade);
             commit("SET_NAME", res.data.userName);
-            // } else {
-            //   // Message.error(res.data.msg)
-            // }
+            resolve(res);
+          }
+        })
+        .catch(error => {
+          reject(error);
+        });
+    });
+  },
+  _producerLogin({ commit }, formdatas) {
+    return new Promise((resolve, reject) => {
+      producerLogin(formdatas)
+        .then(res => {
+          console.log("请求成功");
+          console.log(res);
+          if (res.code == "200") {
+            commit("SET_TOKEN", res.data.token);
+            commit("SET_ROLE", res.data.role);
+            commit("SET_GRADE", res.data.grade);
+            commit("SET_NAME", res.data.userName);
             resolve(res);
           }
         })

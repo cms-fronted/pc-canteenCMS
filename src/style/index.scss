@@ -1,6 +1,6 @@
-@import './variable.scss';
-@import './layout.scss';
-@import './transition.scss';
+@import "./variable.scss";
+@import "./layout.scss";
+@import "./transition.scss";
 
 html {
   height: 100%;
@@ -83,11 +83,11 @@ body {
 .btnStyle1 {
   padding: 11px 20px !important;
 }
-.header i[class^='el-icon'] {
+.header i[class^="el-icon"] {
   color: white;
 }
 #app .clearFixed:after {
-  content: '';
+  content: "";
   display: block;
   width: 0;
   height: 0;
@@ -139,7 +139,7 @@ body {
 .nav-title {
   font-size: 24px;
   color: #168bd5;
-}  
+}
 .el-divider {
   margin-top: 5px;
   margin-bottom: 15px;
@@ -155,10 +155,21 @@ body {
     margin-left: 15px;
   }
 }
-.main-content{
+.main-content {
   padding: 20px 0;
 }
-.el-table__expanded-cell{
+.el-table__expanded-cell {
   padding-top: 0 !important;
   padding-bottom: 0 !important;
+}
+/* 解决element-ui的table表格控件表头与内容列不对齐问题 */
+.el-table th.gutter {
+  display: table-cell !important;
+}
+.el-table td,
+.el-table th {
+  text-align: center !important;
+}
+.hide .el-upload--picture-card {
+  display: none;
 }

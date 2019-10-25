@@ -5,68 +5,244 @@
     <div class="main">
       <div class="main-header">
         <div class="select-title">
-          <el-form :inline="true" :model="formdata">
-            <el-form-item label="开始时间">
-              <el-date-picker v-model="formdata.begin_time" style="width:200px" type="datetime"></el-date-picker>
+          <el-form :inline="true" :model="formdata" label-width="80px">
+            <el-form-item label="开始">
+              <el-date-picker
+                v-model="formdata.time_begin"
+                value-format="yyyy-MM-dd HH:mm:ss"
+                style="width:200px"
+                type="datetime"
+              ></el-date-picker>
             </el-form-item>
-            <el-form-item label="结束时间">
-              <el-date-picker v-model="formdata.end_time" style="width:200px" type="datetime"></el-date-picker>
+            <el-form-item label="结束">
+              <el-date-picker
+                v-model="formdata.time_end"
+                value-format="yyyy-MM-dd HH:mm:ss"
+                style="width:200px"
+                type="datetime"
+              ></el-date-picker>
             </el-form-item>
-            <el-form-item label="餐次">
-              <el-input placeholder="请输入餐次"></el-input>
-            </el-form-item>
-            <el-form-item label="消费地点">
-              <el-input placeholder="请输入消费地点"></el-input>
-            </el-form-item>
-            <el-form-item label="部门">
-              <el-select v-model="value" placeholder="请选择部门">
+            <el-form-item label="公司">
+              <el-select v-model="formdata.company_ids" @change="getList" placeholder="请选择公司">
                 <el-option
-                  v-for="item in options"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
+                  v-for="item in companiesList"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
                 ></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="人员信息">
-              <el-input placeholder="请输入人员信息"></el-input>
+            <el-form-item label="消费地点">
+              <el-select v-model="formdata.canteen_id" @change="getDinnersList" placeholder="请选择饭堂">
+                <el-option
+                  v-for="item in locationList"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="部门">
+              <el-select v-model="formdata.department_id" placeholder="请选择部门">
+                <el-option
+                  v-for="item in departmentList"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="姓名">
+              <el-input placeholder="请输入姓名" v-model="formdata.name"></el-input>
+            </el-form-item>
+            <el-form-item label="手机号码">
+              <el-input placeholder="请输入手机号码" v-model="formdata.phone"></el-input>
+            </el-form-item>
+            <el-form-item label="餐次">
+              <el-select v-model="formdata.dinner_id" placeholder="请选择部门">
+                <el-option
+                  v-for="item in dinnersList"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                ></el-option>
+              </el-select>
             </el-form-item>
           </el-form>
         </div>
         <div class="btn-area">
-          <el-button type="primary">查询</el-button>
+          <el-button type="primary" @click="queryList" :disabled="isDisabled">查询</el-button>
           <el-button type="primary">导出</el-button>
         </div>
       </div>
       <div class="main-content">
         <el-table style="width:100%" :data="tableData" border></el-table>
+        <!-- <el-pagination
+          style="width:100%;text-align:center"
+          background
+          layout="prev, pager, next"
+          :total="sum"
+          :page-size="10"
+          :current-page="page"
+          @current-change="queryList"
+          @prev-click="queryList"
+          @next-click="queryList"
+        ></el-pagination>-->
+        <pagination v-if="!tableData" :total="total" :page="current_page" @pagination="queryList"></pagination>
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import $axios from "@/api/index";
+import Pagination from "@/components/Pagination";
+import { flatten } from "@/utils/flatternArr";
 export default {
   data() {
     return {
       formdata: {
         name: "",
         phone: "",
-        types: "",
-        department: "",
-        begin_time: "",
-        end_time: "",
-        status: "",
-        goods_name: ""
+        department_id: "",
+        time_begin: "",
+        time_end: "",
+        dinner_id: "",
+        company_ids: "",
+        canteen_id: ""
       },
+      current_page: 1,
+      pageSize: 10,
+      total: 0,
       value: "",
-      options: [
-        {
-          value: "选项1",
-          label: "黄金糕"
-        }
-      ]
+      tableData: [],
+      companiesList: [],
+      departmentList: [],
+      locationList: [],
+      dinnersList: [],
+      company_id: "",
+      isDisabled: true
     };
+  },
+  created() {
+    this.getCompanies();
+  },
+  computed: {
+    isAble() {
+      return (
+        !!this.formdata.time_end &&
+        !!this.formdata.time_begin &&
+        !!this.formdata.company_ids
+      );
+    }
+  },
+  watch: {
+    isAble(val) {
+      console.log(val);
+      this.isDisabled = !val;
+    }
+  },
+  methods: {
+    getList(val) {
+      if (String(val).includes(",")) {
+        this.departmentList = [{ name: "全部" }];
+        this.locationList = [{ name: "全部" }];
+        this.dinnersList = [];
+        this.formdata.department_id = "";
+        this.formdata.canteen_id = "";
+        this.dinner_id = "";
+      } else {
+        this.getDepartmentList(val);
+        this.getLocationList(val);
+      }
+    },
+    getCompanies() {
+      $axios
+        .get("/v1/admin/companies")
+        .then(res => {
+          let arr = res.data;
+          let allCompanies = [];
+          let companiesList = flatten(arr);
+          companiesList.forEach(element => {
+            let id = element.id;
+            allCompanies.push(id);
+          });
+          allCompanies = allCompanies.join(",");
+          companiesList.unshift({
+            name: "全部",
+            id: allCompanies
+          });
+          this.companiesList = companiesList;
+        })
+        .catch(err => console.log(err));
+    },
+    getDepartmentList(company_id) {
+      $axios
+        .get(`v1/departments?c_id=${company_id}`)
+        .then(res => {
+          let arr = res.data;
+          let departmentList = flatten(arr);
+          departmentList.unshift({
+            name: "全部"
+          });
+          this.departmentList = departmentList;
+        })
+        .catch(err => console.log(err));
+    },
+    getDinnersList(canteen_id) {
+      if (canteen_id) {
+        $axios
+          .get(`/v1/canteen/dinners?canteen_id=${canteen_id}`)
+          .then(res => {
+            this.dinnersList = Array.from(res.data);
+          })
+          .catch(err => console.log(err));
+      }
+    },
+    getLocationList(company_id) {
+      if (company_id) {
+        $axios
+          .get(`/v1/company/consumptionLocation?company_id=${company_id}`)
+          .then(res => {
+            this.locationList = Array.from(res.data.canteen);
+          })
+          .catch(err => console.log(err));
+      }
+    },
+    queryList() {
+      let { page, pageSize, sum } = this;
+      let {
+        name,
+        company_ids,
+        time_end,
+        time_begin,
+        dinner_id,
+        phone,
+        canteen_id,
+        department_id
+      } = this.formdata;
+      console.log(this.formdata);
+      $axios
+        .get("/v1/order/orderStatistic/detail", {
+          name: name,
+          company_ids: company_ids,
+          time_end: time_end,
+          time_begin: time_begin,
+          dinner_id: dinner_id,
+          phone: phone,
+          canteen_id: canteen_id,
+          department_id: department_id
+        })
+        .then(res => {
+          this.tableData = Array.from(res.data.data);
+          this.total = res.data.total;
+          this.current_page = res.data.current_page;
+        })
+        .catch(err => console.log(err));
+    }
+  },
+  components: {
+    Pagination
   }
 };
 </script>
@@ -78,6 +254,9 @@ export default {
     width: 90%;
     display: flex;
     flex-wrap: wrap;
+    .el-select {
+      width: 200px;
+    }
   }
   .btn-area {
     float: right;

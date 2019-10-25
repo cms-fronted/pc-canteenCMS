@@ -15,35 +15,32 @@
               </el-form-item>
               <el-form-item label="公司">
                 <!-- @change="getCanteenList(company_id)" -->
-              <el-select v-model="company_id" placeholder="请选择公司" >
-                <el-option
-                  v-for="item in companyList"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="消费地点">
-              <el-select v-model="canteen_id" placeholder="请选择消费地点">
-                <el-option
-                  v-for="item in canteenList"
-                  :key="item.value"
-                  :label="item.label"
-                  :value="item.value"
-                ></el-option>
-              </el-select>
-            </el-form-item>
+                <el-select v-model="company_id" placeholder="请选择公司">
+                  <el-option
+                    v-for="item in companyList"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="消费地点">
+                <el-select v-model="canteen_id" placeholder="请选择消费地点">
+                  <el-option
+                    v-for="item in canteenList"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-button type="primary">查询</el-button>
+              <el-button type="primary">导出</el-button>
             </el-form>
-          </div>
-          <div class="btn-area">
-            <el-button type="primary">查询</el-button>
-            <el-button type="primary">导出</el-button>
           </div>
         </div>
         <div class="main-content">
-          <el-table style="width:100%" :data="tableData" border>
-          </el-table>
+          <el-table style="width:100%" :data="tableData" border></el-table>
         </div>
       </div>
     </div>
@@ -53,7 +50,7 @@
 <script>
 import $axios from "@/api/index";
 export default {
-  data(){
+  data() {
     return {
       formdata: {
         time_begin: "",
@@ -68,56 +65,33 @@ export default {
           value: "公司1",
           label: "公司1"
         }
-      ]
-    }
+      ],
+      tableData: []
+    };
   },
-  created(){
+  created() {
     this.fetchCompanyList();
     // this.getCanteenList();
-    
   },
-  methods:{
-    fetchCompanyList(){
+  methods: {
+    fetchCompanyList() {
       // get('/v1/companies')
-      $axios.
-        get('/v1/manager/companies?name="周兵一级企业"')
+      $axios
+        .get('/v1/manager/companies?name="周兵一级企业"')
         .then(res => {
-          console.log(res)
-          // this.companyList = Array.from(res.data.data);
         })
         .catch(error => console.log(err));
     },
-    getCanteenList(){
+    getCanteenList() {
       this.canteen_id = "";
       $axios
-        .get('/v1/canteens')
-        .then(res => {
-          
-        })
+        .get("/v1/canteens")
+        .then(res => {})
         .catch(error => console.log(err));
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scpoed>
-  .main-header{
-    .select-title {
-      float: left;
-      width: 90%;
-      display: flex;
-      flex-wrap: wrap;
-    }
-    .btn-area {
-      float: right;
-      width: 10%;
-      display: flex;
-      flex-direction: column;
-      display: block;
-      .el-button {
-        margin-bottom: 20px;
-      }
-    }
-  }
-  
 </style>

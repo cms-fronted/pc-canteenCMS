@@ -13,8 +13,6 @@
             >
               <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
             </el-select>
-          </div>
-          <div class="btn-area">
             <el-button type="primary" @click="fetchSupplierList">查询供应商</el-button>
             <el-button type="primary" @click="showAddSupplier">增加供应商</el-button>
           </div>

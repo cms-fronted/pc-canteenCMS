@@ -22,6 +22,10 @@ import getTitle from '@/utils/getTitle'
 
 export const currencyRoutes = [
   {
+    path: '/',
+    redirect:'/order'
+  },
+  {
     path: '/login',
     name: 'Login',
     component: () => import('@/views/login'),
@@ -31,28 +35,13 @@ export const currencyRoutes = [
     hidden: true
   },
   {
-    path: '/',
-    name: 'Home',
-    component: Layout,
-    redirect: '/home',
+    path: '/producer',
+    name: 'producerLogin',
+    component: () => import('@/views/producerLogin'),
     meta: {
-      title: 'Home',
-      icon: 'el-icon-house'
+      title: '登陆页面'
     },
-    children: [
-      {
-        path: 'home',
-        name: 'Home-home',
-        component: () => import('@/views/home'),
-        meta: { title: '首页', }
-      },
-      {
-        path: 'menu',
-        name: 'Home-menu',
-        component: () => import('@/views/menuManage'),
-        meta: { title: '菜单', }
-      }
-    ]
+    hidden: true
   },
   {
     path: '/order',

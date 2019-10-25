@@ -150,6 +150,7 @@ export default {
   created() {
     this.getSupplierList();
     this.getCategoryList();
+    this.fetchTableList();
   },
   methods: {
     /* 公用方法*/
@@ -187,10 +188,9 @@ export default {
     getSupplierList() {
       this.supplier_id = "";
       $axios
-        .get("/v1/company/suppliers?page=1&size=10")
+        .get("/v1/company/suppliers")
         .then(res => {
-          console.log(res.data.data);
-          this.supplierList = res.data.data;
+          this.supplierList = res.data;
           this.supplierList.unshift({
             id: 0,
             name: "全部"
@@ -332,4 +332,10 @@ export default {
 </script>
 
 <style  lang="scss" scpoed>
+.main-content {
+  .el-button {
+    margin-left: 5px;
+    margin-top: 5px;
+  }
+}
 </style>

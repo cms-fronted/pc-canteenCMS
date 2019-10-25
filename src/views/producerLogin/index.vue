@@ -69,7 +69,7 @@ export default {
     };
   },
   mounted() {
-    this.shopTip();
+    // this.shopTip();
   },
   methods: {
     onSuccess() {
@@ -94,7 +94,7 @@ export default {
     },
     _login() {
       this.$store
-        .dispatch("user/_login", this.ruleForm)
+        .dispatch("user/_producerLogin", this.ruleForm)
         .then(res => {
           if (!res.code == "200") {
             this.refresh();

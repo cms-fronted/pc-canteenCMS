@@ -7,14 +7,14 @@
         <div class="main-header">
           <div class="select-title">
             <span class="content-header">公司：</span>
-            <el-select
-              v-model="company_id"
-              placeholder="请选择"
-            >
-              <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+            <el-select v-model="company_id" placeholder="请选择">
+              <el-option
+                v-for="item in companyList"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              ></el-option>
             </el-select>
-          </div>
-          <div class="btn-area">
             <el-button type="primary" @click="fetchTableList">查询商品类型</el-button>
             <el-button type="primary" @click="addGoods">增加商品类型</el-button>
           </div>
@@ -31,32 +31,28 @@
             </el-table-column>
           </el-table>
           <pagination v-show="total > 10" :total="total" :page.sync="page" @pagination="getList"></pagination>
-          </div>
         </div>
       </div>
-      <!-- 增加商品类型弹窗  -->
-      <add-dialog 
-        :visible="AddVisible" 
-        @closeDialog1="closeDialog1" 
-        :editData="goodsForm"
-      ></add-dialog>
-      <!-- 更改商品类型弹窗 -->
-      <revise-dialog 
-        :visible="reviseVisible" 
-        @closeDialog2="closeDialog2" 
-        :editData="reviseForm"
-        :c_id="currentCompanyId"
-      ></revise-dialog>
     </div>
+    <!-- 增加商品类型弹窗  -->
+    <add-dialog :visible="AddVisible" @closeDialog1="closeDialog1" :editData="goodsForm"></add-dialog>
+    <!-- 更改商品类型弹窗 -->
+    <revise-dialog
+      :visible="reviseVisible"
+      @closeDialog2="closeDialog2"
+      :editData="reviseForm"
+      :c_id="currentCompanyId"
+    ></revise-dialog>
+  </div>
 </template>
 
 <script>
 import $axios from "@/api/index";
 import AddDialog from "./dialog1";
 import ReviseDialog from "./dialog2";
-import Pagination from '@/components/Pagination'
+import Pagination from "@/components/Pagination";
 export default {
-  data(){
+  data() {
     return {
       companyList: [],
       company_id: "",
@@ -65,24 +61,24 @@ export default {
         c_id: "",
         name: ""
       },
-      reviseForm:{
+      reviseForm: {
         id: "",
         name: ""
       },
       tableList: [],
-      currentGoodsId : "",
+      currentGoodsId: "",
       reviseVisible: false,
       currentCompanyId: "",
       total: 0,
-      page: 1,
-    }
+      page: 1
+    };
   },
-  components: { AddDialog,ReviseDialog,Pagination },
-  created(){
+  components: { AddDialog, ReviseDialog, Pagination },
+  created() {
     this.fetchCompanyList();
   },
-  methods:{
-    fetchCompanyList(){
+  methods: {
+    fetchCompanyList() {
       $axios
         .get("/v1/companies")
         .then(res => {
@@ -90,7 +86,7 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    fetchTableList(){
+    fetchTableList() {
       $axios
         .get(`/v1/categories?c_id=${this.company_id}&page=${this.page}&size=10`)
         .then(res => {
@@ -99,22 +95,22 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    handleEdit(val){
+    handleEdit(val) {
       this.reviseForm.id = val.id;
       this.reviseForm.name = val.name;
       this.currentCompanyId = val.c_id;
       this.reviseVisible = true;
     },
-    handleDelete(val){
+    handleDelete(val) {
       this.currentGoodsId = val.id;
       this.$confirm("确定删除该类型吗？", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
         type: "warning"
       })
-        .then(() =>{
+        .then(() => {
           $axios
-            .post("/v1/category/delete",{
+            .post("/v1/category/delete", {
               id: this.currentGoodsId
             })
             .then(res => {
@@ -122,67 +118,69 @@ export default {
               this.sendMessage(res.msg);
             })
             .catch(err => console.log(err));
-        }).catch((err) => {});
+        })
+        .catch(err => {});
     },
-    addGoods(){
+    addGoods() {
       this.AddVisible = true;
     },
-    sendMessage(msg){
-      if(msg === 'ok'){
+    sendMessage(msg) {
+      if (msg === "ok") {
         this.$message({
           type: "success",
           message: "操作成功!"
         });
-      }else {
+      } else {
         this.$message({
           type: "info",
           message: "操作失败"
-        })
+        });
       }
     },
-    closeDialog1(val,msg){
+    closeDialog1(val, msg) {
       this.goodsForm = {
         c_id: "",
         name: ""
       };
       this.AddVisible = val;
-      if(msg === 'ok'){
+      if (msg === "ok") {
         this.fetchTableList();
         this.sendMessage(msg);
       }
     },
-    closeDialog2(val,msg){
+    closeDialog2(val, msg) {
       this.reviseForm = {
         id: "",
         name: ""
       };
       this.reviseVisible = val;
-      if(msg === 'ok'){
+      if (msg === "ok") {
         this.fetchTableList();
         this.sendMessage(msg);
       }
     },
-    getList(val){
+    getList(val) {
       this.page = val;
       this.fetchTableList();
     }
   }
-}
+};
 </script>
 
 <style lang="scss" scpoed>
-  .main{
-    .main-content{
-      .el-table{
-        th,td{
-          text-align: center;
-        }
+.main {
+  .main-content {
+    .el-table {
+      th,
+      td {
+        text-align: center;
       }
     }
   }
-  .el-dialog__wrapper{
-    .el-dialog{
-      width: 30%;
-    }
+}
+.el-dialog__wrapper {
+  .el-dialog {
+    width: 30%;
   }
+}
 </style>
