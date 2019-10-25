@@ -17,8 +17,13 @@
           <el-option v-for="item in canteenList" :key="item.id" :value="item.id" :label="item.name"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="餐次" prop="dinner_id" @change="getCategoryList">
-        <el-select v-model="formdata.dinner_id" placeholder="请选择" style="width:120px">
+      <el-form-item label="餐次" prop="dinner_id">
+        <el-select
+          v-model="formdata.dinner_id"
+          placeholder="请选择"
+          style="width:120px"
+          @change="getCategoryList"
+        >
           <el-option v-for="item in dinnerList" :key="item.id" :value="item.id" :label="item.name"></el-option>
         </el-select>
       </el-form-item>
@@ -28,7 +33,7 @@
             v-for="item in categoryList"
             :key="item.id"
             :value="item.id"
-            :label="item.name"
+            :label="item.category"
           ></el-option>
         </el-select>
       </el-form-item>
@@ -78,7 +83,8 @@ export default {
       type: Boolean
     },
     editData: Object,
-    canteenList: Array
+    canteenList: Array,
+    c_id: [String,Number]
   },
   data() {
     return {
@@ -116,6 +122,7 @@ export default {
   },
   methods: {
     _add() {
+      this.formdata = {c_id: this.c_id, ...this.formdata};
       $axios
         .post("/v1/food/save", this.formdata)
         .then(res => {

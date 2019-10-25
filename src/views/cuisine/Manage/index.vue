@@ -40,7 +40,7 @@
               <el-select v-model="queryForm.m_id">
                 <el-option
                   v-for="item in categoryList"
-                  :label="item.name"
+                  :label="item.category"
                   :key="item.id"
                   :value="item.id"
                 ></el-option>
@@ -82,7 +82,13 @@
         ></el-pagination>-->
       </div>
     </div>
-    <cuisine-dialog :visible="visible" @closeDialog="closeDialog" @_add="_add" :canteenList="locationList" />
+    <cuisine-dialog
+      :c_id="queryForm.company_id"
+      :visible="visible"
+      @closeDialog="closeDialog"
+      @_add="_add"
+      :canteenList="locationList"
+    />
     <el-dialog
       :visible.sync="editVisible"
       title="编辑"
@@ -94,7 +100,7 @@
         <el-form-item style="display:block" label="图片">
           <el-upload
             ref="editUpload"
-            action="http://yuncanteen.51canteen.com:9230/NewJMConsumeJMHG/Mall_photo.ashx"
+            action="/v1/image/upload"
             name="photo"
             :file-list="fileList"
             list-type="picture-card"
@@ -227,7 +233,9 @@ export default {
       if (!isNaN(dinner_id)) {
         $axios
           .get(`/v1/menus/dinner?dinner_id=${dinner_id}`)
-          .then(res => console.log(res))
+          .then(res => {
+            this.categoryList = Array.from(res.data);
+          })
           .catch(err => console.log(err));
       }
     },
@@ -245,27 +253,6 @@ export default {
       this.editVisible = true;
       this.editFormdata = Object.assign({}, item);
     },
-
-    confirmEdit() {
-      Object.assign(this.editFormdata, {
-        types: "edit_goods"
-      });
-      this.$axios
-        .post("/NewJMConsumeJMHG/Mall.ashx", this.editFormdata)
-        .then(res => {
-          if (res.data.code == "200") {
-            this.$message.success(res.data.msg);
-            this.fileList = new Array();
-            this.$refs.editUpload.clearFiles();
-            this.$refs["editForm"].resetFields();
-            this.fetchList(this.page);
-            this.editVisible = false;
-          } else {
-            this.$message.fail(res.data.msg);
-          }
-        })
-        .catch(err => console.log(err));
-    },
     handleClose(done) {
       this.fileList = new Array();
       this.editVisible = false;
@@ -274,7 +261,9 @@ export default {
       this.editData = {};
       this.visible = val;
     },
-
+    confirmEdit() {
+      console.log("确定编辑");
+    },
     openNewType() {
       this.newTypeVisible = true;
     },

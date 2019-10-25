@@ -63,9 +63,14 @@
           </el-select>
         </el-form-item>
         <el-form-item label="餐次">
-          <el-checkbox-group v-model="menuForm.d_id">
-            <el-checkbox v-for="item in dinnerList" :label="item.id" :key="item.id">{{item.name}}</el-checkbox>
-          </el-checkbox-group>
+          <el-select v-model="menuForm.d_id">
+            <el-option
+              v-for="item in dinnerList"
+              :value="item.id"
+              :label="item.name"
+              :key="item.id"
+            ></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="菜类">
           <div v-for="(item, index) in listObj" :key="index" style="margin:5px 0">
@@ -220,10 +225,9 @@ export default {
     },
     handleClick() {
       console.log(this.menuForm);
-      // return;
       $axios
         .post("/v1/menu/save", this.menuForm)
-        .then(res => console.log())
+        .then(res => console.log(res))
         .catch(err => console.log(err));
     },
     changeStatus() {
