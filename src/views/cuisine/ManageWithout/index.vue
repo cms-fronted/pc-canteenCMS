@@ -212,7 +212,7 @@ export default {
       let { m_id, dinner_id, canteen_id, company_id } = queryForm;
       $axios
         .get(`/v1/foods`, {
-          f_type: 2,
+          f_type: 1,
           page: page,
           size: this.pageSize,
           company_ids: company_id,

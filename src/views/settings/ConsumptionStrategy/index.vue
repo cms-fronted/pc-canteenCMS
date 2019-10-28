@@ -2,124 +2,164 @@
   <div class="strategy">
     <div class="nav-title">消费策略设置</div>
     <el-divider></el-divider>
-    <el-table
-      :data="dataList"
-      :span-method="objectSpanMethod"
-      size="mini"
-      border
-      style="width: 100%"
-    >
-      <el-table-column prop="canteen" label="消费地点" width="180"></el-table-column>
-      <el-table-column prop="role" label="人员类型" width="180"></el-table-column>
-      <el-table-column prop="dinner" label="餐饮"></el-table-column>
-      <el-table-column prop="unordered_meals" label="免订餐就餐"></el-table-column>
-      <el-table-column prop="no_meals_ordered" label="未定餐允许就餐"></el-table-column>
-      <el-table-column prop="consumption_count" label="允许消费次数"></el-table-column>
-      <el-table-column prop="status" label="消费状态">
-        <template slot-scope="scope">
-          <span>{{scope.row.status | consumptionType}}</span>
-        </template>
-      </el-table-column>
-      <el-table-column prop="num_type" label="次数类型"></el-table-column>
-      <el-table-column prop="money" label="金额"></el-table-column>
-    </el-table>
+    <div class="main">
+      <div class="main-header">
+        <el-form :model="queryForm" :inline="true" label-width="80px">
+          <el-form-item label="公司">
+            <el-select v-model="queryForm.company_id" @change="getCanteenList">
+              <el-option
+                v-for="item in companiesList"
+                :label="item.name"
+                :value="item.id"
+                :key="item.id"
+              ></el-option>
+            </el-select>
+            <el-form-item label="饭堂">
+              <el-select v-model="queryForm.c_id">
+                <el-option
+                  v-for="item in canteenList"
+                  :label="item.name"
+                  :key="item.id"
+                  :value="item.id"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-button @click="queryList">查询</el-button>
+            <el-button>新增</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+    </div>
+    <div class="main-cotent">
+      <el-table
+        :data="dataList"
+        :span-method="objectSpanMethod"
+        size="mini"
+        border
+        style="width: 100%"
+      >
+        <el-table-column prop="canteen" label="消费地点" width="180"></el-table-column>
+        <el-table-column prop="role" label="人员类型" width="180"></el-table-column>
+        <el-table-column prop="dinner" label="餐饮"></el-table-column>
+        <el-table-column prop="no_meals_ordered" label="未定餐允许就餐"></el-table-column>
+        <el-table-column prop="consumption_count" label="允许消费次数"></el-table-column>
+        <el-table-column prop="status" label="消费状态">
+          <template slot-scope="scope">
+            <span>{{scope.row.status | consumptionType}}</span>
+          </template>
+        </el-table-column>
+        <el-table-column prop="num_type" label="次数类型"></el-table-column>
+        <el-table-column prop="money" label="金额"></el-table-column>
+      </el-table>
+    </div>
   </div>
 </template>
 
 <script>
-import { isArray } from "util";
+import { flatten, getAllOptions } from "@/utils/flatternArr";
+import $axios from "@/api/index";
 export default {
   data() {
     return {
-      budgetList: [
-        {
-          id: 14,
-          unordered_meals: 1,
-          detail: [
-            {
-              number: 1,
-              strategy: [
-                { satus: "ordering_meals", money: 10, sub_money: 5 },
-                { satus: "no_meals_ordered", money: 10, sub_money: 5 },
-                { satus: "unordered_meals", money: 10, sub_money: 5 }
-              ]
-            },
-            {
-              number: 2,
-              strategy: [
-                { satus: "ordering_meals", money: 10, sub_money: 5 },
-                { satus: "no_meals_ordered", money: 10, sub_money: 5 },
-                { satus: "unordered_meals", money: 10, sub_money: 5 }
-              ]
-            }
-          ],
-          consumption_count: 1,
-          ordered_count: 1,
-          dinner: { id: 5, name: "早餐" },
-          role: { id: 1, name: "局长" },
-          canteen: { id: 1, name: "大饭堂" }
-        },
-        {
-          id: 15,
-          unordered_meals: 1,
-          detail: [
-            {
-              number: 1,
-              strategy: [
-                { satus: "ordering_meals", money: 10, sub_money: 5 },
-                { satus: "no_meals_ordered", money: 10, sub_money: 5 },
-                { satus: "unordered_meals", money: 10, sub_money: 5 }
-              ]
-            },
-            {
-              number: 2,
-              strategy: [
-                { satus: "ordering_meals", money: 10, sub_money: 5 },
-                { satus: "no_meals_ordered", money: 10, sub_money: 5 },
-                { satus: "unordered_meals", money: 10, sub_money: 5 }
-              ]
-            }
-          ],
-          consumption_count: 1,
-          ordered_count: 1,
-          dinner: { id: 6, name: "中餐" },
-          role: { id: 1, name: "局长" },
-          canteen: { id: 1, name: "大饭堂" }
-        },
-        {
-          id: 16,
-          unordered_meals: 1,
-          detail: [
-            {
-              number: 1,
-              strategy: [
-                { satus: "ordering_meals", money: 10, sub_money: 5 },
-                { satus: "no_meals_ordered", money: 10, sub_money: 5 },
-                { satus: "unordered_meals", money: 10, sub_money: 5 }
-              ]
-            },
-            {
-              number: 2,
-              strategy: [
-                { satus: "ordering_meals", money: 10, sub_money: 5 },
-                { satus: "no_meals_ordered", money: 10, sub_money: 5 },
-                { satus: "unordered_meals", money: 10, sub_money: 5 }
-              ]
-            }
-          ],
-          consumption_count: 1,
-          ordered_count: 1,
-          dinner: { id: 7, name: "晚餐" },
-          role: { id: 1, name: "局长" },
-          canteen: { id: 1, name: "大饭堂" }
-        }
-      ],
+      queryForm: {
+        company_id: "",
+        c_id: ""
+      },
+      canteenList: [],
+      companiesList: [],
+      current_page: 1,
+      budgetList: [],
+      // budgetList: [
+      //   {
+      //     id: 14,
+      //     unordered_meals: 1,
+      //     detail: [
+      //       {
+      //         number: 1,
+      //         strategy: [
+      //           { satus: "ordering_meals", money: 10, sub_money: 5 },
+      //           { satus: "no_meals_ordered", money: 10, sub_money: 5 },
+      //           { satus: "unordered_meals", money: 10, sub_money: 5 }
+      //         ]
+      //       },
+      //       {
+      //         number: 2,
+      //         strategy: [
+      //           { satus: "ordering_meals", money: 10, sub_money: 5 },
+      //           { satus: "no_meals_ordered", money: 10, sub_money: 5 },
+      //           { satus: "unordered_meals", money: 10, sub_money: 5 }
+      //         ]
+      //       }
+      //     ],
+      //     consumption_count: 1,
+      //     ordered_count: 1,
+      //     dinner: { id: 5, name: "早餐" },
+      //     role: { id: 1, name: "局长" },
+      //     canteen: { id: 1, name: "大饭堂" }
+      //   },
+      //   {
+      //     id: 15,
+      //     unordered_meals: 1,
+      //     detail: [
+      //       {
+      //         number: 1,
+      //         strategy: [
+      //           { satus: "ordering_meals", money: 10, sub_money: 5 },
+      //           { satus: "no_meals_ordered", money: 10, sub_money: 5 },
+      //           { satus: "unordered_meals", money: 10, sub_money: 5 }
+      //         ]
+      //       },
+      //       {
+      //         number: 2,
+      //         strategy: [
+      //           { satus: "ordering_meals", money: 10, sub_money: 5 },
+      //           { satus: "no_meals_ordered", money: 10, sub_money: 5 },
+      //           { satus: "unordered_meals", money: 10, sub_money: 5 }
+      //         ]
+      //       }
+      //     ],
+      //     consumption_count: 1,
+      //     ordered_count: 1,
+      //     dinner: { id: 6, name: "中餐" },
+      //     role: { id: 1, name: "局长" },
+      //     canteen: { id: 1, name: "大饭堂" }
+      //   },
+      //   {
+      //     id: 16,
+      //     unordered_meals: 1,
+      //     detail: [
+      //       {
+      //         number: 1,
+      //         strategy: [
+      //           { satus: "ordering_meals", money: 10, sub_money: 5 },
+      //           { satus: "no_meals_ordered", money: 10, sub_money: 5 },
+      //           { satus: "unordered_meals", money: 10, sub_money: 5 }
+      //         ]
+      //       },
+      //       {
+      //         number: 2,
+      //         strategy: [
+      //           { satus: "ordering_meals", money: 10, sub_money: 5 },
+      //           { satus: "no_meals_ordered", money: 10, sub_money: 5 },
+      //           { satus: "unordered_meals", money: 10, sub_money: 5 }
+      //         ]
+      //       }
+      //     ],
+      //     consumption_count: 1,
+      //     ordered_count: 1,
+      //     dinner: { id: 7, name: "晚餐" },
+      //     role: { id: 1, name: "局长" },
+      //     canteen: { id: 1, name: "大饭堂" }
+      //   }
+      // ],
       dataList: [],
       spanArr: [], //二维数组，用于存放单元格合并规则
       position: 0 //用于存储相同项的开始index
     };
   },
   mounted() {
+    this.getCompanies();
+    this.getRoleType();
     this.handleData();
     this.rowspan(0, "canteen");
     this.rowspan(1, "role");
@@ -138,6 +178,38 @@ export default {
     }
   },
   methods: {
+    async getCompanies() {
+      await $axios
+        .get("/v1/admin/companies")
+        .then(res => {
+          let arr = res.data;
+          this.companiesList = flatten(arr);
+          this.queryForm.c_id = null;
+          this.canteenList = [];
+        })
+        .catch(err => console.log(err));
+    },
+    async getCanteenList(company_id) {
+      await $axios
+        .get(`/v1/company/consumptionLocation?company_id=${company_id}`)
+        .then(res => {
+          this.canteenList = Array.from(res.data.canteen);
+        })
+        .catch(err => console.log(err));
+    },
+    async queryList() {
+      let data = await $axios.get("/v1/canteen/consumptionStrategy", {
+        c_id: this.queryForm.c_id,
+        page: this.current_page,
+        size: 3
+      });
+    },
+    async getRoleType(){
+      let res = await $axios.get('/v1/role/types')
+      console.log(res);
+      return res;
+    },
+    //处理合并数据
     objectSpanMethod({ row, column, rowIndex, columnIndex }) {
       if (column.label == "人员类型") {
         let _row, _col;
@@ -174,7 +246,6 @@ export default {
           });
         });
       });
-      console.log(_data);
       this.dataList = _data;
     },
 

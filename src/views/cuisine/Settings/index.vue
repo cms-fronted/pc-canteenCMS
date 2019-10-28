@@ -237,7 +237,7 @@ export default {
     fetchTableList() {
       $axios
         .get(
-          `/v1/menus/company?company_id=${this.company_id}&canteen_id=${this.canteen_id}`
+          `/v1/menus/company?company_id=${this.company_id}&canteen_id=${this.canteen_id}&s7ize=2&page=1`
         )
         .then(res => {
           let _data = Array.from(res.data.data);

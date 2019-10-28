@@ -182,7 +182,15 @@ export const currencyRoutes = [
         meta: {
           title: '菜品管理'
         }
-      }
+      },
+      {
+        path: 'withoutManage',
+        name: 'Without-cuisine-manage',
+        component: () => import('@/views/cuisine/ManageWithout'),
+        meta: {
+          title: '菜品管理(无选菜)'
+        }
+      },
     ]
   },
   {

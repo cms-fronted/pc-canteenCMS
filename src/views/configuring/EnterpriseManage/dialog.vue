@@ -76,29 +76,29 @@
 
       <!-- 硬件信息对话框 -->
       <el-dialog
-        :visible.sync="addProductVisible"
+        :visible.sync="addMachineVisible"
         width="40%"
-        @close="addProductVisible = false"
+        @close="addMachineVisible = false"
         append-to-body
         title="新增硬件"
       >
-        <el-form ref="productForm" :model="productForm" label-width="80px">
+        <el-form ref="machineForm" :model="machineForm" label-width="80px">
           <el-form-item label="设备名称" prop="name">
-            <el-input v-model="productForm.name"></el-input>
+            <el-input v-model="machineForm.name"></el-input>
           </el-form-item>
           <el-form-item label="设备号" prop="code">
-            <el-input v-model="productForm.code"></el-input>
+            <el-input v-model="machineForm.code"></el-input>
           </el-form-item>
           <el-form-item label="编号" prop="number">
-            <el-input v-model="productForm.number"></el-input>
+            <el-input v-model="machineForm.number"></el-input>
           </el-form-item>
-          <el-form-item label="密码" prop="pwd">
-            <el-input v-model="productForm.pwd"></el-input>
+          <el-form-item label="密码" prop="pwd" v-if="!isEditMachine">
+            <el-input v-model="machineForm.pwd"></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
-          <el-button @click="addProductVisible = false">取 消</el-button>
-          <el-button type="primary" @click="_submitProductInfo">确 定</el-button>
+          <el-button @click="closeMachineDialog">取 消</el-button>
+          <el-button type="primary" @click="_submitMachineInfo">确 定</el-button>
         </div>
       </el-dialog>
       <el-row :gutter="20">
@@ -138,7 +138,7 @@
               type="primary"
               size="small"
               @click="addCanteen"
-              :disabled="!canteens || canteen_id"
+              :disabled="isEdit || canteen_id"
             >新增饭堂</el-button>
             <el-button type="primary" size="small" @click="handleClick">添加餐次</el-button>
             <el-table style="width:100%" :data="dataTable" size="small">
@@ -169,7 +169,14 @@
           <el-card class="box-card" body-style="paddingBottom: 5px">
             <div slot="header" class="clearfix">账户设置</div>
             <el-form ref="accountForm" :model="accountForm">
-              <el-form-item>
+              <el-form-item prop="dinningMode">
+                <el-radio-group v-model="accountForm.dining_mode">
+                  <el-radio :label="1">堂食</el-radio>
+                  <el-radio :label="2">外卖</el-radio>
+                  <el-radio :label="3">全部</el-radio>
+                </el-radio-group>
+              </el-form-item>
+              <el-form-item prop="type">
                 <el-radio-group v-model="accountForm.type">
                   <el-radio :label="2">不可透支消费</el-radio>
                   <el-radio :label="1">可透支消费</el-radio>
@@ -185,7 +192,7 @@
                   ></el-input>元
                 </span>
               </el-form-item>
-              <el-form-item>
+              <el-form-item prop="clean_type">
                 <div style="marginTop: 5px">
                   <el-radio-group v-model="accountForm.clean_type">
                     <el-radio :label="2">非系统自动清零</el-radio>
@@ -214,18 +221,23 @@
               <el-button
                 style="float: right; padding: 3px 0"
                 type="text"
-                @click="addNewProduct"
+                @click="oprnMachineDialog"
               >添加硬件</el-button>
             </div>
-            <el-table :data="productData" style="width:100%" size="mini">
+            <el-table :data="machineTable" style="width:100%" size="mini">
               <el-table-column label="编号" prop="number"></el-table-column>
               <el-table-column label="设备名称" prop="name"></el-table-column>
               <el-table-column label="设备号" prop="code"></el-table-column>
-              <el-table-column label="密码" prop="pwd"></el-table-column>
+              <!-- <el-table-column label="密码" prop="pwd"></el-table-column> -->
+              <el-table-column label="状态">
+                <template slot-scope="scoped">
+                  <span>{{scoped.row.state===1?"正常":"异常"}}</span>
+                </template>
+              </el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="scoped">
-                  <el-button size="small" type="text">编辑</el-button>
-                  <el-button size="small" type="text" @click="_delete(scoped.row)">删除</el-button>
+                  <el-button size="small" type="text" @click="_editMachine(scoped.row)">编辑</el-button>
+                  <!-- <el-button size="small" type="text" @click="_deleteMachine(scoped.row)">删除</el-button> -->
                 </template>
               </el-table-column>
             </el-table>
@@ -241,6 +253,7 @@
 </template>
 <script>
 import $axios from "@/api/index";
+import { stringify } from "querystring";
 const weekOptions = [
   { label: "周一", value: 0 },
   { label: "周二", value: 1 },
@@ -251,14 +264,27 @@ const weekOptions = [
   { label: "周日", value: 6 }
 ];
 export default {
-  props: ["visible", "company_id", "dialogTitle", "isEdit", "formdata"],
+  props: [
+    "visible",
+    "company_id",
+    "dialogTitle",
+    "isEdit",
+    "formdata",
+    "editDinnerList",
+    "editAccount",
+    "machineList"
+  ],
   data() {
     return {
       isOpen: false,
       dinnersVisible: false,
-      addProductVisible: false,
-      productForm: {
-        c_id: "",
+      addMachineVisible: false,
+      editDinnerData: this.editDinnerList,
+      editAccountForm: this.editAccount,
+      isEditMachine: false,
+      machineForm: {
+        id: "",
+        belong_id: "",
         name: "",
         code: "",
         number: "",
@@ -295,17 +321,36 @@ export default {
       accountForm: {
         type: "",
         clean_type: "",
+        dining_mode: 1,
         clean_day: 1,
         clean_time: "08:00",
         limit_money: 1
       },
       dataTable: [],
-      productData: []
+      machineTable: []
     };
   },
   watch: {
     visible(val) {
       this.isOpen = val;
+    },
+    formdata(val) {
+      this.canteens = val.name;
+    },
+    editDinnerList(val) {
+      if (this.isEdit) {
+        this.dataTable = val;
+      }
+    },
+    editAccount(val) {
+      if (this.isEdit) {
+        this.accountForm = val;
+      }
+    },
+    machineList(val) {
+      if (this.isEdit) {
+        this.machineTable = val;
+      }
     }
   },
   created() {
@@ -385,7 +430,7 @@ export default {
         });
     },
     _addDinner() {
-      //添加残次信息
+      //添加餐次信息
       this.dataTable.push({ ...this.dinnerForm });
       this.$refs.dinnerForm.resetFields();
       this.dinnersVisible = false;
@@ -393,10 +438,17 @@ export default {
     _submitOptions() {
       let data = {};
       data.dinners = JSON.stringify(this.dataTable);
-      data.c_id = this.canteen_id;
       data.account = JSON.stringify(this.accountForm);
+      if (this.isEdit) {
+        data.c_id = this.formdata.id;
+      } else {
+        data.c_id = this.canteen_id;
+      }
+      const url = !this.isEdit
+        ? "/v1/canteen/configuration/save"
+        : "/v1/canteen/configuration/update";
       $axios
-        .post("/v1/canteen/configuration/save", data)
+        .post(url, data)
         .then(res => {
           this.$message.success("设置成功");
           this.dataTable.length = 0;
@@ -405,29 +457,65 @@ export default {
         .catch(err => console.log(err));
     },
     handleClose() {
+      this.dataTable.length = 0;
+      this.$refs.accountForm.resetFields();
       this.$emit("closeAdd", false);
     },
     changeDay(val) {
       this.accountForm.clean_day = val > 31 ? 31 : val;
     },
-    _delete(row) {
-      this.dataTable = this.dataTable.filter(item => {
+    oprnMachineDialog() {
+      this.addMachineVisible = true;
+      this.machineForm = {};
+    },
+    closeMachineDialog() {
+      this.addMachineVisible = false;
+      this.isEditMachine = false;
+      this.machineForm = {};
+    },
+    _deleteMachine(row) {
+      this.machineTable = this.machineTable.filter(item => {
         return item.name != row.name;
       });
     },
-    addNewProduct() {
-      this.addProductVisible = true;
+    _editMachine(row) {
+      this.isEditMachine = true;
+      this.machineForm = Object.assign({}, row);
+      this.addMachineVisible = true;
     },
-    _submitProductInfo() {
-      this.productForm.c_id = this.formdata.id || this.canteen_id;
-      $axios
-        .post("v1/canteen/saveMachine", this.productForm)
-        .then(res => {
-          this.$refs.productForm.resetFields();
-          this.addProductVisible = false;
-          this.$message.success("添加成功");
-        })
-        .catch(err => console.log(err));
+    _submitMachineInfo() {
+      //新增硬件
+      if (!this.isEditMachine) {
+        this.machineForm.belong_id = this.formdata.id || this.canteen_id;
+        this.machineForm.company_id = this.company_id;
+        this.machineForm.machine_type = "canteen";
+        console.log(this.machineForm);
+        $axios
+          .post("v1/canteen/saveMachine", this.machineForm)
+          .then(res => {
+            this.$emit(
+              "updateMachineTable",
+              { id: this.canteen_id || this.formdata.id },
+              "canteen"
+            );
+            this.closeMachineDialog();
+            this.$message.success("添加成功");
+          })
+          .catch(err => console.log(err));
+      } else {
+        $axios
+          .post("/v1/canteen/updateMachine", this.machineForm)
+          .then(res => {
+            this.$emit(
+              "updateMachineTable",
+              { id: this.canteen_id || this.formdata.id },
+              "canteen"
+            );
+            this.closeMachineDialog();
+            this.$message.success("修改成功");
+          })
+          .catch(err => console.log(err));
+      }
     }
   }
 };
@@ -437,6 +525,9 @@ export default {
 .box-card {
   .el-card__header {
     padding: 5px !important;
+  }
+  .el-form-item {
+    margin: 0;
   }
 }
 .clearfix {

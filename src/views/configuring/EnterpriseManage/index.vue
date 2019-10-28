@@ -1,5 +1,5 @@
 <template>
-  <div class="manage">
+  <div class="enterprise-manage">
     <div class="nav-title">企业管理</div>
     <el-divider></el-divider>
     <div class="main">
@@ -83,6 +83,10 @@
       :company_id="company_id"
       :isEdit="isEdit"
       :formdata="editForm"
+      :editDinnerList="editDinnersList"
+      :editAccount="editAccount"
+      :machineList="machineList"
+      @updateMachineTable="(val,type) => getMachineList(val,type)"
     ></add-canteen-dialog>
     <add-shop-dialog
       :visible="addShopVisible"
@@ -99,6 +103,7 @@
 import $axios from "@/api/index";
 import AddCanteenDialog from "./dialog";
 import AddShopDialog from "./addShop";
+import { async } from "q";
 export default {
   components: {
     AddCanteenDialog,
@@ -111,6 +116,17 @@ export default {
       addShopVisible: false,
       canteenDialogTitle: "",
       shopDialogTitle: "",
+      editDinnersList: [],
+      machineList: [],
+      editAccount: {
+        type: "",
+        clean_type: "",
+        clean_day: 1,
+        clean_time: "08:00",
+        limit_money: 1,
+        id: "",
+        dining_mode: 1
+      },
       companyList: [],
       canteensLocData: [],
       shopLocData: [],
@@ -128,7 +144,10 @@ export default {
       enterpriseForm: {
         name: ""
       },
-      editForm: {}
+      editForm: {
+        dinnersList: [],
+        account: {}
+      }
     };
   },
   created() {
@@ -137,7 +156,7 @@ export default {
   watch: {
     filterText(val) {
       this.$refs.tree.filter(val);
-    },
+    }
   },
   methods: {
     handleNodeClick(val) {
@@ -156,7 +175,6 @@ export default {
       $axios
         .get(`/v1/company/consumptionLocation?company_id=${id}`)
         .then(res => {
-          console.log(res);
           this.canteensLocData = Array.from(res.data.canteen);
           if (res.data.shop) {
             this.shopLocData.push(res.data.shop);
@@ -174,16 +192,21 @@ export default {
     },
     addCanteen() {
       this.canteenDialogTitle = "新增饭堂";
+      this.isEdit = false;
+      this.editForm = {};
       this.addCanteenVisible = true;
     },
     _cancelCanteen(val) {
       this.addCanteenVisible = val;
+      this.editDinnersList.length = 0;
+      this.editAccount = {};
     },
     addShop() {
       this.shopDialogTitle = "新增小卖部";
       this.addShopVisible = true;
     },
     closeShopDialog(val) {
+      this.isEdit = val;
       this.addShopVisible = val;
     },
     addEnterprise() {
@@ -205,25 +228,51 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    getCanteenConfig(id) {
-      $axios
+    async getCanteenConfig(id) {
+      let data = null;
+      await $axios
         .get(`/v1/canteen/configuration?c_id=${id}`)
-        .then(res => console.log(res))
+        .then(res => {
+          data = res.data;
+        })
         .catch(err => console.log(err));
+      return data;
     },
-    _editCanteen(val) {
+    async _editCanteen(val) {
       let id = val.id;
       this.isEdit = true;
       this.editForm = val;
       this.canteenDialogTitle = "编辑饭堂";
-      this.getCanteenConfig(id);
+      const data = await this.getCanteenConfig(id);
+      this.getMachineList(val, "canteen");
+      this.editForm.dinnersList = data.dinners;
+      this.editDinnersList = Array.from(data.dinners);
+      this.editAccount = { ...data.account };
       this.addCanteenVisible = true;
     },
-    _editShop(val) {
+    async _editShop(val) {
       this.editForm = val;
+      console.log(this.editForm);
       this.isEdit = true;
       this.shopDialogTitle = "编辑小卖部";
+      this.getMachineList(val, "shop");
       this.addShopVisible = true;
+    },
+    async getMachineList(val, type) {
+      console.log(val, type);
+      let data;
+      await $axios
+        .get("/v1/machines", {
+          belong_id: val.id,
+          machine_type: type,
+          page: 1,
+          size: 10
+        })
+        .then(res => {
+          this.machineList = Array.from(res.data.data);
+        })
+        .catch(err => console.log(err));
+      return data;
     }
   }
 };
@@ -236,7 +285,7 @@ export default {
   min-height: 550px;
 
   .filter-input {
-    width: 80%;
+    width: 90%;
     padding: 0 10px 18px 10px;
   }
 }

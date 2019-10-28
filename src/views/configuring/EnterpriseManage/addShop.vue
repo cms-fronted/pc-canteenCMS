@@ -52,16 +52,22 @@
           </el-card>
         </el-col>
         <el-col :span="14">
-          <el-card body-style="paddingBottom: 5px" v-if="!isEdit">
+          <el-card body-style="paddingBottom: 5px">
             <div slot="header" class="clearfix">
               <span>小卖部</span>
             </div>
-            <div >
+            <div>
               <span style="margin-right: 8px">
                 小卖部名称
-                <el-input v-model="shop_name" size="small" style="width:200px;"></el-input>
+                <el-input v-model="shop_name" size="small" style="width:200px;marginRight:10px"></el-input>
+                <el-radio-group v-model="taking_mode">
+                  <el-radio :label="1">自取</el-radio>
+                  <el-radio :label="2">外卖</el-radio>
+                  <el-radio :label="3">全部</el-radio>
+                </el-radio-group>
               </span>
-              <el-button type="primary" size="small" @click="addShop" :disabled="!shop_name">新增小卖部</el-button>
+              <el-button type="primary" size="small" @click="addShop" v-if="!isEdit">新增小卖部</el-button>
+              <el-button type="primary" size="small" @click="editShop" v-else>编辑小卖部</el-button>
             </div>
           </el-card>
           <el-card class="box-card" body-style="paddingBottom: 5px">
@@ -91,6 +97,7 @@ export default {
     return {
       isOpen: false,
       shop_name: "",
+      taking_mode: 1,
       addProductVisible: false,
       checkAll: { system: false, shop: false, canteen: false },
       modulesCheckbox: { system: [], canteen: [], shop: [] }, //每一个功能模块对应的id
@@ -198,9 +205,21 @@ export default {
       $axios
         .post("/v1/shop/save", {
           c_id: this.company_id,
-          name: this.shop_name
+          name: this.shop_name,
+          taking_mode: this.taking_mode
         })
-        .then(res => console.log(res));
+        .then(res => console.log(res))
+        .catch(err => console.log(err));
+    },
+    editShop() {
+      $axios
+        .post("/v1/shop/update", {
+          id: this.formdata.id,
+          name: this.shop_name,
+          taking_mode: this.taking_mode
+        })
+        .then(res => console.log(res))
+        .catch(err => console.log(err));
     }
   }
 };
