@@ -9,7 +9,7 @@
             <span class="content-header">人员信息</span>
             <el-input class="filter-input" v-model="filterText" placeholder="输入人员信息"  style="width:200px"></el-input>
             <el-button type="primary">查询</el-button>
-            <el-button type="primary">批量补录</el-button>
+            <el-button type="primary" @click="batchHandle">批量补录</el-button>
           </div>
         </div>
         <div class="main-content">
@@ -73,35 +73,19 @@
           </div>
         </div>
       </div>
-      <el-dialog title="批量充值" :visible.sync="dialogFormVisible">
-        <div class="dialog-header clearfix">
-          <span class="download">下载模板：<a href="#" download>补录管理模板.xls</a></span>
-          <el-upload
-            class="upload-excel upload"
-            ref="upload"
-            :limit="limit"
-            :headers="header"
-            :show-file-list="false"
-            accept=".xls,.xlsx"
-            action=""
-            :on-success='handleSuccess'
-            :data="{}"
-            name=""
-            >
-            <el-button type="primary">点击上传</el-button>
-          </el-upload>
-        </div>
-        <div slot="footer" class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
-        </div>
-      </el-dialog>
+      <upload-dialog
+        :params="dialogParams"
+        @closeDialog="closeDialog"
+        :visible="dialogFormVisible"
+      >
+      </upload-dialog>
     </div>
   </div>
 </template>
 
 <script>
 import $axios from "@/api/index";
+import uploadDialog from "./dialog";
 export default {
   data(){
     return {
@@ -121,8 +105,16 @@ export default {
       },
       canteenList: [],
       dinnersList: [],
-      dialogFormVisible: true
+      dialogFormVisible: false,
+      dialogParams: {
+        title: "批量充值",
+        header: {},
+        limit: 1
+      }
     }
+  },
+  components: {
+    uploadDialog
   },
   created(){
     this.fetchCanteenList();
@@ -137,6 +129,12 @@ export default {
           this.canteenList = res.data;
         })
         .catch(error => console.log(err)); */
+    },
+    closeDialog(val){
+      this.dialogFormVisible = val;
+    },
+    batchHandle(){
+      this.dialogFormVisible = true;
     }
   }
 }
@@ -167,6 +165,11 @@ export default {
       }
       .el-button+.el-button {
         margin-left: 30px;
+      }
+    }
+    .el-table{
+      th,td{
+        text-align: center;
       }
     }
   }
