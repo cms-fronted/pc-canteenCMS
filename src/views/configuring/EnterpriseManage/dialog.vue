@@ -93,7 +93,7 @@
             <el-input v-model="machineForm.number"></el-input>
           </el-form-item>
           <el-form-item label="密码" prop="pwd" v-if="!isEditMachine">
-            <el-input v-model="machineForm.pwd"></el-input>
+            <el-input v-model="machineForm.pwd" show-password></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">

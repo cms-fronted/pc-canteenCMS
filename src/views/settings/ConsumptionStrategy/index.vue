@@ -24,7 +24,7 @@
                 ></el-option>
               </el-select>
             </el-form-item>
-            <el-button @click="queryList" :disabled="!!queryForm.c_id">查询</el-button>
+            <el-button @click="queryList" :disabled="!!!queryForm.c_id">查询</el-button>
             <el-button @click="settingDialogVisible  =true">新增</el-button>
           </el-form-item>
         </el-form>
@@ -38,10 +38,10 @@
         border
         style="width: 100%"
       >
-        <el-table-column prop="canteen" label="消费地点" width="180"></el-table-column>
-        <el-table-column prop="role" label="人员类型" width="180"></el-table-column>
-        <el-table-column prop="dinner" label="餐饮"></el-table-column>
-        <el-table-column label="未定餐允许就餐">
+        <el-table-column prop="canteen" label="消费地点" width="120px"></el-table-column>
+        <el-table-column prop="role" label="人员类型" width="120px"></el-table-column>
+        <el-table-column prop="dinner" label="餐饮" width="120px"></el-table-column>
+        <el-table-column label="未定餐允许就餐" width="150px">
           <template slot-scope="scoped">
             <span>
               {{
@@ -50,15 +50,25 @@
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="consumption_count" label="允许消费次数"></el-table-column>
-        <el-table-column prop="status" label="消费状态">
+        <el-table-column prop="consumption_count" label="允许消费次数" width="150px"></el-table-column>
+        <el-table-column prop="status" label="消费状态" width="120px">
           <template slot-scope="scope">
             <span>{{scope.row.status | consumptionType}}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="num_type" label="次数类型"></el-table-column>
-        <el-table-column prop="money" label="金额"></el-table-column>
-        <el-table-column label="操作">
+        <el-table-column prop="num_type" label="次数类型" width="80px"></el-table-column>
+        <el-table-column label="金额">
+          <template slot-scope="scoped">
+            <el-tag
+              type="info"
+              size="small"
+              effect="dark"
+              style="marginRight:5px"
+            >标准金额:{{scoped.row.money}}元</el-tag>
+            <el-tag type="warning" size="small" effect="dark">附加金额:{{scoped.row.money}}元</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column label="操作" width="80px">
           <template slot-scope="scoped">
             <span>
               <el-button type="text" @click="_editSetting(scoped.row)">编辑</el-button>
@@ -116,6 +126,135 @@
         <el-button type="primary" @click="_addNewSetting">确 定</el-button>
       </span>
     </el-dialog>
+
+    <el-dialog
+      :visible.sync="changeSettingVisible"
+      title="修改策略"
+      width="40%"
+      @close="_closeEditSettingDialog"
+    >
+      <el-dialog
+        width="40%"
+        append-to-body
+        :visible.sync="addCountVisible"
+        @close="_closeCountDialog"
+      >
+        <el-form :model="countDetailForm">
+          <el-form-item label="次数类型">
+            <p>第{{detail.length + 1}}次</p>
+          </el-form-item>
+          <el-form-item label="订餐就餐">
+            <span>
+              标准金额
+              <el-input
+                style="width:100px"
+                size="mini"
+                type="number"
+                v-model="orderingMealForm.money"
+              ></el-input>
+            </span>
+            <span>
+              附加金额
+              <el-input
+                style="width:100px"
+                size="mini"
+                type="number"
+                v-model="orderingMealForm.sub_money"
+              ></el-input>
+            </span>
+          </el-form-item>
+          <el-form-item label="订餐未就餐">
+            <span>
+              标准金额
+              <el-input
+                style="width:100px"
+                size="mini"
+                type="number"
+                v-model="noMealOrderedForm.money"
+              ></el-input>
+            </span>
+            <span>
+              附加金额
+              <el-input
+                style="width:100px"
+                size="mini"
+                type="number"
+                v-model="noMealOrderedForm.sub_money"
+              ></el-input>
+            </span>
+          </el-form-item>
+          <el-form-item label="未订餐就餐">
+            <span>
+              标准金额
+              <el-input
+                style="width:100px"
+                size="mini"
+                type="number"
+                v-model="unOrderedMealForm.money"
+              ></el-input>
+            </span>
+            <span>
+              附加金额
+              <el-input
+                style="width:100px"
+                size="mini"
+                type="number"
+                v-model="unOrderedMealForm.sub_money"
+              ></el-input>
+            </span>
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="_closeCountDialog">取 消</el-button>
+          <el-button type="primary" @click="_changeDetail">确 定</el-button>
+        </span>
+      </el-dialog>
+
+      <el-form :model="editSettingForm" ref="editSettingForm" label-width="100px">
+        <el-form-item label="未定餐就餐" prop="unordered_meals">
+          <el-radio-group v-model="editSettingForm.unordered_meals">
+            <el-radio :label="1">允许</el-radio>
+            <el-radio :label="2">拒绝</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="订餐数量">
+          <el-input type="number" v-model="editSettingForm.ordered_count" style="width:100px"></el-input>
+        </el-form-item>
+      </el-form>
+      <el-card class="box-card" body-style="paddingBottom: 5px">
+        <div slot="header" class="clearfix">
+          <span>消费设置</span>
+          <el-button style="float: right; padding: 3px 0" type="text" @click="_openCountDialog">添加次数</el-button>
+        </div>
+        <el-table style="width:100%" :data="detailStrategy" height="250">
+          <el-table-column label="次数" width="80px">
+            <template slot-scope="scoped">
+              <span>第{{scoped.row.number}}次</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="类型">
+            <template slot-scope="scope">
+              <span>{{scope.row.status | consumptionType}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="金额">
+            <template slot-scope="scoped">
+              <el-tag
+                type="info"
+                size="mini"
+                effect="dark"
+                style="marginRight:5px"
+              >标准:{{scoped.row.money}}元</el-tag>
+              <el-tag type="warning" size="mini" effect="dark">附加:{{scoped.row.money}}元</el-tag>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-card>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="_closeEditSettingDialog">取 消</el-button>
+        <el-button type="primary" @click="changeSetting">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -126,6 +265,9 @@ export default {
   data() {
     return {
       settingDialogVisible: false,
+      changeSettingVisible: false,
+      addCountVisible: false,
+      isEdit: false,
       queryForm: {
         company_id: "",
         c_id: ""
@@ -140,6 +282,22 @@ export default {
         t_id: "",
         unordered_meals: ""
       },
+      editSettingForm: {},
+      detail: [],
+      detailStrategy: [],
+      countDetailForm: {},
+      orderingMealForm: {
+        money: "",
+        sub_money: ""
+      },
+      noMealOrderedForm: {
+        money: "",
+        sub_money: ""
+      },
+      unOrderedMealForm: {
+        money: "",
+        sub_money: ""
+      },
       current_page: 1,
       budgetList: [],
       dataList: [],
@@ -150,10 +308,6 @@ export default {
   mounted() {
     this.getCompanies();
     this.getRoleType();
-    this.handleData();
-    this.rowspan(0, "canteen");
-    this.rowspan(1, "role");
-    this.rowspan(2, "dinner");
   },
   filters: {
     consumptionType: function(str) {
@@ -206,7 +360,6 @@ export default {
         })
         .then(res => {
           this.budgetList = Array.from(res.data);
-          console.log(this.budgetList);
           this.handleData();
           this.rowspan(0, "canteen");
           this.rowspan(1, "role");
@@ -219,14 +372,107 @@ export default {
         .then(res => (this.roleTypeList = Array.from(res.data.data)));
     },
     async _addNewSetting() {
-      await $axios
-        .post("/v1/canteen/consumptionStrategy/save", this.newSettingForm)
-        .then(res => console.log(res))
-        .catch(err => console.log(err));
+      if (this.isEdit) {
+        this.newSettingForm.detail = JSON.stringify(this.newSettingForm.detail);
+        await $axios
+          .post("/v1/canteen/consumptionStrategy/update", this.newSettingForm)
+          .then(res => {
+            if (res.msg === "ok") {
+              this.closeSettingDialog();
+            }
+          })
+          .catch(err => console.log(err));
+      } else {
+        await $axios
+          .post("/v1/canteen/consumptionStrategy/save", this.newSettingForm)
+          .then(res => {
+            if (res.msg === "ok") {
+              this.$message.success("添加成功");
+              this.queryList();
+            }
+            this.closeSettingDialog();
+          })
+          .catch(err => console.log(err));
+      }
     },
     closeSettingDialog() {
       this.settingDialogVisible = false;
+      this.isEdit = false;
       this.$refs.newSettingForm.resetFields();
+    },
+    _editSetting(row) {
+      let editData = this.budgetList.filter(item => item.id === row.id);
+      let objData = editData[0];
+      let { detail } = objData;
+      this.isEdit = true;
+      this.editSettingForm = Object.assign({}, objData);
+      this.detail = detail;
+      detail &&
+        detail.forEach(i => {
+          i.strategy.forEach(j => {
+            this.detailStrategy.push({
+              number: i.number,
+              status: j.status,
+              money: j.money,
+              sub_money: j.sub_money
+            });
+          });
+        });
+      this.changeSettingVisible = true;
+    },
+    _closeEditSettingDialog() {
+      this.$refs.editSettingForm.resetFields();
+      this.detail = [];
+      this.detailStrategy = [];
+      this.isEdit = false;
+      this.changeSettingVisible = false;
+    },
+    _openCountDialog() {
+      this.addCountVisible = true;
+    },
+    _closeCountDialog() {
+      this.addCountVisible = false;
+      this.orderingMealForm = {};
+      this.noMealOrderedForm = {};
+      this.unOrderedMealForm = {};
+    },
+    //处理消费策略数据
+    _changeDetail() {
+      let number = this.detail.length + 1;
+      let detail = [
+        {
+          number: number,
+          status: "ordering_meals",
+          ...this.orderingMealForm
+        },
+        {
+          number: number,
+          status: "no_meals_ordered",
+          ...this.noMealOrderedForm
+        },
+        {
+          number: number,
+          status: "unordered_meals",
+          ...this.unOrderedMealForm
+        }
+      ];
+      detail.forEach(item => this.detailStrategy.push(item));
+      this.detail.push({ number: number, strategy: detail });
+      this._closeCountDialog();
+    },
+    //提交消费策略设置修改请求
+    async changeSetting() {
+      this.editSettingForm.detail = JSON.stringify(this.detail);
+      await $axios
+        .post("/v1/canteen/consumptionStrategy/update", this.editSettingForm)
+        .then(res => {
+          if (res.msg === "ok") {
+            this.$message.success("修改成功");
+            this.queryList();
+          }
+          this._closeEditSettingDialog();
+        })
+        .catch(err => console.log(err));
     },
     //处理合并数据
     objectSpanMethod({ row, column, rowIndex, columnIndex }) {
@@ -239,9 +485,6 @@ export default {
         };
       }
     },
-    _editSetting(row) {
-      console.log(row);
-    },
     handleData() {
       let _data = [];
       this.budgetList.forEach(i => {
@@ -249,6 +492,7 @@ export default {
           i.detail.forEach(j => {
             j.strategy.forEach(k => {
               _data.push({
+                id: i.id,
                 canteen: i.canteen.name,
                 canteen_id: i.canteen.id,
                 dinner: i.dinner.name,
@@ -256,7 +500,7 @@ export default {
                 role: i.role.name,
                 role_id: i.role.id,
                 money: k.money,
-                status: k.satus,
+                status: k.status,
                 sub_money: k.sub_money,
                 num_type: j.number,
                 consumption_count: i.consumption_count,
@@ -267,6 +511,7 @@ export default {
           });
         } else {
           _data.push({
+            id: i.id,
             canteen: i.canteen.name,
             canteen_id: i.canteen.id,
             dinner: i.dinner.name,
@@ -316,5 +561,18 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss" scoped>
+.clearfix {
+  text-align: center;
+  margin: -20px;
+  padding: 10px 20px;
+}
+.clearfix:before,
+.clearfix:after {
+  display: table;
+  content: "";
+}
+.clearfix:after {
+  clear: both;
+}
 </style>
