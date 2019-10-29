@@ -38,7 +38,20 @@ export default {
       this.$emit('closeDialog',false);
     },
     handleSuccess(){
-
+      this.sendMessage(res.msg);
+    },
+    sendMessage(msg){
+      if(msg === 'ok'){
+        this.$message({
+          type: "success",
+          message: "已成功进行补录!"
+        });
+      }else {
+        this.$message({
+          type: "info",
+          message: "操作失败"
+        })
+      }
     }
   },
   watch: {
