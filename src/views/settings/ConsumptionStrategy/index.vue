@@ -51,6 +51,7 @@
           </template>
         </el-table-column>
         <el-table-column prop="consumption_count" label="允许消费次数" width="150px"></el-table-column>
+        <el-table-column prop="ordered_count" label="订餐数量" width="100px"></el-table-column>
         <el-table-column prop="status" label="消费状态" width="120px">
           <template slot-scope="scope">
             <span>{{scope.row.status | consumptionType}}</span>
@@ -406,6 +407,12 @@ export default {
       let { detail } = objData;
       this.isEdit = true;
       this.editSettingForm = Object.assign({}, objData);
+
+      //处理已有消费策略详情
+      if (!detail) {
+        this.changeSettingVisible = true;
+        return;
+      }
       this.detail = detail;
       detail &&
         detail.forEach(i => {
