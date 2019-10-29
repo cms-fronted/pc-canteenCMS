@@ -2,29 +2,29 @@
   <div>
     <el-dialog :visible.sync="isOpen" width="90%" @close="closeDialog" :title="dialogTitle">
       <el-dialog
-        :visible.sync="addProductVisible"
+        :visible.sync="addMachineVisible"
         width="40%"
-        @close="addProductVisible = false"
+        @close="closeMachineDialog"
         append-to-body
         title="新增硬件"
       >
-        <el-form ref="productForm" :model="productForm" label-width="80px">
+        <el-form ref="machineForm" :model="machineForm" label-width="80px">
           <el-form-item label="设备名称" prop="name">
-            <el-input v-model="productForm.name"></el-input>
+            <el-input v-model="machineForm.name"></el-input>
           </el-form-item>
           <el-form-item label="设备号" prop="code">
-            <el-input v-model="productForm.code"></el-input>
+            <el-input v-model="machineForm.code"></el-input>
           </el-form-item>
           <el-form-item label="编号" prop="number">
-            <el-input v-model="productForm.number"></el-input>
+            <el-input v-model="machineForm.number"></el-input>
           </el-form-item>
           <el-form-item label="密码" prop="pwd">
-            <el-input v-model="productForm.pwd"></el-input>
+            <el-input v-model="machineForm.pwd"></el-input>
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
-          <el-button @click="addProductVisible = false">取 消</el-button>
-          <el-button type="primary" @click="_addProduct">确 定</el-button>
+          <el-button @click="closeMachineDialog">取 消</el-button>
+          <el-button type="primary" @click="_submitMachineInfo">确 定</el-button>
         </div>
       </el-dialog>
 
@@ -59,7 +59,12 @@
             <div>
               <span style="margin-right: 8px">
                 小卖部名称
-                <el-input v-model="shop_name" size="small" style="width:200px;marginRight:10px"></el-input>
+                <el-input
+                  v-model="shop_name"
+                  size="small"
+                  style="width:200px;marginRight:10px"
+                  :disabled="!!shop_id"
+                ></el-input>
                 <el-radio-group v-model="taking_mode">
                   <el-radio :label="1">自取</el-radio>
                   <el-radio :label="2">外卖</el-radio>
@@ -76,15 +81,32 @@
               <el-button
                 style="float: right; padding: 3px 0"
                 type="text"
-                @click="addNewProduct"
+                @click="addNewMachine"
               >添加硬件</el-button>
             </div>
+            <el-table :data="machineTable" style="width:100%" size="mini">
+              <el-table-column label="编号" prop="number"></el-table-column>
+              <el-table-column label="设备名称" prop="name"></el-table-column>
+              <el-table-column label="设备号" prop="code"></el-table-column>
+              <!-- <el-table-column label="密码" prop="pwd"></el-table-column> -->
+              <el-table-column label="状态">
+                <template slot-scope="scoped">
+                  <span>{{scoped.row.state===1?"正常":"异常"}}</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="操作">
+                <template slot-scope="scoped">
+                  <el-button size="small" type="text" @click="_editMachine(scoped.row)">编辑</el-button>
+                  <!-- <el-button size="small" type="text" @click="_deleteMachine(scoped.row)">删除</el-button> -->
+                </template>
+              </el-table-column>
+            </el-table>
           </el-card>
         </el-col>
       </el-row>
       <div slot="footer" class="dialog-footer">
         <el-button @click="closeDialog">取 消</el-button>
-        <el-button type="primary">确定</el-button>
+        <el-button @click="closeDialog" type="primary">确定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -98,7 +120,8 @@ export default {
       isOpen: false,
       shop_name: "",
       taking_mode: 1,
-      addProductVisible: false,
+      addMachineVisible: false,
+      isEditMachine: false,
       checkAll: { system: false, shop: false, canteen: false },
       modulesCheckbox: { system: [], canteen: [], shop: [] }, //每一个功能模块对应的id
       checkedModules: {
@@ -106,8 +129,10 @@ export default {
         shop: [],
         canteen: []
       },
-      productForm: {
-        c_id: this.company_id, //toFixed: 换成小卖部id
+      shop_id: "",
+      machineForm: {
+        belong_id: "",
+        id: "",
         name: "",
         code: "",
         number: "",
@@ -118,13 +143,29 @@ export default {
         shop: false,
         canteen: false
       },
+      machineTable: [],
       modules: [] //系统所有功能模块
     };
   },
-  props: ["visible", "company_id", "dialogTitle", "isEdit", "formdata"],
+  props: [
+    "visible",
+    "company_id",
+    "dialogTitle",
+    "isEdit",
+    "formdata",
+    "machineList"
+  ],
   watch: {
     visible(val) {
       this.isOpen = val;
+    },
+    formdata(val) {
+      this.shop_name = val.name;
+    },
+    machineList(val) {
+      if (this.isEdit) {
+        this.machineTable = val;
+      }
     }
   },
   created() {
@@ -132,6 +173,9 @@ export default {
   },
   methods: {
     closeDialog() {
+      this.shop_name = "";
+      this.shop_id = "";
+      this.taking_mode = 1;
       this.$emit("closeDialog", false);
     },
     handleCheckAllChange(val, index) {
@@ -192,13 +236,54 @@ export default {
       });
     },
     //打开添加硬件对话框
-    addNewProduct() {
-      this.addProductVisible = true;
+    addNewMachine() {
+      this.addMachineVisible = true;
+      this.machineForm = {};
     },
-    //发起添加硬件请求
-    _addProduct() {
-      let data = this.productForm;
-      $axios.post("");
+    closeMachineDialog() {
+      this.addMachineVisible = false;
+      this.isEditMachine = false;
+      this.machineForm = {};
+    },
+    //编辑硬件
+    _editMachine(row) {
+      this.isEditMachine = true;
+      this.machineForm = Object.assign({}, row);
+      this.addMachineVisible = true;
+    },
+    //新增硬件
+    _submitMachineInfo() {
+      if (!this.isEditMachine) {
+        this.machineForm.belong_id = this.formdata.id || this.shop_id;
+        this.machineForm.company_id = this.company_id;
+        this.machineForm.machine_type = "shop";
+        console.log(this.machineForm);
+        $axios
+          .post("v1/canteen/saveMachine", this.machineForm)
+          .then(res => {
+            this.$emit(
+              "updateMachineTable",
+              { id: this.canteen_id || this.formdata.id },
+              "shop"
+            );
+            this.closeMachineDialog();
+            this.$message.success("添加成功");
+          })
+          .catch(err => console.log(err));
+      } else {
+        $axios
+          .post("/v1/canteen/updateMachine", this.machineForm)
+          .then(res => {
+            this.$emit(
+              "updateMachineTable",
+              { id: this.canteen_id || this.formdata.id },
+              "shop"
+            );
+            this.closeMachineDialog();
+            this.$message.success("修改成功");
+          })
+          .catch(err => console.log(err));
+      }
     },
     //发起添加新小卖部请求
     addShop() {
@@ -208,7 +293,14 @@ export default {
           name: this.shop_name,
           taking_mode: this.taking_mode
         })
-        .then(res => console.log(res))
+        .then(res => {
+          if (res.msg === "ok") {
+            this.$message.success("新增成功");
+            this.shop_id = res.data.shop_id;
+          } else {
+            this.$message.error(res.msg);
+          }
+        })
         .catch(err => console.log(err));
     },
     editShop() {
@@ -218,7 +310,9 @@ export default {
           name: this.shop_name,
           taking_mode: this.taking_mode
         })
-        .then(res => console.log(res))
+        .then(res => {
+          if (res.msg === "ok") this.$message.success("修改成功");
+        })
         .catch(err => console.log(err));
     }
   }

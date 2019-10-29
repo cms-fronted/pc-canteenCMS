@@ -452,6 +452,7 @@ export default {
         .then(res => {
           this.$message.success("设置成功");
           this.dataTable.length = 0;
+          this.$emit('updateCanteenList',this.company_id)
           this.handleClose();
         })
         .catch(err => console.log(err));

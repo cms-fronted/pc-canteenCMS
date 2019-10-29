@@ -4,7 +4,7 @@
     <el-divider></el-divider>
     <div class="main">
       <div class="main-header">
-        <el-form :model="queryForm" :inline="true" label-width="80px">
+        <el-form :model="queryForm" :inline="true" label-width="60px">
           <el-form-item label="公司">
             <el-select v-model="queryForm.company_id" @change="getCanteenList">
               <el-option
@@ -24,8 +24,8 @@
                 ></el-option>
               </el-select>
             </el-form-item>
-            <el-button @click="queryList">查询</el-button>
-            <el-button>新增</el-button>
+            <el-button @click="queryList" :disabled="!!queryForm.c_id">查询</el-button>
+            <el-button @click="settingDialogVisible  =true">新增</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -41,7 +41,15 @@
         <el-table-column prop="canteen" label="消费地点" width="180"></el-table-column>
         <el-table-column prop="role" label="人员类型" width="180"></el-table-column>
         <el-table-column prop="dinner" label="餐饮"></el-table-column>
-        <el-table-column prop="no_meals_ordered" label="未定餐允许就餐"></el-table-column>
+        <el-table-column label="未定餐允许就餐">
+          <template slot-scope="scoped">
+            <span>
+              {{
+              scoped.row.unordered_meals === 1 ? "允许" : "拒绝"
+              }}
+            </span>
+          </template>
+        </el-table-column>
         <el-table-column prop="consumption_count" label="允许消费次数"></el-table-column>
         <el-table-column prop="status" label="消费状态">
           <template slot-scope="scope">
@@ -50,8 +58,64 @@
         </el-table-column>
         <el-table-column prop="num_type" label="次数类型"></el-table-column>
         <el-table-column prop="money" label="金额"></el-table-column>
+        <el-table-column label="操作">
+          <template slot-scope="scoped">
+            <span>
+              <el-button type="text" @click="_editSetting(scoped.row)">编辑</el-button>
+            </span>
+          </template>
+        </el-table-column>
       </el-table>
     </div>
+    <el-dialog
+      :visible.sync="settingDialogVisible"
+      width="30%"
+      title="新增策略"
+      @close="closeSettingDialog"
+    >
+      <el-form :model="newSettingForm" ref="newSettingForm" label-width="100px">
+        <el-form-item label="公司" prop="company_id">
+          <el-select v-model="newSettingForm.company_id" @change="getDialogCanteenList">
+            <el-option
+              v-for="item in companiesList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="饭堂" prop="c_id">
+          <el-select v-model="newSettingForm.c_id">
+            <el-option
+              v-for="item in dialogCanteenList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="人员类型" prop="t_id">
+          <el-select v-model="newSettingForm.t_id">
+            <el-option
+              v-for="item in roleTypeList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="未订餐就餐" prop="unordered_meals">
+          <el-radio-group v-model="newSettingForm.unordered_meals">
+            <el-radio :label="1">允许</el-radio>
+            <el-radio :label="2">拒绝</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="closeSettingDialog">取 消</el-button>
+        <el-button type="primary" @click="_addNewSetting">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -61,97 +125,23 @@ import $axios from "@/api/index";
 export default {
   data() {
     return {
+      settingDialogVisible: false,
       queryForm: {
         company_id: "",
         c_id: ""
       },
       canteenList: [],
+      dialogCanteenList: [],
       companiesList: [],
+      roleTypeList: [],
+      newSettingForm: {
+        company_id: "",
+        c_id: "",
+        t_id: "",
+        unordered_meals: ""
+      },
       current_page: 1,
       budgetList: [],
-      // budgetList: [
-      //   {
-      //     id: 14,
-      //     unordered_meals: 1,
-      //     detail: [
-      //       {
-      //         number: 1,
-      //         strategy: [
-      //           { satus: "ordering_meals", money: 10, sub_money: 5 },
-      //           { satus: "no_meals_ordered", money: 10, sub_money: 5 },
-      //           { satus: "unordered_meals", money: 10, sub_money: 5 }
-      //         ]
-      //       },
-      //       {
-      //         number: 2,
-      //         strategy: [
-      //           { satus: "ordering_meals", money: 10, sub_money: 5 },
-      //           { satus: "no_meals_ordered", money: 10, sub_money: 5 },
-      //           { satus: "unordered_meals", money: 10, sub_money: 5 }
-      //         ]
-      //       }
-      //     ],
-      //     consumption_count: 1,
-      //     ordered_count: 1,
-      //     dinner: { id: 5, name: "早餐" },
-      //     role: { id: 1, name: "局长" },
-      //     canteen: { id: 1, name: "大饭堂" }
-      //   },
-      //   {
-      //     id: 15,
-      //     unordered_meals: 1,
-      //     detail: [
-      //       {
-      //         number: 1,
-      //         strategy: [
-      //           { satus: "ordering_meals", money: 10, sub_money: 5 },
-      //           { satus: "no_meals_ordered", money: 10, sub_money: 5 },
-      //           { satus: "unordered_meals", money: 10, sub_money: 5 }
-      //         ]
-      //       },
-      //       {
-      //         number: 2,
-      //         strategy: [
-      //           { satus: "ordering_meals", money: 10, sub_money: 5 },
-      //           { satus: "no_meals_ordered", money: 10, sub_money: 5 },
-      //           { satus: "unordered_meals", money: 10, sub_money: 5 }
-      //         ]
-      //       }
-      //     ],
-      //     consumption_count: 1,
-      //     ordered_count: 1,
-      //     dinner: { id: 6, name: "中餐" },
-      //     role: { id: 1, name: "局长" },
-      //     canteen: { id: 1, name: "大饭堂" }
-      //   },
-      //   {
-      //     id: 16,
-      //     unordered_meals: 1,
-      //     detail: [
-      //       {
-      //         number: 1,
-      //         strategy: [
-      //           { satus: "ordering_meals", money: 10, sub_money: 5 },
-      //           { satus: "no_meals_ordered", money: 10, sub_money: 5 },
-      //           { satus: "unordered_meals", money: 10, sub_money: 5 }
-      //         ]
-      //       },
-      //       {
-      //         number: 2,
-      //         strategy: [
-      //           { satus: "ordering_meals", money: 10, sub_money: 5 },
-      //           { satus: "no_meals_ordered", money: 10, sub_money: 5 },
-      //           { satus: "unordered_meals", money: 10, sub_money: 5 }
-      //         ]
-      //       }
-      //     ],
-      //     consumption_count: 1,
-      //     ordered_count: 1,
-      //     dinner: { id: 7, name: "晚餐" },
-      //     role: { id: 1, name: "局长" },
-      //     canteen: { id: 1, name: "大饭堂" }
-      //   }
-      // ],
       dataList: [],
       spanArr: [], //二维数组，用于存放单元格合并规则
       position: 0 //用于存储相同项的开始index
@@ -197,17 +187,46 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    async queryList() {
-      let data = await $axios.get("/v1/canteen/consumptionStrategy", {
-        c_id: this.queryForm.c_id,
-        page: this.current_page,
-        size: 3
-      });
+    async getDialogCanteenList(company_id) {
+      this.newSettingForm.c_id = "";
+      this.newSettingForm.t_id = "";
+      await $axios
+        .get(`/v1/company/consumptionLocation?company_id=${company_id}`)
+        .then(res => {
+          this.dialogCanteenList = Array.from(res.data.canteen);
+        })
+        .catch(err => console.log(err));
     },
-    async getRoleType(){
-      let res = await $axios.get('/v1/role/types')
-      console.log(res);
-      return res;
+    async queryList() {
+      let data = await $axios
+        .get("/v1/canteen/consumptionStrategy", {
+          c_id: this.queryForm.c_id,
+          page: this.current_page,
+          size: 3
+        })
+        .then(res => {
+          this.budgetList = Array.from(res.data);
+          console.log(this.budgetList);
+          this.handleData();
+          this.rowspan(0, "canteen");
+          this.rowspan(1, "role");
+          this.rowspan(2, "dinner");
+        });
+    },
+    async getRoleType() {
+      await $axios
+        .get("/v1/role/types")
+        .then(res => (this.roleTypeList = Array.from(res.data.data)));
+    },
+    async _addNewSetting() {
+      await $axios
+        .post("/v1/canteen/consumptionStrategy/save", this.newSettingForm)
+        .then(res => console.log(res))
+        .catch(err => console.log(err));
+    },
+    closeSettingDialog() {
+      this.settingDialogVisible = false;
+      this.$refs.newSettingForm.resetFields();
     },
     //处理合并数据
     objectSpanMethod({ row, column, rowIndex, columnIndex }) {
@@ -220,31 +239,45 @@ export default {
         };
       }
     },
-    printScope(val) {
-      console.log(val);
+    _editSetting(row) {
+      console.log(row);
     },
     handleData() {
       let _data = [];
       this.budgetList.forEach(i => {
-        i.detail.forEach(j => {
-          j.strategy.forEach(k => {
-            _data.push({
-              canteen: i.canteen.name,
-              canteen_id: i.canteen.id,
-              dinner: i.dinner.name,
-              dinner_id: i.dinner.id,
-              role: i.role.name,
-              role_id: i.role.id,
-              money: k.money,
-              status: k.satus,
-              sub_money: k.sub_money,
-              num_type: j.number,
-              consumption_count: i.consumption_count,
-              unordered_meals: i.unordered_meals,
-              ordered_count: i.ordered_count
+        if (i.detail) {
+          i.detail.forEach(j => {
+            j.strategy.forEach(k => {
+              _data.push({
+                canteen: i.canteen.name,
+                canteen_id: i.canteen.id,
+                dinner: i.dinner.name,
+                dinner_id: i.dinner.id,
+                role: i.role.name,
+                role_id: i.role.id,
+                money: k.money,
+                status: k.satus,
+                sub_money: k.sub_money,
+                num_type: j.number,
+                consumption_count: i.consumption_count,
+                unordered_meals: i.unordered_meals,
+                ordered_count: i.ordered_count
+              });
             });
           });
-        });
+        } else {
+          _data.push({
+            canteen: i.canteen.name,
+            canteen_id: i.canteen.id,
+            dinner: i.dinner.name,
+            dinner_id: i.dinner.id,
+            role: i.role.name,
+            role_id: i.role.id,
+            consumption_count: i.consumption_count,
+            unordered_meals: i.unordered_meals,
+            ordered_count: i.ordered_count
+          });
+        }
       });
       this.dataList = _data;
     },

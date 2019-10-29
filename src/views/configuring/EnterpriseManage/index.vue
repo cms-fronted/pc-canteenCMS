@@ -87,6 +87,7 @@
       :editAccount="editAccount"
       :machineList="machineList"
       @updateMachineTable="(val,type) => getMachineList(val,type)"
+      @updateCanteenList="getComsumptionLoc"
     ></add-canteen-dialog>
     <add-shop-dialog
       :visible="addShopVisible"
@@ -95,6 +96,8 @@
       :company_id="company_id"
       :isEdit="isEdit"
       :formdata="editForm"
+      :machineList="machineList"
+      @updateMachineTable="(val,type) => getMachineList(val,type)"
     ></add-shop-dialog>
   </div>
 </template>
@@ -259,7 +262,6 @@ export default {
       this.addShopVisible = true;
     },
     async getMachineList(val, type) {
-      console.log(val, type);
       let data;
       await $axios
         .get("/v1/machines", {
