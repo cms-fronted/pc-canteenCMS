@@ -357,6 +357,14 @@ export const currencyRoutes = [
           title: '企业管理',
         },
         component: () => import('@/views/configuring/EnterpriseManage')
+      },
+      {
+        path: 'modules',
+        name:'Configuring-modules',
+        meta: {
+          title: '模块管理'
+        },
+        component: () => import('@/views/configuring/Modules')
       }
     ]
   },

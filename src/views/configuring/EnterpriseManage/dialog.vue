@@ -381,9 +381,9 @@ export default {
         shopModules
       ]);
       modulesCheck.then(res => {
-        const systemModules = res[0].data[0];
-        const canteenModules = res[1].data[0];
-        const shopModules = res[2].data[0];
+        const systemModules = res[0].data;
+        const canteenModules = res[1].data;
+        const shopModules = res[2].data;
         let arr = [];
         for (let item in systemModules) {
           if (item === "items") {
@@ -406,6 +406,9 @@ export default {
             );
           }
         }
+        console.log(systemModules);
+        console.log(canteenModules);
+        console.log(shopModules);
         this.modules = Object.assign(
           {},
           { system: systemModules },
@@ -452,7 +455,7 @@ export default {
         .then(res => {
           this.$message.success("设置成功");
           this.dataTable.length = 0;
-          this.$emit('updateCanteenList',this.company_id)
+          this.$emit("updateCanteenList", this.company_id);
           this.handleClose();
         })
         .catch(err => console.log(err));

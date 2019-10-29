@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="manage">
+    <div class="cuisine-manage">
       <span class="nav-title">菜品管理</span>
       <el-divider></el-divider>
       <div class="main">

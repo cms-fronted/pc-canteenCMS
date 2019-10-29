@@ -332,10 +332,12 @@ export default {
 </script>
 
 <style  lang="scss" scpoed>
-.main-content {
-  .el-button {
-    margin-left: 5px;
-    margin-top: 5px;
+.manage {
+  .main-content {
+    .el-button {
+      margin-left: 5px;
+      margin-top: 5px;
+    }
   }
 }
 </style>
