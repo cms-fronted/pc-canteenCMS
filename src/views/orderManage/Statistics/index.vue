@@ -6,39 +6,48 @@
       <div class="main">
         <div class="main-header">
           <div class="select-title">
-            <el-form :inline="true" :model="formdata" label-width="80px">
-              <el-form-item label="开始时间">
-                <el-date-picker v-model="formdata.time_begin" style="width:200px" type="datetime"></el-date-picker>
+            <el-form :inline="true" :model="formdata" label-width="40px" label-position="left">
+              <el-form-item label="开始">
+                <el-date-picker
+                  v-model="formdata.time_begin"
+                  value-format="yyyy-MM-dd HH:mm:ss"
+                  format="yyyy-MM-dd"
+                  style="width:180px"
+                  type="datetime"
+                ></el-date-picker>
               </el-form-item>
-              <el-form-item label="结束时间">
-                <el-date-picker v-model="formdata.time_end" style="width:200px" type="datetime"></el-date-picker>
+              <el-form-item label="结束">
+                <el-date-picker
+                  v-model="formdata.time_end"
+                  value-format="yyyy-MM-dd HH:mm:ss"
+                  format="yyyy-MM-dd"
+                  style="width:180px"
+                  type="datetime"
+                ></el-date-picker>
               </el-form-item>
               <el-form-item label="公司">
-                <!-- @change="getCanteenList(company_id)" -->
-              <el-select v-model="company_id" placeholder="请选择公司" @change="getList">
-                <el-option
-                  v-for="item in companyList"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="消费地点">
-              <el-select v-model="canteen_id" placeholder="请选择消费地点">
-                <el-option
-                  v-for="item in canteenList"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                ></el-option>
-              </el-select>
-            </el-form-item>
+                <el-select v-model="company_id" placeholder="请选择公司" @change="getCanteenList">
+                  <el-option
+                    v-for="item in companyOptions"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="消费地点" label-width="70px">
+                <el-select v-model="canteen_id" placeholder="请选择消费地点">
+                  <el-option
+                    v-for="item in canteenOptions"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-button type="primary" @click="queryList">查询</el-button>
+              <el-button type="primary">导出</el-button>
             </el-form>
-          </div>
-          <div class="btn-area">
-            <el-button type="primary" @click="queryList">查询</el-button>
-            <el-button type="primary">导出</el-button>
           </div>
         </div>
         <div class="main-content">
@@ -60,75 +69,60 @@ export default {
         time_end: ""
       },
       company_id: "",
-      companyList: "",
+      companyOptions: [],
       canteen_id: "",
-      canteenList: "",
+      canteenOptions: [],
       tableData: []
-    }
+    };
   },
   created() {
-    this.fetchCompanyList();
+    this.getCompanies();
   },
-  methods:{
-    fetchCompanyList(){
-      $axios
-        .get("/v1/admin/companies")
-        .then(res => {
-          let arr = res.data;
-          let allCompanies = [];
-          let companyList = flatten(arr);
-          companyList.forEach(element => {
-            let id = element.id;
-            allCompanies.push(id);
-          });
-          allCompanies = allCompanies.join(",");
-          companyList.unshift({
-            name: "全部",
-            id: allCompanies
-          });
-          this.companyList = companyList;
-        })
-        .catch(err => console.log(err));
+  methods: {
+    async getCompanies() {
+      const res = await $axios.get("/v1/admin/companies", this.queryForm);
+      if (res.msg === "ok") {
+        this.companyOptions = flatten(res.data);
+        console.log(this.canteenOptions);
+      }
     },
-    getList(val) {
+    getCanteenList(val) {
+      this.canteenOptions = [];
       if (String(val).includes(",")) {
         this.canteenList = [{ name: "全部" }];
         this.formdata.canteen_id = "";
       } else {
-        console.log(val)
         this.getCanteenList(val);
       }
     },
-    getCanteenList(company_id){
+    getCanteenList(company_id) {
       if (company_id) {
         $axios
           .get(`/v1/company/consumptionLocation?company_id=${company_id}`)
           .then(res => {
-            console.log(1)
-            console.log(res)
-            this.canteenList = Array.from(res.data.canteen);
+            this.canteenOptions = Array.from(res.data.canteen);
+            this.canteenOptions.unshift({ id: 0, name: "全部" });
           })
           .catch(err => console.log(err));
       }
     },
-    // /v1/order/orderStatistic?company_ids=6&canteen_id=1&time_begin=2019-09-07&time_end=2019-09-07&page=1&size=20
-    queryList(){
+    queryList() {
       $axios
-      .get("/v1/order/orderStatistic", {
-        company_ids: this.company_id,
-        canteen_id: this.canteen_id,
-        time_begin: this.formdata.time_begin,
-        time_end: this.formdata.time_end,
-        page: 1,
-        size: 10
-      })
-      .then(res => {
-        console.log(res)
-        this.tableData = Array.from(res.data.data);
-        /* this.total = res.data.total;
+        .get("/v1/order/orderStatistic", {
+          company_ids: this.company_id,
+          canteen_id: this.canteen_id,
+          time_begin: this.formdata.time_begin,
+          time_end: this.formdata.time_end,
+          page: 1,
+          size: 10
+        })
+        .then(res => {
+          console.log(res);
+          this.tableData = Array.from(res.data.data);
+          /* this.total = res.data.total;
         this.current_page = res.data.current_page; */
-      })
-      .catch(err => console.log(err));
+        })
+        .catch(err => console.log(err));
     }
   }
 };

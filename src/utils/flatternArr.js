@@ -32,6 +32,13 @@ export function getAllOptions(target) {
   })
   return target;
 }
+export function unshiftAllOptions(arr) {
+  arr.unshift({
+    id: 0,
+    name: '全部'
+  })
+  return arr
+}
 // export function flatten(arr) {
 //   let result = [];
 //   for (let i = 0; i < arr.length; i++) {

@@ -1,5 +1,5 @@
 <template>
-  <div class="details">
+  <div class="order-manage-details">
     <div class="nav-title">订餐明细</div>
     <el-divider></el-divider>
     <div class="main">
@@ -10,7 +10,6 @@
               <el-date-picker
                 v-model="formdata.time_begin"
                 value-format="yyyy-MM-dd HH:mm:ss"
-                style="width:200px"
                 type="datetime"
               ></el-date-picker>
             </el-form-item>
@@ -18,7 +17,6 @@
               <el-date-picker
                 v-model="formdata.time_end"
                 value-format="yyyy-MM-dd HH:mm:ss"
-                style="width:200px"
                 type="datetime"
               ></el-date-picker>
             </el-form-item>
@@ -76,18 +74,19 @@
         </div>
       </div>
       <div class="main-content">
-        <el-table style="width:100%" :data="tableData" border></el-table>
-        <!-- <el-pagination
-          style="width:100%;text-align:center"
-          background
-          layout="prev, pager, next"
-          :total="sum"
-          :page-size="10"
-          :current-page="page"
-          @current-change="queryList"
-          @prev-click="queryList"
-          @next-click="queryList"
-        ></el-pagination>-->
+        <el-table style="width:100%" :data="tableData" border>
+          <el-table-column prop="ordering_date" label="订餐日期"></el-table-column>
+          <el-table-column prop="canteen" label="消费地点"></el-table-column>
+          <el-table-column prop="department" label="部门"></el-table-column>
+          <el-table-column prop="name" label="姓名"></el-table-column>
+          <el-table-column label="餐次">
+            <template slot-scope="scoped">
+              <span>
+                <el-button type="text">{{scoped.row.name}}</el-button>
+              </span>
+            </template>
+          </el-table-column>
+        </el-table>
         <pagination v-if="!tableData" :total="total" :page="current_page" @pagination="queryList"></pagination>
       </div>
     </div>
@@ -97,7 +96,7 @@
 <script>
 import $axios from "@/api/index";
 import Pagination from "@/components/Pagination";
-import { flatten } from "@/utils/flatternArr";
+import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
 export default {
   data() {
     return {
@@ -162,16 +161,7 @@ export default {
         .then(res => {
           let arr = res.data;
           let allCompanies = [];
-          let companiesList = flatten(arr);
-          companiesList.forEach(element => {
-            let id = element.id;
-            allCompanies.push(id);
-          });
-          allCompanies = allCompanies.join(",");
-          companiesList.unshift({
-            name: "全部",
-            id: allCompanies
-          });
+          let companiesList = getAllOptions(flatten(arr));
           this.companiesList = companiesList;
         })
         .catch(err => console.log(err));
@@ -181,10 +171,7 @@ export default {
         .get(`v1/departments?c_id=${company_id}`)
         .then(res => {
           let arr = res.data;
-          let departmentList = flatten(arr);
-          departmentList.unshift({
-            name: "全部"
-          });
+          let departmentList = unshiftAllOptions(flatten(arr));
           this.departmentList = departmentList;
         })
         .catch(err => console.log(err));
@@ -194,7 +181,7 @@ export default {
         $axios
           .get(`/v1/canteen/dinners?canteen_id=${canteen_id}`)
           .then(res => {
-            this.dinnersList = Array.from(res.data);
+            this.dinnersList = unshiftAllOptions(Array.from(res.data));
           })
           .catch(err => console.log(err));
       }
@@ -204,7 +191,7 @@ export default {
         $axios
           .get(`/v1/company/consumptionLocation?company_id=${company_id}`)
           .then(res => {
-            this.locationList = Array.from(res.data.canteen);
+            this.locationList = unshiftAllOptions(Array.from(res.data.canteen));
           })
           .catch(err => console.log(err));
       }
@@ -248,24 +235,29 @@ export default {
 </script>
 
 <style lang="scss" scpoed>
-.main-header {
-  .select-title {
-    float: left;
-    width: 90%;
-    display: flex;
-    flex-wrap: wrap;
-    .el-select {
-      width: 200px;
+.order-manage-details {
+  .main-header {
+    .select-title {
+      float: left;
+      width: 90%;
+      display: flex;
+      flex-wrap: wrap;
+      .el-input {
+        width: 180px;
+      }
+      .el-select {
+        width: 180px;
+      }
     }
-  }
-  .btn-area {
-    float: right;
-    width: 10%;
-    display: flex;
-    flex-direction: column;
-    display: block;
-    .el-button {
-      margin-bottom: 20px;
+    .btn-area {
+      float: right;
+      width: 10%;
+      display: flex;
+      flex-direction: column;
+      display: block;
+      .el-button {
+        margin-bottom: 20px;
+      }
     }
   }
 }

@@ -17,90 +17,41 @@
           <div slot="header" class="clearfix">
             <span>{{title}}</span>
           </div>
-          <div class="modules-tree-container">
-            <div class="block" style="borderRight:1px solid #eff2f6">
-              <p>系统功能模块</p>
-              <el-tree
-                :data="systemModules"
-                ref="systemTree"
-                :props="defaultProps"
-                @check-change="checkChange"
-                default-expand-all
-              >
-                <span class="modules-tree-node" slot-scope="{ node, data }">
-                  <span>{{ node.label }}</span>
-                  <span class="btns-text">
-                    <el-button
-                      type="text"
-                      size="mini"
-                      @click="() => openEditModuleDialog(data,1)"
-                    >编辑</el-button>
-                    <el-button
-                      type="text"
-                      size="mini"
-                      @click="() => openModuleDialog(node, data, 1)"
-                    >新增</el-button>
-                  </span>
-                </span>
-              </el-tree>
-            </div>
-            <div class="block" style="borderRight:1px solid #eff2f6">
-              <p>饭堂功能模块</p>
-              <el-tree
-                ref="canteenTree"
-                :data="canteenModules"
-                node-key="id"
-                :props="defaultProps"
-                :show-checkbox="changeDefaultStatus"
-                @check-change="(obj,checked,childrenChecked) => checkChange(obj,checked,childrenChecked,2)"
-                default-expand-all
-              >
-                <span class="modules-tree-node" slot-scope="{ node, data }">
-                  <span>{{data.type === 1 ? "PC端" : "移动端"}}——{{ node.label }}</span>
-                  <span class="btns-text">
-                    <el-button
-                      type="text"
-                      size="mini"
-                      @click="() => openEditModuleDialog(data,2)"
-                    >编辑</el-button>
-                    <el-button
-                      type="text"
-                      size="mini"
-                      @click="() => openModuleDialog(node,data,2)"
-                    >新增</el-button>
-                  </span>
-                </span>
-              </el-tree>
-            </div>
-            <div class="block" style="borderRight:1px solid #eff2f6">
-              <p>小卖部功能模块</p>
-              <el-tree
-                ref="shopTree"
-                :data="shopModules"
-                node-key="id"
-                :props="defaultProps"
-                :show-checkbox="changeDefaultStatus"
-                @check-change="(obj,checked,childrenChecked) => checkChange(obj,checked,childrenChecked,3)"
-                default-expand-all
-              >
-                <span class="modules-tree-node" slot-scope="{ node, data }">
-                  <span>{{data.type === 1 ? "PC端" : "移动端"}}——{{ node.label }}</span>
-                  <span class="btns-text">
-                    <el-button
-                      type="text"
-                      size="mini"
-                      @click="() => openEditModuleDialog(data,3)"
-                    >编辑</el-button>
-                    <el-button
-                      type="text"
-                      size="mini"
-                      @click="() => openModuleDialog(node, data,3)"
-                    >新增</el-button>
-                  </span>
-                </span>
-              </el-tree>
-            </div>
-          </div>
+          <el-row :gutter="20">
+            <el-col :span="8">
+              <div class="modules-tree-container">
+                <div class="block">
+                  <p>饭堂功能模块</p>
+                  <el-tree
+                    ref="canteenTree"
+                    :data="canteenModules"
+                    node-key="id"
+                    :props="defaultProps"
+                    :show-checkbox="changeDefaultStatus"
+                    @check-change="(obj,checked,childrenChecked) => checkChange(obj,checked,childrenChecked,2)"
+                    default-expand-all
+                  >
+                    <span class="modules-tree-node" slot-scope="{ node, data }">
+                      <span>{{data.type === 1 ? "PC端" : "移动端"}}——{{ node.label }}</span>
+                      <span class="btns-text">
+                        <el-button
+                          type="text"
+                          size="mini"
+                          @click="() => openEditModuleDialog(data,2)"
+                        >编辑</el-button>
+                        <el-button
+                          type="text"
+                          size="mini"
+                          @click="() => openModuleDialog(node,data)"
+                        >新增</el-button>
+                      </span>
+                    </span>
+                  </el-tree>
+                </div>
+              </div>
+            </el-col>
+            <el-col :span="14"></el-col>
+          </el-row>
         </el-card>
       </div>
     </div>
@@ -112,7 +63,7 @@
       @close="closeModuleDialog"
     >
       <el-form :model="modulesForm" ref="modulesForm" label-width="80px" label-position="right">
-        <el-form-item label="功能类型" prop="system" v-if="!noParentId">
+        <el-form-item label="功能类型" prop="system" v-if="false">
           <el-radio-group v-model="systemType">
             <el-radio :label="1">系统功能</el-radio>
             <el-radio :label="2">饭堂</el-radio>
@@ -129,7 +80,7 @@
           <el-input v-model="modulesForm.icon"></el-input>
         </el-form-item>
         <el-form-item label="模块类型" prop="type">
-          <el-radio-group v-model="modulesForm.type">
+          <el-radio-group v-model="modulesForm.type" :disabled="typeDisabled">
             <el-radio :label="1">pc端</el-radio>
             <el-radio :label="2">手机端</el-radio>
           </el-radio-group>
@@ -174,8 +125,9 @@ export default {
   data() {
     return {
       title: "默认设置模块",
-      systemType: "",
+      systemType: 2,
       noParentId: true,
+      typeDisabled: false,
       modulesDialogTitle: "新增模块",
       changeDefaultStatus: false,
       modulesVisible: false,
@@ -208,18 +160,20 @@ export default {
   },
   watch: {
     changeDefaultStatus(val) {
-      this.title = !val ? "默认设置模块" : "更改默认模块"
+      this.title = !val ? "默认设置模块" : "更改默认模块";
     }
   },
   methods: {
     openModuleDialog(node, data, type) {
-      this.systemType = type;
-      this.noParentId = this.systemType ? true : false;
-      let dataF = data || {};
-      if (dataF.id) {
+      let dataForm = data || {};
+      console.log(dataForm);
+      if (dataForm.id) {
         this.modulesForm.parent_id = data.id;
+        this.modulesForm.type = dataForm.type;
+        this.typeDisabled = true;
       } else {
         this.modulesForm.parent_id = 0;
+        this.typeDisabled = false;
       }
       this.modulesVisible = true;
     },
@@ -271,19 +225,19 @@ export default {
       this.changeDefaultStatus = !this.changeDefaultStatus;
     },
     async submitModulesForm() {
-      let url = "";
       let type = this.systemType;
-      switch (type) {
-        case 1:
-          url = "/v1/module/system/save";
-          break;
-        case 2:
-          url = "/v1/module/system/canteen/save";
-          break;
-        case 3:
-          url = "/v1/module/system/shop/save";
-          break;
-      }
+      const url = "/v1/module/system/canteen/save";
+      // switch (type) {
+      //   case 1:
+      //     url = "/v1/module/system/save";
+      //     break;
+      //   case 2:
+      //     url = "/v1/module/system/canteen/save";
+      //     break;
+      //   case 3:
+      //     url = "/v1/module/system/shop/save";
+      //     break;
+      // }
       let res = await $axios.post(url, this.modulesForm);
       if (res.msg === "ok") {
         this.closeModuleDialog();
@@ -299,32 +253,39 @@ export default {
         this.renderModules();
       }
     },
-    getModules() {
-      let systemModules = this.$axios.get("/v1/modules?type=1");
-      let canteenModules = this.$axios.get("/v1/modules?type=2");
-      let shopModules = this.$axios.get("/v1/modules?type=3");
-      let reqList = [];
-      reqList.push(systemModules, canteenModules, shopModules);
-      return this.$axios.all(reqList).then(
-        this.$axios.spread(function(...resList) {
-          return resList;
-        })
-      );
-    },
+    // getModules() {
+    //   let systemModules = this.$axios.get("/v1/modules?type=1");
+    //   let canteenModules = this.$axios.get("/v1/modules?type=2");
+    //   let shopModules = this.$axios.get("/v1/modules?type=3");
+    //   let reqList = [];
+    //   reqList.push(systemModules, canteenModules, shopModules);
+    //   return this.$axios.all(reqList).then(
+    //     this.$axios.spread(function(...resList) {
+    //       return resList;
+    //     })
+    //   );
+    // },
     async renderModules() {
       try {
-        let resq = await this.getModules();
-        let system = resq[0].data.data;
-        let canteen = resq[1].data.data;
-        let shop = resq[2].data.data;
-        this.systemModules = Array.from(system);
-        this.canteenModules = Array.from(canteen);
-        this.shopModules = Array.from(shop);
-        this.s_modules = flatten(system);
-        this.c_modules = flatten(canteen);
-        this.p_modules = flatten(shop);
-        this.handleModuleData(this.c_modules, "canteenTree");
-        this.handleModuleData(this.p_modules, "shopTree");
+        const res = await $axios.get("/v1/modules?type=2");
+        if (res.msg === "ok") {
+          console.log(res);
+          this.canteenModules = Array.from(res.data);
+          this.c_modules = flatten(res.data);
+          this.handleModuleData(this.c_modules, "canteenTree");
+        }
+        // let resq = await this.getModules();
+        // let system = resq[0].data.data;
+        // let canteen = resq[1].data.data;
+        // let shop = resq[2].data.data;
+        // this.systemModules = Array.from(system);
+        // this.canteenModules = Array.from(canteen);
+        // this.shopModules = Array.from(shop);
+        // this.s_modules = flatten(system);
+        // this.c_modules = flatten(canteen);
+        // this.p_modules = flatten(shop);
+        // this.handleModuleData(this.c_modules, "canteenTree");
+        // this.handleModuleData(this.p_modules, "shopTree");
       } catch (error) {
         console.log(error);
       }
