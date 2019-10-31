@@ -1,17 +1,13 @@
 <template>
-  <div>
-    <div class="role-play">
-      角色设置
-    </div>
+  <div class="role-play">
+    <div class="nav-title">角色设置</div>
+    <el-divider></el-divider>
   </div>
 </template>
 
 <script>
-export default {
-
-}
+export default {};
 </script>
 
 <style>
-
 </style>

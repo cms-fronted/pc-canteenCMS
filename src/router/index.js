@@ -331,6 +331,14 @@ export const currencyRoutes = [
           title: '密码设置',
         }
       },
+      {
+        path: 'operation',
+        name: 'Settings-operation-journal',
+        component: () => import('@/views/settings/OperationJournal'),
+        meta: {
+          title: '操作日志查询',
+        }
+      },
     ]
   },
   {

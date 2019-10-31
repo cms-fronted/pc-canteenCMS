@@ -5,17 +5,15 @@
       <el-divider></el-divider>
       <div class="main">
         <div class="main-header">
-          <div class="select-title">
-            <span class="content-header">公司：</span>
-            <el-select
-              v-model="company_id"
-              placeholder="请选择"
-            >
-              <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
-            </el-select>
-            <el-button type="primary" @click="fetchSupplierList">查询供应商</el-button>
-            <el-button type="primary" @click="showAddSupplier">增加供应商</el-button>
-          </div>
+          <span class="content-header">公司：</span>
+          <el-select
+            v-model="company_id"
+            placeholder="请选择"
+          >
+            <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          </el-select>
+          <el-button type="primary" @click="fetchSupplierList">查询供应商</el-button>
+          <el-button type="primary" @click="showAddSupplier">增加供应商</el-button>
         </div>
         <div class="main-content">
           <el-table style="width:100%" border :data="supplierList">
