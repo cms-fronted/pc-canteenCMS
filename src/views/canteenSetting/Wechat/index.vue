@@ -14,7 +14,7 @@
             <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
           <el-button type="primary" @click="fetchTableList">查询商品类型</el-button>
-          <el-button type="primary" @click="addGoods">增加商品类型</el-button>
+          <el-button type="primary" @click="handleClick({c_id:company_id},'_add','增加商品类型')">增加商品类型</el-button>
         </div>
         <div class="main-content">
           <el-table style="width:100%" border :data="tableList">
@@ -22,7 +22,7 @@
             <el-table-column label="商品类型" prop="name"></el-table-column>
             <el-table-column label="操作">
               <template slot-scope="scope">
-                <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>
+                <el-button size="mini" @click="handleClick(scope.row,'_edit','更改商品类型')">编辑</el-button>
                 <el-button size="mini" type="danger" @click="handleDelete(scope.row)">Delete</el-button>
               </template>
             </el-table-column>
@@ -31,48 +31,41 @@
         </div>
       </div>
     </div>
-    <!-- 增加商品类型弹窗  -->
-    <add-dialog :visible="AddVisible" @closeDialog1="closeDialog1" :editData="goodsForm"></add-dialog>
-    <!-- 更改商品类型弹窗 -->
-    <revise-dialog
-      :visible="reviseVisible"
-      @closeDialog2="closeDialog2"
-      :editData="reviseForm"
-      :c_id="currentCompanyId"
-    ></revise-dialog>
+    <handle-dialog
+      :visible="visible"
+      :type="editType"
+      :editFormdata="editFormdata"
+      :title="dialogTitle"
+      :companiesVisible="companiesVisible"
+      @close="closeDialog"
+      @confirm="confirmUpdate"
+    >
+    </handle-dialog>
   </div>
 </template>
 
 <script>
 import $axios from "@/api/index";
-import AddDialog from "./dialog1";
-import ReviseDialog from "./dialog2";
+import HandleDialog from "./dialog";
 import Pagination from "@/components/Pagination";
 import store from '@/store';
 export default {
   data() {
     return {
-      grade: store.getters.grade,
+      grade: store.getters.grade,  
       companyList: [],
       company_id: "",
-      AddVisible: false,
-      goodsForm: {
-        c_id: "",
-        name: ""
-      },
-      reviseForm: {
-        id: "",
-        name: ""
-      },
       tableList: [],
       currentGoodsId: "",
-      reviseVisible: false,
-      currentCompanyId: "",
       total: 0,
-      page: 1
+      page: 1,
+      visible: false,
+      editType: "",
+      editFormdata: {},
+      dialogTitle: ""
     };
   },
-  components: { AddDialog, ReviseDialog, Pagination },
+  components: { Pagination,HandleDialog },
   created() {
     this.fetchCompanyList();
   },
@@ -103,18 +96,12 @@ export default {
         $axios
         .get(`/v1/categories?page=${this.page}&size=10`)
         .then(res => {
+          console.log(res)
           this.tableList = Array.from(res.data.data);
           this.total = res.data.total;
         })
         .catch(err => console.log(err));
       }
-      
-    },
-    handleEdit(val) {
-      this.reviseForm.id = val.id;
-      this.reviseForm.name = val.name;
-      this.currentCompanyId = val.c_id;
-      this.reviseVisible = true;
     },
     handleDelete(val) {
       this.currentGoodsId = val.id;
@@ -136,9 +123,6 @@ export default {
         })
         .catch(err => {});
     },
-    addGoods() {
-      this.AddVisible = true;
-    },
     sendMessage(msg) {
       if (msg === "ok") {
         this.$message({
@@ -152,31 +136,24 @@ export default {
         });
       }
     },
-    closeDialog1(val, msg) {
-      this.goodsForm = {
-        c_id: "",
-        name: ""
-      };
-      this.AddVisible = val;
-      if (msg === "ok") {
-        this.fetchTableList();
-        this.sendMessage(msg);
-      }
-    },
-    closeDialog2(val, msg) {
-      this.reviseForm = {
-        id: "",
-        name: ""
-      };
-      this.reviseVisible = val;
-      if (msg === "ok") {
-        this.fetchTableList();
-        this.sendMessage(msg);
-      }
-    },
     getList(val) {
       this.page = val;
       this.fetchTableList();
+    },
+    closeDialog(val){
+      this.visible = val;
+    },
+    confirmUpdate(val){
+      if(val === 'ok'){
+        this.fetchTableList();
+      }
+    },
+    handleClick(row = {}, type, title){
+      this.editFormdata = {}
+      this.visible = true;
+      this.dialogTitle = title;
+      this.editType = type;
+      Object.assign(this.editFormdata, {}, row);
     }
   }
 };
