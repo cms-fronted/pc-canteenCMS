@@ -5,10 +5,11 @@
       <el-divider></el-divider>
       <div class="main">
         <div class="main-header">
-          <span class="content-header">公司：</span>
+          <span class="content-header"  v-if="companiesVisible">公司：</span>
           <el-select
             v-model="company_id"
             placeholder="请选择"
+            v-if="companiesVisible"
           >
             <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
@@ -47,9 +48,11 @@ import $axios from "@/api/index";
 import AddDialog from "./dialog1";
 import ReviseDialog from "./dialog2";
 import Pagination from "@/components/Pagination";
+import store from '@/store';
 export default {
   data() {
     return {
+      grade: store.getters.grade,
       companyList: [],
       company_id: "",
       AddVisible: false,
@@ -73,6 +76,11 @@ export default {
   created() {
     this.fetchCompanyList();
   },
+  computed: {
+    companiesVisible(){
+      return this.grade !== 3;
+    }
+  },
   methods: {
     fetchCompanyList() {
       $axios
@@ -83,13 +91,24 @@ export default {
         .catch(err => console.log(err));
     },
     fetchTableList() {
-      $axios
-        .get(`/v1/categories?c_id=${this.company_id}&page=${this.page}&size=10`)
+      if(this.companiesVisible){
+        $axios
+          .get(`/v1/categories?c_id=${this.company_id}&page=${this.page}&size=10`)
+          .then(res => {
+            this.tableList = Array.from(res.data.data);
+            this.total = res.data.total;
+          })
+          .catch(err => console.log(err));
+      }else{
+        $axios
+        .get(`/v1/categories?page=${this.page}&size=10`)
         .then(res => {
           this.tableList = Array.from(res.data.data);
           this.total = res.data.total;
         })
         .catch(err => console.log(err));
+      }
+      
     },
     handleEdit(val) {
       this.reviseForm.id = val.id;
