@@ -1,23 +1,23 @@
 <template>
   <el-dialog :visible.sync="isOpen" title="新增供应商"  @close="handleClose">
-    <el-form ref="addSupplierForm" label-width="100px">
-      <el-form-item label="公司">
+    <el-form ref="addForm" label-width="100px" :model="formdata">
+      <el-form-item label="公司" v-if="companiesVisible">
         <el-select
           placeholder="请选择"
-          v-model="addSupplierForm.c_id"
+          v-model="formdata.c_id"
           style="width: 265px;"
         >
           <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="供应商">
-        <el-input placeholder="请输入" v-model="addSupplierForm.name"></el-input>
+        <el-input placeholder="请输入" v-model="formdata.name"></el-input>
       </el-form-item>
       <el-form-item label="账号">
-        <el-input placeholder="请输入" v-model="addSupplierForm.account"></el-input>
+        <el-input placeholder="请输入" v-model="formdata.account"></el-input>
       </el-form-item>
       <el-form-item label="密码">
-        <el-input placeholder="请输入" type="password" v-model="addSupplierForm.pwd"></el-input>
+        <el-input placeholder="请输入" type="password" v-model="formdata.pwd"></el-input>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -35,17 +35,18 @@ export default {
       type: Boolean
     },
     editData: Object,
+    companiesVisible: Boolean
   },
   data() {
     return {
       isOpen: this.visible,
       companyList: [],
-      addSupplierForm: {}
+      formdata: {}
     }
   },
   watch: {
     visible(val) {
-      this.addSupplierForm = Object.assign({}, this.addSupplierForm, this.editData);
+      this.formdata = Object.assign({}, this.formdata, this.editData);
       this.isOpen = val;
     }
   },
@@ -62,13 +63,15 @@ export default {
         .catch(err => console.log(err));
     },
     handleClose(){
-      this.$emit("closeDialog1", false);
+      this.$emit("close", false);
+      this.$refs['addForm'].resetFields();
     },
     addSupplier(){
       $axios
-        .post('/v1/supplier/save',this.addSupplierForm)
+        .post('/v1/supplier/save',this.formdata)
         .then(res => {
-          this.$emit("closeDialog1", false, res.msg);
+          this.$refs['addForm'].resetFields();
+          this.$emit("close", false, res.msg);
         })
         .catch(err => console.log(err));
     }
