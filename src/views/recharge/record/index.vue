@@ -23,7 +23,7 @@
                   type="datetime"
                 ></el-date-picker>
               </el-form-item>
-              <el-form-item label="公司">
+              <el-form-item label="公司"  v-if="companiesVisible">
                 <el-select v-model="formdata.company_ids" placeholder="请选择公司" style="width:200px">
                   <el-option
                     v-for="item in companiesList"
@@ -77,9 +77,11 @@
 import $axios from "@/api/index";
 import Pagination from '@/components/Pagination'
 import { flatten } from "@/utils/flatternArr";
+import store from '@/store';
 export default {
   data (){
     return {
+      grade: store.getters.grade,
       formdata: {
         time_begin: "",
         time_end: "",
@@ -105,6 +107,11 @@ export default {
   },
   created(){
     this.getCompanies();
+  },
+  computed: {
+    companiesVisible(){
+      return this.grade !== 3;
+    }
   },
   components:{Pagination},
   methods:{

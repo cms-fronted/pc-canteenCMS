@@ -4,9 +4,9 @@
     <el-divider></el-divider>
     <div class="main">
       <div class="main-header">
-        <span class="content-header">公司：</span>
+        <span class="content-header"  v-if="companiesVisible">公司：</span>
         <el-select v-model="company_id" placeholder="请选择" style="width:150px" 
-          @change="fetchCanteenList(company_id)">
+          @change="fetchCanteenList(company_id)"  v-if="companiesVisible">
           <el-option
             v-for="item in companyList"
             :key="item.id"
@@ -90,6 +90,7 @@ export default {
       header: {
         token: store.getters.token
       },
+      grade: store.getters.grade,
       company_id: "",
       companyList: [],
       canteen_id: "",
@@ -109,6 +110,11 @@ export default {
   },
   created(){
     this.fetchCompanyList();
+  },
+  computed: {
+    companiesVisible(){
+      return this.grade !== 3;
+    }
   },
   methods: {
     sendMessage(msg){
@@ -150,18 +156,26 @@ export default {
         .catch(error => console.log(err));
     },
     fetchCanteenList(id){
+      this.canteen_id = '';
       this.canteenList = [];
-      if(typeof id === 'string' && id.indexOf(',')){
-        this.canteenList.unshift({id:'',name:'全部'})
-        this.canteen_id = ''
+      if(this.companiesVisible){
+        if(typeof id === 'string' && id.indexOf(',')){
+          this.canteenList.unshift({id:'',name:'全部'})
+        }else{
+          $axios
+          .get(`/v1/canteens?company_id=${id}`)
+          .then(res => {
+            this.canteenList = Array.from(res.data);
+          })
+          .catch(err => console.log(err));
+        }
       }else{
-        this.canteen_id = '';
         $axios
-        .get(`/v1/canteens?company_id=${id}`)
-        .then(res => {
-          this.canteenList = res.data;
-        })
-        .catch(error => console.log(err));
+          .get("/v1/managerCanteens")
+          .then(res => {
+            this.canteenList = Array.from(res.data);
+          })
+          .catch(err => console.log(err));
       }
     },
     fetchTableList(){
