@@ -4,7 +4,7 @@
       <div class="nav-title">订餐统计</div>
       <el-divider></el-divider>
       <div class="main">
-        <div class="main-header">
+        <div class="main-header" :class="{ 'active': !companiesVisible}">
           <div class="select-title">
             <el-form :inline="true" :model="formdata" label-width="80px">
               <el-form-item label="开始时间">
@@ -13,9 +13,8 @@
               <el-form-item label="结束时间">
                 <el-date-picker v-model="formdata.time_end" style="width:200px" type="datetime"></el-date-picker>
               </el-form-item>
-              <el-form-item label="公司">
-                <!-- @change="getCanteenList(company_id)" -->
-              <el-select v-model="company_id" placeholder="请选择公司" @change="getList">
+              <el-form-item label="公司" v-if="companiesVisible">
+              <el-select v-model="company_id" placeholder="请选择公司" style="width:200px" @change="getList">
                 <el-option
                   v-for="item in companyList"
                   :key="item.id"
@@ -25,7 +24,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="消费地点">
-              <el-select v-model="canteen_id" placeholder="请选择消费地点">
+              <el-select v-model="canteen_id" placeholder="请选择消费地点" style="width:200px">
                 <el-option
                   v-for="item in canteenList"
                   :key="item.id"
@@ -42,7 +41,8 @@
           </div>
         </div>
         <div class="main-content">
-          <el-table style="width:100%" :data="tableData" border></el-table>
+          <el-table style="width:100%" :data="tableData" border>
+          </el-table>
         </div>
       </div>
     </div>
@@ -52,9 +52,11 @@
 <script>
 import $axios from "@/api/index";
 import { flatten } from "@/utils/flatternArr";
+import store from '@/store';
 export default {
-  data() {
+  data(){
     return {
+      grade: store.getters.grade,
       formdata: {
         time_begin: "",
         time_end: ""
@@ -66,8 +68,13 @@ export default {
       tableData: []
     }
   },
-  created() {
+  created(){
     this.fetchCompanyList();
+  },
+  computed: {
+    companiesVisible(){
+      return this.grade !== 3;
+    }
   },
   methods:{
     fetchCompanyList(){
@@ -100,18 +107,26 @@ export default {
       }
     },
     getCanteenList(company_id){
-      if (company_id) {
+      this.canteen_id = "";
+      if(this.companiesVisible){
+        // 企业 grade 不为3
         $axios
-          .get(`/v1/company/consumptionLocation?company_id=${company_id}`)
+          .get(`/v1/canteens?company_id=${company_id}`)
           .then(res => {
-            console.log(1)
-            console.log(res)
-            this.canteenList = Array.from(res.data.canteen);
+            this.canteenList = Array.from(res.data);
+            console.log(this.canteenList)
+          })
+          .catch(err => console.log(err));
+      }else{
+        // 企业 grade 为3
+        $axios
+          .get("/v1/managerCanteens")
+          .then(res => {
+            this.canteenList = Array.from(res.data);
           })
           .catch(err => console.log(err));
       }
     },
-    // /v1/order/orderStatistic?company_ids=6&canteen_id=1&time_begin=2019-09-07&time_end=2019-09-07&page=1&size=20
     queryList(){
       $axios
       .get("/v1/order/orderStatistic", {
@@ -131,8 +146,39 @@ export default {
       .catch(err => console.log(err));
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scpoed>
+  .main-header{
+    .select-title {
+      float: left;
+      width: 90%;
+      display: flex;
+      flex-wrap: wrap;
+    }
+    .btn-area {
+      float: right;
+      width: 10%;
+      display: flex;
+      flex-direction: column;
+      display: block;
+      .el-button {
+        margin-bottom: 20px;
+      }
+    }
+  }
+  .main-header.active{
+    .select-title {
+      width: 85%;
+    }
+    .btn-area {
+      width: 15%;
+      flex-direction: row;
+      .el-button {
+        margin-left: 8px;
+      }
+    }
+  }
+  
 </style>
