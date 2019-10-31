@@ -354,7 +354,7 @@ export default {
     }
   },
   created() {
-    this.getModules();
+    // this.getModules();
   },
   methods: {
     handleCheckAllChange(val, index) {
@@ -406,9 +406,6 @@ export default {
             );
           }
         }
-        console.log(systemModules);
-        console.log(canteenModules);
-        console.log(shopModules);
         this.modules = Object.assign(
           {},
           { system: systemModules },

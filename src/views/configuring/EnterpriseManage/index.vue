@@ -241,12 +241,20 @@ export default {
         .catch(err => console.log(err));
       return data;
     },
+    async getSystemModules(id) {
+      const res = $axios.get("/v1/modules/canteen/withSystem", {
+        c_id: id
+      });
+      return res;
+    },
     async _editCanteen(val) {
-      let id = val.id;
+      let id = val.id; //饭堂id
       this.isEdit = true;
       this.editForm = val;
       this.canteenDialogTitle = "编辑饭堂";
       const data = await this.getCanteenConfig(id);
+      const modules = await this.getSystemModules(id);
+      console.log(modules);
       this.getMachineList(val, "canteen");
       this.editForm.dinnersList = data.dinners;
       this.editDinnersList = Array.from(data.dinners);
@@ -255,7 +263,6 @@ export default {
     },
     async _editShop(val) {
       this.editForm = val;
-      console.log(this.editForm);
       this.isEdit = true;
       this.shopDialogTitle = "编辑小卖部";
       this.getMachineList(val, "shop");

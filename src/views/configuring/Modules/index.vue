@@ -4,7 +4,10 @@
     <el-divider></el-divider>
     <div class="main">
       <div class="main-header">
-        <el-button type="primary">更改默认设置</el-button>
+        <el-button
+          type="primary"
+          @click="changeDefault"
+        >{{changeDefaultStatus ? '完成默认设置' : '更改默认设置'}}</el-button>
         <el-button type="primary" @click="openModuleDialog">增加模块</el-button>
         <el-button type="primary">删除模块</el-button>
         <el-button type="primary">编辑模块</el-button>
@@ -18,9 +21,9 @@
             <div class="block" style="borderRight:1px solid #eff2f6">
               <p>系统功能模块</p>
               <el-tree
-                :data="shopModules"
+                :data="systemModules"
+                ref="systemTree"
                 :props="defaultProps"
-                show-checkbox
                 @check-change="checkChange"
                 default-expand-all
               >
@@ -32,7 +35,11 @@
                       size="mini"
                       @click="() => openEditModuleDialog(data,1)"
                     >编辑</el-button>
-                    <el-button type="text" size="mini" @click="() => remove(node, data)">删除</el-button>
+                    <el-button
+                      type="text"
+                      size="mini"
+                      @click="() => openModuleDialog(node, data, 1)"
+                    >新增</el-button>
                   </span>
                 </span>
               </el-tree>
@@ -40,21 +47,27 @@
             <div class="block" style="borderRight:1px solid #eff2f6">
               <p>饭堂功能模块</p>
               <el-tree
+                ref="canteenTree"
                 :data="canteenModules"
+                node-key="id"
                 :props="defaultProps"
-                show-checkbox
-                @check-change="checkChange"
+                :show-checkbox="changeDefaultStatus"
+                @check-change="(obj,checked,childrenChecked) => checkChange(obj,checked,childrenChecked,2)"
                 default-expand-all
               >
                 <span class="modules-tree-node" slot-scope="{ node, data }">
-                  <span>{{ node.label }}</span>
+                  <span>{{data.type === 1 ? "PC端" : "移动端"}}——{{ node.label }}</span>
                   <span class="btns-text">
                     <el-button
                       type="text"
                       size="mini"
                       @click="() => openEditModuleDialog(data,2)"
                     >编辑</el-button>
-                    <el-button type="text" size="mini" @click="() => remove(node, data)">删除</el-button>
+                    <el-button
+                      type="text"
+                      size="mini"
+                      @click="() => openModuleDialog(node,data,2)"
+                    >新增</el-button>
                   </span>
                 </span>
               </el-tree>
@@ -62,21 +75,27 @@
             <div class="block" style="borderRight:1px solid #eff2f6">
               <p>小卖部功能模块</p>
               <el-tree
+                ref="shopTree"
                 :data="shopModules"
+                node-key="id"
                 :props="defaultProps"
-                show-checkbox
-                @check-change="checkChange"
+                :show-checkbox="changeDefaultStatus"
+                @check-change="(obj,checked,childrenChecked) => checkChange(obj,checked,childrenChecked,3)"
                 default-expand-all
               >
                 <span class="modules-tree-node" slot-scope="{ node, data }">
-                  <span>{{ node.label }}</span>
+                  <span>{{data.type === 1 ? "PC端" : "移动端"}}——{{ node.label }}</span>
                   <span class="btns-text">
                     <el-button
                       type="text"
                       size="mini"
                       @click="() => openEditModuleDialog(data,3)"
                     >编辑</el-button>
-                    <el-button type="text" size="mini" @click="() => remove(node, data)">删除</el-button>
+                    <el-button
+                      type="text"
+                      size="mini"
+                      @click="() => openModuleDialog(node, data,3)"
+                    >新增</el-button>
                   </span>
                 </span>
               </el-tree>
@@ -93,7 +112,7 @@
       @close="closeModuleDialog"
     >
       <el-form :model="modulesForm" ref="modulesForm" label-width="80px" label-position="right">
-        <el-form-item label="功能类型" prop="system">
+        <el-form-item label="功能类型" prop="system" v-if="!noParentId">
           <el-radio-group v-model="systemType">
             <el-radio :label="1">系统功能</el-radio>
             <el-radio :label="2">饭堂</el-radio>
@@ -150,12 +169,15 @@
 
 <script>
 import $axios from "@/api/index";
+import { flatten } from "@/utils/flatternArr";
 export default {
   data() {
     return {
-      title: "默认模块",
-      systemType: 1,
+      title: "默认设置模块",
+      systemType: "",
+      noParentId: true,
       modulesDialogTitle: "新增模块",
+      changeDefaultStatus: false,
       modulesVisible: false,
       editModuleVisible: false,
       modulesBelong: "",
@@ -165,23 +187,40 @@ export default {
         icon: "",
         type: 1,
         default: 1,
-        parent_id: 0
+        parent_id: ""
       },
       editModuleForm: {},
       systemModules: [],
+      s_modules: [],
       canteenModules: [],
+      c_modules: [],
       shopModules: [],
+      p_modules: [],
       defaultProps: {
         label: "name",
         children: "items"
-      }
+      },
+      timer: null
     };
   },
   created() {
     this.renderModules();
   },
+  watch: {
+    changeDefaultStatus(val) {
+      this.title = !val ? "默认设置模块" : "更改默认模块"
+    }
+  },
   methods: {
-    openModuleDialog() {
+    openModuleDialog(node, data, type) {
+      this.systemType = type;
+      this.noParentId = this.systemType ? true : false;
+      let dataF = data || {};
+      if (dataF.id) {
+        this.modulesForm.parent_id = data.id;
+      } else {
+        this.modulesForm.parent_id = 0;
+      }
       this.modulesVisible = true;
     },
     closeModuleDialog() {
@@ -200,10 +239,36 @@ export default {
       this.editModuleVisible = false;
       this.editModuleForm = {};
     },
-    checkChange(obj, checked, childrenChecked) {
-      console.log(obj);
-      console.log(checked);
-      console.log(childrenChecked);
+    async checkChange(obj, checked, childrenChecked, type) {
+      let form = {};
+      let canChange = [];
+      let defaultType = checked ? 1 : 2;
+      if (obj.items) {
+        obj.items.forEach(item => {
+          if (item.default === 1) {
+            defaultType = 1;
+          }
+        });
+      }
+      form = Object.assign(
+        {},
+        {
+          type: type,
+          modules: [{ id: obj.id, default: defaultType }]
+        }
+      );
+      form.modules = JSON.stringify(form.modules);
+      let res = await $axios.post("/v1/module/default/handel", form);
+      if (res.msg === "ok") {
+        if (!obj.items) {
+          this.timer = setTimeout(() => {
+            this.$message.success("修改成功");
+          }, 500);
+        }
+      }
+    },
+    changeDefault() {
+      this.changeDefaultStatus = !this.changeDefaultStatus;
     },
     async submitModulesForm() {
       let url = "";
@@ -222,7 +287,7 @@ export default {
       let res = await $axios.post(url, this.modulesForm);
       if (res.msg === "ok") {
         this.closeModuleDialog();
-        this.getModules();
+        this.renderModules();
         this.$message.success("模块添加成功");
       }
     },
@@ -255,9 +320,26 @@ export default {
         this.systemModules = Array.from(system);
         this.canteenModules = Array.from(canteen);
         this.shopModules = Array.from(shop);
+        this.s_modules = flatten(system);
+        this.c_modules = flatten(canteen);
+        this.p_modules = flatten(shop);
+        this.handleModuleData(this.c_modules, "canteenTree");
+        this.handleModuleData(this.p_modules, "shopTree");
       } catch (error) {
         console.log(error);
       }
+    },
+    handleModuleData(data, treeRef) {
+      let checkKey = [];
+      data.forEach(item => {
+        if (item.default === 1) {
+          checkKey.push(item.id);
+        }
+        if (item.default === 2 && item.p_id) {
+          checkKey.splice(checkKey.indexOf(item.p_id), 1);
+        }
+      });
+      this.$refs[treeRef].setCheckedKeys(checkKey);
     }
   }
 };
@@ -265,7 +347,7 @@ export default {
 
 <style lang="scss" scoped>
 .modules-tree-container {
-  width: 70%;
+  width: 100%;
   flex: 1;
   display: flex;
   // justify-content: space-between;

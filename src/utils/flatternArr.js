@@ -6,14 +6,18 @@ export function flatten(arr) {
       while (el.items) {
         result.push({
           id: el.id,
-          name: el.name
+          name: el.name,
+          default: el.default,
+          p_id: el.parent_id
         })
         tree2arr(el.items);
         return
       }
       result.push({
         id: el.id,
-        name: el.name
+        name: el.name,
+        default: el.default,
+        p_id: el.parent_id
       })
     });
   }

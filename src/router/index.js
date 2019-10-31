@@ -23,7 +23,7 @@ import getTitle from '@/utils/getTitle'
 export const currencyRoutes = [
   {
     path: '/',
-    redirect:'/order'
+    redirect: '/order'
   },
   {
     path: '/login',
@@ -188,7 +188,7 @@ export const currencyRoutes = [
         name: 'Without-cuisine-manage',
         component: () => import('@/views/cuisine/ManageWithout'),
         meta: {
-          title: '菜品管理(无选菜)'
+          title: '菜品管理(无选菜)',
         }
       },
     ]
@@ -360,7 +360,7 @@ export const currencyRoutes = [
       },
       {
         path: 'modules',
-        name:'Configuring-modules',
+        name: 'Configuring-modules',
         meta: {
           title: '模块管理'
         },
