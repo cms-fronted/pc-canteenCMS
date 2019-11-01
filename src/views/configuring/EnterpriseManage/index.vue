@@ -73,6 +73,7 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
+        <el-button type="warning" @click="resetParent">重置</el-button>
         <el-button type="primary" @click="_addEnterprise">确 定</el-button>
       </span>
     </el-dialog>
@@ -86,6 +87,7 @@
       :editDinnerList="editDinnersList"
       :editAccount="editAccount"
       :machineList="machineList"
+      :modules="modules"
       @updateMachineTable="(val,type) => getMachineList(val,type)"
       @updateCanteenList="getComsumptionLoc"
     ></add-canteen-dialog>
@@ -131,6 +133,7 @@ export default {
         dining_mode: 1
       },
       companyList: [],
+      modules: {},
       canteensLocData: [],
       shopLocData: [],
       company_id: "",
@@ -162,6 +165,9 @@ export default {
     }
   },
   methods: {
+    resetParent() {
+      this.parent = {};
+    },
     handleNodeClick(val) {
       let { id, name } = val;
       this.company_id = id;
@@ -203,6 +209,7 @@ export default {
       this.addCanteenVisible = val;
       this.editDinnersList.length = 0;
       this.editAccount = {};
+      this.modules = [];
     },
     addShop() {
       this.shopDialogTitle = "新增小卖部";
@@ -241,9 +248,9 @@ export default {
         .catch(err => console.log(err));
       return data;
     },
-    async getSystemModules(id) {
+    async getSystemModules() {
       const res = $axios.get("/v1/modules/canteen/withSystem", {
-        c_id: id
+        c_id: this.company_id
       });
       return res;
     },
@@ -254,9 +261,13 @@ export default {
       this.canteenDialogTitle = "编辑饭堂";
       const data = await this.getCanteenConfig(id);
       const modules = await this.getSystemModules(id);
-      console.log(modules);
       this.getMachineList(val, "canteen");
-      this.editForm.dinnersList = data.dinners;
+      if (modules.msg === "ok") {
+        this.modules = Array.from(modules.data);
+      }
+      if (data.msg === "ok") {
+        this.editForm.dinnersList = data.dinners;
+      }
       this.editDinnersList = Array.from(data.dinners);
       this.editAccount = { ...data.account };
       this.addCanteenVisible = true;

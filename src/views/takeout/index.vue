@@ -75,7 +75,10 @@
           <el-table-column label="餐次">
             <template slot-scope="scoped">
               <span>
-                <el-button type="text" @click="openDetailDialog(scoped.row.dinner)">{{scoped.row.dinner}}</el-button>
+                <el-button
+                  type="text"
+                  @click="openDetailDialog(scoped.row.dinner)"
+                >{{scoped.row.dinner}}</el-button>
               </span>
             </template>
           </el-table-column>

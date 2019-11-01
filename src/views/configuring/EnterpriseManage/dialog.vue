@@ -104,8 +104,26 @@
       <el-row :gutter="20">
         <el-col :span="10">
           <el-card class="box-card">
-            <div>PC端</div>
-            <div style="margin: 15px 0;" v-for="(items, index) in modules" :key="items.create_time">
+            <div>
+              PC端
+              <el-button type="text" @click="test">测试</el-button>
+            </div>
+            <div v-for="(item,index) in pcModules" :key="index">
+              <el-checkbox
+                :indeterminate="isIndeterminate[item.id]"
+                v-model="checkAll[item.id]"
+              >{{item.name}}</el-checkbox>
+              <el-checkbox-group style="padding: 0 20px" v-model="checkedModules[item.id]">
+                <el-checkbox
+                  v-for="items in item.items"
+                  :label="items.name"
+                  :value="items.id"
+                  :key="items.id"
+                  @change="val => handleCheckedModulesChange(val,item.id)"
+                ></el-checkbox>
+              </el-checkbox-group>
+            </div>
+            <!-- <div style="margin: 15px 0;" v-for="(items, index) in modules" :key="items.create_time">
               <el-checkbox
                 :indeterminate="isIndeterminate[index]"
                 v-model="checkAll[index]"
@@ -121,7 +139,7 @@
                   :key="items.id"
                 >{{items.name}}</el-checkbox>
               </el-checkbox-group>
-            </div>
+            </div>-->
           </el-card>
         </el-col>
         <el-col :span="14">
@@ -272,10 +290,12 @@ export default {
     "formdata",
     "editDinnerList",
     "editAccount",
-    "machineList"
+    "machineList",
+    "modules"
   ],
   data() {
     return {
+      testCheck: [],
       isOpen: false,
       dinnersVisible: false,
       addMachineVisible: false,
@@ -290,19 +310,12 @@ export default {
         number: "",
         pwd: ""
       },
-      checkAll: { system: false, shop: false, canteen: false },
-      modulesCheckbox: { system: [], canteen: [], shop: [] }, //每一个功能模块对应的id
-      checkedModules: {
-        system: [],
-        shop: [],
-        canteen: []
-      },
-      isIndeterminate: {
-        system: false,
-        shop: false,
-        canteen: false
-      },
-      modules: [], //系统所有功能模块
+      checkAll: {},
+      modulesCheckbox: {}, //每一个小功能模块下所有的id
+      checkedModules: {},
+      isIndeterminate: {},
+      pcModules: [],
+      wxModules: [],
       canteen_id: null,
       canteens: null,
       advancedType: 1,
@@ -351,68 +364,52 @@ export default {
       if (this.isEdit) {
         this.machineTable = val;
       }
+    },
+    modules(val) {
+      this.pcModules = val.filter(item => item.type === 1);
+      this.pcModules.forEach(item => {
+        this.checkAll = Object.assign({}, this.checkAll, { [item.id]: false });
+        this.isIndeterminate = Object.assign({}, this.isIndeterminate, {
+          [item.id]: false
+        });
+        this.checkedModules = Object.assign({}, this.checkedModules, {
+          [item.id]: []
+        });
+        this.modulesCheckbox = Object.assign({}, this.modulesCheckbox, {
+          [item.id]: []
+        });
+      });
+
+      this.wxModules = val.filter(item => item.type === 2);
     }
   },
   created() {
     // this.getModules();
   },
   methods: {
-    handleCheckAllChange(val, index) {
-      this.checkedModules["" + index] = val
-        ? this.modulesCheckbox["" + index]
-        : [];
-      this.isIndeterminate["" + index] = false;
-    },
-    handleCheckedModulesChange(value, index) {
-      let checkedCount = value.length;
-      this.checkAll["" + index] =
-        checkedCount === this.modulesCheckbox["" + index].length;
-      this.isIndeterminate["" + index] =
-        checkedCount > 0 &&
-        checkedCount < this.modulesCheckbox["" + index].length;
-    },
-    getModules() {
-      let systemModules = $axios.get("/v1/modules?type=1");
-      let canteenModules = $axios.get("/v1/modules?type=2");
-      let shopModules = $axios.get("/v1/modules?type=3");
-      let modulesCheck = Promise.all([
-        systemModules,
-        canteenModules,
-        shopModules
-      ]);
-      modulesCheck.then(res => {
-        const systemModules = res[0].data;
-        const canteenModules = res[1].data;
-        const shopModules = res[2].data;
-        let arr = [];
-        for (let item in systemModules) {
-          if (item === "items") {
-            systemModules[item].forEach(i =>
-              this.modulesCheckbox.system.push(i.id)
-            );
+    test() {
+      // console.log(this.pcModules);
+      // console.log(this.checkAll);
+      // console.log(this.isIndeterminate);
+      // console.log(this.checkedModules);
+      this.pcModules.forEach((item, index) => {
+        for (let key in item) {
+          if (key === "items") {
+            console.log(item);
+            this.modulesCheckbox[this.pcModules[index].id].push(item.id);
           }
         }
-        for (let item in canteenModules) {
-          if (item === "items") {
-            canteenModules[item].forEach(i =>
-              this.modulesCheckbox.canteen.push(i.id)
-            );
-          }
-        }
-        for (let item in shopModules) {
-          if (item === "items") {
-            shopModules[item].forEach(i =>
-              this.modulesCheckbox.shop.push(i.id)
-            );
-          }
-        }
-        this.modules = Object.assign(
-          {},
-          { system: systemModules },
-          { canteen: canteenModules },
-          { shop: shopModules }
-        );
       });
+      // for (let i in this.pcModules) {
+      //   console.log(i);
+      //   if (i === "items") {
+      //     console.log(i, this.pcModules[i]);
+      //   }
+      // }
+      // this.pcModules.forEach(item => {
+      //   for (let i in item) {
+      //   }
+      // });
     },
     handleClick() {
       this.dinnersVisible = true;
@@ -517,7 +514,65 @@ export default {
           })
           .catch(err => console.log(err));
       }
+    },
+    // handleCheckAllChange(val, index) {
+    //   this.checkedModules["" + index] = val
+    //     ? this.modulesCheckbox["" + index]
+    //     : [];
+    //   this.isIndeterminate["" + index] = false;
+    // },
+    handleCheckedModulesChange(value, index) {
+      console.log(value, index);
+      let checkedCount = value.length;
+      this.checkAll[index] =
+        checkedCount === this.modulesCheckbox["" + index].length;
+      // this.isIndeterminate["" + index] =
+      //   checkedCount > 0 &&
+      //   checkedCount < this.modulesCheckbox["" + index].length;
     }
+    // getModules() {
+    //   let systemModules = $axios.get("/v1/modules?type=1");
+    //   let canteenModules = $axios.get("/v1/modules?type=2");
+    //   let shopModules = $axios.get("/v1/modules?type=3");
+    //   let modulesCheck = Promise.all([
+    //     systemModules,
+    //     canteenModules,
+    //     shopModules
+    //   ]);
+    //   modulesCheck.then(res => {
+    //     const systemModules = res[0].data;
+    //     const canteenModules = res[1].data;
+    //     const shopModules = res[2].data;
+    //     let arr = [];
+    //     for (let item in systemModules) {
+    //       if (item === "items") {
+    //         systemModules[item].forEach(i =>
+    //           this.modulesCheckbox.system.push(i.id)
+    //         );
+    //       }
+    //     }
+    //     for (let item in canteenModules) {
+    //       if (item === "items") {
+    //         canteenModules[item].forEach(i =>
+    //           this.modulesCheckbox.canteen.push(i.id)
+    //         );
+    //       }
+    //     }
+    //     for (let item in shopModules) {
+    //       if (item === "items") {
+    //         shopModules[item].forEach(i =>
+    //           this.modulesCheckbox.shop.push(i.id)
+    //         );
+    //       }
+    //     }
+    //     this.modules = Object.assign(
+    //       {},
+    //       { system: systemModules },
+    //       { canteen: canteenModules },
+    //       { shop: shopModules }
+    //     );
+    //   });
+    // },
   }
 };
 </script>
@@ -545,3 +600,5 @@ export default {
   clear: both;
 }
 </style>
+
+

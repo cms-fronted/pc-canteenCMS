@@ -169,7 +169,7 @@ export default {
     }
   },
   created() {
-    this.getModules();
+    // this.getModules();
   },
   methods: {
     closeDialog() {
@@ -192,49 +192,49 @@ export default {
         checkedCount > 0 &&
         checkedCount < this.modulesCheckbox["" + index].length;
     },
-    getModules() {
-      let systemModules = $axios.get("/v1/modules?type=1");
-      let canteenModules = $axios.get("/v1/modules?type=2");
-      let shopModules = $axios.get("/v1/modules?type=3");
-      let modulesCheck = Promise.all([
-        systemModules,
-        canteenModules,
-        shopModules
-      ]);
-      modulesCheck.then(res => {
-        const systemModules = res[0].data[0];
-        const canteenModules = res[1].data[0];
-        const shopModules = res[2].data[0];
-        let arr = [];
-        for (let item in systemModules) {
-          if (item === "items") {
-            systemModules[item].forEach(i =>
-              this.modulesCheckbox.system.push(i.id)
-            );
-          }
-        }
-        for (let item in canteenModules) {
-          if (item === "items") {
-            canteenModules[item].forEach(i =>
-              this.modulesCheckbox.canteen.push(i.id)
-            );
-          }
-        }
-        for (let item in shopModules) {
-          if (item === "items") {
-            shopModules[item].forEach(i =>
-              this.modulesCheckbox.shop.push(i.id)
-            );
-          }
-        }
-        this.modules = Object.assign(
-          {},
-          { system: systemModules },
-          { canteen: canteenModules },
-          { shop: shopModules }
-        );
-      });
-    },
+    // getModules() {
+    //   let systemModules = $axios.get("/v1/modules?type=1");
+    //   let canteenModules = $axios.get("/v1/modules?type=2");
+    //   let shopModules = $axios.get("/v1/modules?type=3");
+    //   let modulesCheck = Promise.all([
+    //     systemModules,
+    //     canteenModules,
+    //     shopModules
+    //   ]);
+    //   modulesCheck.then(res => {
+    //     const systemModules = res[0].data[0];
+    //     const canteenModules = res[1].data[0];
+    //     const shopModules = res[2].data[0];
+    //     let arr = [];
+    //     for (let item in systemModules) {
+    //       if (item === "items") {
+    //         systemModules[item].forEach(i =>
+    //           this.modulesCheckbox.system.push(i.id)
+    //         );
+    //       }
+    //     }
+    //     for (let item in canteenModules) {
+    //       if (item === "items") {
+    //         canteenModules[item].forEach(i =>
+    //           this.modulesCheckbox.canteen.push(i.id)
+    //         );
+    //       }
+    //     }
+    //     for (let item in shopModules) {
+    //       if (item === "items") {
+    //         shopModules[item].forEach(i =>
+    //           this.modulesCheckbox.shop.push(i.id)
+    //         );
+    //       }
+    //     }
+    //     this.modules = Object.assign(
+    //       {},
+    //       { system: systemModules },
+    //       { canteen: canteenModules },
+    //       { shop: shopModules }
+    //     );
+    //   });
+    // },
     //打开添加硬件对话框
     addNewMachine() {
       this.addMachineVisible = true;
