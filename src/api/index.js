@@ -19,6 +19,9 @@ let loading = null
 // 请求拦截器
 $axios.interceptors.request.use(
   config => {
+    if (loading) {
+      loading.close();
+    }
     loading = Loading.service({ text: '拼命加载中' })
     const token = store.getters.token
     if (token) {

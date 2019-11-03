@@ -23,7 +23,7 @@
           ></el-option>
         </el-select>
         <el-button @click="AddVisible = true">新增</el-button>
-        <el-button @click="fetchTableList">查询</el-button>
+        <el-button @click="fetchTableList(1)">查询</el-button>
       </div>
       <div class="main-content">
         <el-table style="width:100%" :data="tableList" :span-method="objectSpanMethod">
@@ -43,11 +43,17 @@
           <el-table-column label="可选菜品" prop="number"></el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>
+              <el-button size="mini" @click="_edit(scope.row)">编辑</el-button>
               <el-button size="mini" type="danger" @click="_delete(scope.row)">Delete</el-button>
             </template>
           </el-table-column>
         </el-table>
+        <pagination
+          :total="total"
+          :pageSize="size"
+          :currentPage="current_page"
+          @pagination="fetchTableList"
+        ></pagination>
       </div>
     </div>
     <el-dialog :visible.sync="AddVisible" title="新增菜单">
@@ -89,8 +95,8 @@
             <el-radio :label="2">动态</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="数量">
-          <el-input v-model="menuForm.number" :disabled="isMoving"></el-input>
+        <el-form-item label="数量" v-if="menuForm.status===1">
+          <el-input v-model="menuForm.number"></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -98,15 +104,44 @@
         <el-button type="primary" @click="handleClick">确 定</el-button>
       </span>
     </el-dialog>
+
+    <el-dialog :visible.sync="editVisible" width="30%" title="编辑菜单" center>
+      <el-form :model="editForm" label-width="60px">
+        <el-form-item label="菜类">
+          <el-input v-model="editForm.category"></el-input>
+        </el-form-item>
+        <el-form-item label="状态">
+          <el-radio-group v-model="editForm.status">
+            <el-radio :label="1">固定</el-radio>
+            <el-radio :label="2">动态</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="数量" v-if="editForm.status===1">
+          <el-input v-model="editForm.number"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="_editClose">取 消</el-button>
+        <el-button type="primary" @click="_editConfirm">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import $axios from "@/api/index";
+import Pagination from "@/components/Pagination";
 import { flatten } from "@/utils/flatternArr";
 export default {
+  components: { Pagination },
   data() {
     return {
+      editVisible: false,
+      editForm: {
+        category: "",
+        status: 0,
+        number: 0
+      },
       companyList: [],
       company_id: "",
       canteen_id: "",
@@ -126,7 +161,10 @@ export default {
       locationList: [],
       tableList: [],
       spanArr: [], //二维数组，用于存放单元格合并规则
-      position: 0 //用于存储相同项的开始index
+      position: 0, //用于存储相同项的开始index
+      current_page: 1,
+      size: 2,
+      total: 10
     };
   },
   watch: {
@@ -231,41 +269,66 @@ export default {
         .catch(err => console.log(err));
     },
     changeStatus() {
-      this.isMoving = !this.isMoving;
-      this.menuForm.number = this.isMoving == 1 ? 0 : "";
+      // this.isMoving = !this.isMoving;
+      // this.menuForm.number = this.isMoving == 1 ? 0 : "";
     },
-    fetchTableList() {
+    fetchTableList(page) {
+      page = page || 1;
       $axios
         .get(
-          `/v1/menus/company?company_id=${this.company_id}&canteen_id=${this.canteen_id}&s7ize=2&page=1`
+          `/v1/menus/company?company_id=${this.company_id}&canteen_id=${this.canteen_id}&size=${this.size}&page=${page}`
         )
         .then(res => {
           let _data = Array.from(res.data.data);
+          this.total = res.data.total;
           let _list = [];
-          console.log(_data);
           _data.forEach(i => {
-            i.dinner.forEach(j => {
-              j.menus.forEach(k => {
-                _list.push({
-                  grade: i.company.grade,
-                  company_name: i.company.name,
-                  company_id: i.company.id,
-                  id: j.id,
-                  canteen_name: i.name,
-                  category_name: j.name, //早餐，午餐，晚餐
-                  category: k.category, //荤菜，素菜，汤
-                  status: k.status,
-                  number: k.count
-                });
+            if (i.dinner.length) {
+              //如果设置了菜类明细
+              i.dinner.forEach(j => {
+                if (j.menus.length) {
+                  //如果设置了菜类状态和可选数量
+                  j.menus.forEach(k => {
+                    _list.push({
+                      grade: i.company.grade,
+                      company_name: i.company.name,
+                      company_id: i.company.id,
+                      canteen_name: i.name,
+                      canteen_id: i.id,
+                      category_name: j.name, //早餐，午餐，晚餐
+                      category: k.category, //荤菜，素菜，汤
+                      dinner_id: j.id,
+                      menu_id: k.id,
+                      status: k.status,
+                      number: k.count
+                    });
+                  });
+                } else {
+                  _list.push({
+                    grade: i.company.grade,
+                    company_name: i.company.name,
+                    company_id: i.company.id,
+                    canteen_name: i.name,
+                    canteen_id: i.id,
+                    category_name: j.name, //早餐，午餐，晚餐
+                    dinner_id: j.id
+                  });
+                }
               });
-            });
+            } else {
+              _list.push({
+                grade: i.company.grade,
+                company_name: i.company.name,
+                company_id: i.company.id,
+                canteen_name: i.name
+              });
+            }
           });
           this.tableList = Array.from(_list);
           this.rowspan(0, "grade");
           this.rowspan(1, "company_name");
           this.rowspan(2, "canteen_name");
           this.rowspan(3, "category_name");
-          console.log(this.tableList);
         })
         .catch(err => console.log(err));
     },
@@ -275,8 +338,17 @@ export default {
         .then(res => (this.canteen_detail = Array.from(res.data)))
         .catch(err => console.log(err));
     },
-    handleEdit(val) {
+    _edit(val) {
       console.log(val);
+      this.editForm = Object.assign({}, val);
+      this.editVisible = true;
+    },
+    _editConfirm() {
+      console.log(this.editForm);
+    },
+    _editClose() {
+      this.editVisible = false;
+      this.editForm = {};
     },
     rowspan(idx, prop) {
       this.spanArr[idx] = [];

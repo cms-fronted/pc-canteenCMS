@@ -2,6 +2,7 @@ export function flatten(arr) {
   const result = [];
   tree2arr(arr);
   function tree2arr(arr) {
+    arr = Array.isArray(arr) ? arr : [arr]
     arr.forEach(el => {
       while (el.items) {
         result.push({
@@ -39,14 +40,15 @@ export function unshiftAllOptions(arr) {
   })
   return arr
 }
-// export function flatten(arr) {
-//   let result = [];
-//   for (let i = 0; i < arr.length; i++) {
-//     if (Array.isArray(arr[i].items)) {
-//       result = result.concat(flatten(arr[i].items))
-//     } else {
-//       result.push(arr[i])
-//     }
-//   }
-//   return result
-// }
+export function treeToArr(arr) {
+  let result = [];
+  for (let i = 0; i < arr.length; i++) {
+    if (Array.isArray(arr[i].items)) {
+      result = result.concat(treeToArr(arr[i].items))
+      result.push(arr[i])
+    } else {
+      result.push(arr[i])
+    }
+  }
+  return result
+}

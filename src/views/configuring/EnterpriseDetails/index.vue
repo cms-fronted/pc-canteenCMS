@@ -29,14 +29,6 @@
         </div>
         <div class="main-content">
           <el-table style="width:100%" :data="companyList">
-            <el-table-column type="expand">
-              <template slot-scope="props">
-                <el-table :data="props.row.canteen" style="width:100%">
-                  <el-table-column prop="name" label="饭堂名称"></el-table-column>
-                  <el-table-column prop="shop" label="功能模块"></el-table-column>
-                </el-table>
-              </template>
-            </el-table-column>
             <el-table-column prop="create_time" label="创建时间" width="200px"></el-table-column>
             <el-table-column label="公司级别" prop="grade">
               <template slot-scope="props">
@@ -57,23 +49,28 @@
               </template>
             </el-table-column>
           </el-table>
+          <pagination
+            :total="total"
+            @pagination="fetchList"
+            :pageSize="size"
+            :currentPage="current_page"
+          ></pagination>
         </div>
       </div>
     </div>
 
     <el-dialog
-      width="80%"
+      width="50%"
       :visible.sync="detailDialogVisible"
-      :show-close="false"
       @close="closeDetailDialog"
-      title="明细"
+      title="企业明细"
       center
     >
-      <el-row :gutter="10">
-        <el-col :span="4">
+      <el-row :gutter="20">
+        <el-col :span="6">
           <div class="lf-col">
-            <el-table class="canteen-table" size="mini" :show-header="false" :data="canteenList">
-              <el-table-column>
+            <el-table class="canteen-table" size="mini" :data="canteenList">
+              <el-table-column label="饭堂名称">
                 <template slot-scope="scoped">
                   <el-button type="text">{{scoped.row.name}}</el-button>
                 </template>
@@ -85,10 +82,40 @@
           </div>
         </el-col>
         <el-col :span="18">
-          <el-card class="box-card">
+          <show-modules :modules="modules" :disabled="true"></show-modules>
+          <el-card class="box-card" body-style="paddingBottom: 5px">
             <div slot="header" class="clearfix">
-              <span>企业明细</span>
+              <span>硬件列表</span>
             </div>
+            <el-table :data="machineList" size="mini">
+              <el-table-column label="设备类别">
+                <template slot-scope="scoped">
+                  <span>{{scoped.row.machine_type | showMachineType}}</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="设备序号" prop="number"></el-table-column>
+              <el-table-column label="设备名称" prop="name"></el-table-column>
+              <el-table-column label="硬件号" prop="code"></el-table-column>
+              <el-table-column label="状态" prop="state">
+                <template slot-scope="scoped">
+                  <span>{{scoped.row.state | showState}}</span>
+                </template>
+              </el-table-column>
+              <el-table-column label="操作">
+                <template slot-scope="scoped">
+                  <span>
+                    <el-button type="text" @click="_delete(scoped.row)">删除</el-button>
+                  </span>
+                </template>
+              </el-table-column>
+            </el-table>
+            <pagination
+              :pageSize="machine_size"
+              :currentPage="machine_page"
+              @pagination="getCompanyMachine"
+              :small="true"
+              :total="machine_total"
+            ></pagination>
           </el-card>
         </el-col>
       </el-row>
@@ -98,14 +125,20 @@
 
 <script>
 import $axios from "@/api/index";
+import ShowModules from "@/components/ShowModules";
+import Pagination from "@/components/Pagination";
 import { flatten } from "@/utils/flatternArr";
 export default {
+  components: { ShowModules, Pagination },
   data() {
     return {
       detailDialogVisible: false,
+      company_id: "",
       companyOptions: [],
       companyList: [],
       canteenList: [],
+      machineList: [],
+      modules: [],
       detailForm: {},
       queryForm: {
         name: "",
@@ -114,7 +147,10 @@ export default {
       staffs: 100,
       current_page: 1,
       size: 10,
-      total: ""
+      total: 10,
+      machine_page: 1,
+      machine_size: 3,
+      machine_total: 10
     };
   },
   filters: {
@@ -136,6 +172,12 @@ export default {
       } else {
         return `${changeNum[str]}级企业`;
       }
+    },
+    showState: function(val) {
+      return val === 1 ? "正常" : "异常";
+    },
+    showMachineType: function(val) {
+      return val === "canteen" ? "饭堂" : "小卖部";
     }
   },
   created() {
@@ -143,9 +185,10 @@ export default {
     this.getCompaniesList();
   },
   methods: {
-    async fetchList() {
+    async fetchList(page) {
+      page = page || 1;
       const res = await $axios.get(
-        `/v1/companies?page=${this.current_page}&size=${this.size}`,
+        `/v1/companies?page=${page}&size=${this.size}`,
         this.queryForm
       );
       if (res.msg === "ok") {
@@ -157,13 +200,71 @@ export default {
       this.companyOptions = Array.from(flatten(res.data));
     },
     async openDetailDialog(row) {
+      this.company_id = row.id;
+      let company_id = row.id;
       this.canteenList = Array.from(row.canteen);
-      const res = await $axios.get(`/v1/canteens/company?company_id=${row.id}`);
-      console.log(res);
+      await this.getModules(company_id);
+      await this.getCompanyDetail(company_id);
+      await this.getCompanyMachine();
+
       this.detailDialogVisible = true;
     },
     closeDetailDialog() {
       this.detailDialogVisible = false;
+    },
+    async getCompanyDetail(company_id) {
+      const res = await $axios.get(
+        `/v1/canteens/company?company_id=${company_id}`
+      );
+      if (res.msg === "ok") {
+        this.staffs = res.data.staffs;
+      }
+      return res;
+    },
+    async getModules(company_id) {
+      const res = await $axios.get("/v1/modules/canteen/withSystem", {
+        c_id: company_id
+      });
+      if (res.msg === "ok") {
+        this.modules = Array.from(res.data);
+      }
+      return res;
+    },
+    async getCompanyMachine(page) {
+      const res = await $axios.get("/v1/machines/company", {
+        company_id: this.company_id,
+        page: page || 1,
+        size: this.machine_size
+      });
+      if (res.msg === "ok") {
+        this.machineList = Array.from(res.data.data);
+        this.machine_total = res.data.total;
+      }
+      return res;
+    },
+    async _delete(row) {
+      let id = row.id;
+      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(async () => {
+          const res = await $axios.post("/v1/canteen/deleteMachine", { id });
+          if (res.msg === "ok") {
+            this.$message({
+              type: "success",
+              message: "删除成功!"
+            });
+            await this.getCompanyMachine(this.company_id);
+          }
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
     }
   }
 };

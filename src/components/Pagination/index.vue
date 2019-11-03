@@ -1,6 +1,7 @@
 <template>
   <div class="pagination-container">
     <el-pagination
+      :small="small"
       :background="background"
       :total="total"
       :layout="layout"
@@ -15,6 +16,10 @@
 export default {
   name: "Pagination",
   props: {
+    small: {
+      type: Boolean,
+      default: false
+    },
     total: {
       required: true,
       type: Number

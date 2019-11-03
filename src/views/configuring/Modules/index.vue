@@ -43,6 +43,7 @@
                           type="text"
                           size="mini"
                           @click="() => openModuleDialog(node,data)"
+                          v-if="data.type === 1"
                         >新增</el-button>
                       </span>
                     </span>

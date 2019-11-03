@@ -495,7 +495,7 @@ export default {
     handleData() {
       let _data = [];
       this.budgetList.forEach(i => {
-        if (i.detail) {
+        if (i.detail.length) {
           i.detail.forEach(j => {
             j.strategy.forEach(k => {
               _data.push({

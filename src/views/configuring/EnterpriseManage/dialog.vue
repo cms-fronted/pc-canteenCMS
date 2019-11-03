@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog :visible.sync="isOpen" width="90%" :title="dialogTitle" center @close="handleClose">
+    <el-dialog :visible.sync="isOpen" width="45%" :title="dialogTitle" center @close="handleClose">
       <!-- 餐次信息对话框 -->
       <el-dialog
         center
@@ -101,167 +101,155 @@
           <el-button type="primary" @click="_submitMachineInfo">确 定</el-button>
         </div>
       </el-dialog>
-      <el-row :gutter="20">
-        <el-col :span="10">
+      <!-- <el-row :gutter="50">
+        <el-col :span="9">
           <el-card class="box-card">
             <div>
               PC端
               <el-button type="text" @click="test">测试</el-button>
             </div>
-            <div v-for="(item,index) in pcModules" :key="index">
+            <div v-for="item in pcModules" :key="item.create_time">
               <el-checkbox
                 :indeterminate="isIndeterminate[item.id]"
                 v-model="checkAll[item.id]"
+                @change="checked => handleCheckAllChange(checked,item.id)"
               >{{item.name}}</el-checkbox>
-              <el-checkbox-group style="padding: 0 20px" v-model="checkedModules[item.id]">
-                <el-checkbox
-                  v-for="items in item.items"
-                  :label="items.name"
-                  :value="items.id"
-                  :key="items.id"
-                  @change="val => handleCheckedModulesChange(val,item.id)"
-                ></el-checkbox>
-              </el-checkbox-group>
-            </div>
-            <!-- <div style="margin: 15px 0;" v-for="(items, index) in modules" :key="items.create_time">
-              <el-checkbox
-                :indeterminate="isIndeterminate[index]"
-                v-model="checkAll[index]"
-                @change="checked => handleCheckAllChange(checked,index)"
-              >{{items.name}}</el-checkbox>
               <el-checkbox-group
-                v-model="checkedModules[index]"
-                @change="val => handleCheckedModulesChange(val,index)"
+                style="padding: 0 20px"
+                @change="checked => handleCheckedModulesChange(checked,item.id)"
+                v-model="checkedPCModules[item.id]"
               >
                 <el-checkbox
-                  v-for="items in items.items"
+                  v-for="items in item.items"
                   :label="items.id"
-                  :key="items.id"
+                  :key="items.create_time"
                 >{{items.name}}</el-checkbox>
               </el-checkbox-group>
-            </div>-->
+            </div>
+            <div>
+              微信端
+              <el-button type="text" @click="testDefault">测试</el-button>
+            </div>
+            <div v-for="item in WXModules" :key="item.create_time">
+              <el-checkbox
+                :indeterminate="isIndeterminate[item.id]"
+                v-model="checkAll[item.id]"
+                @change="checked => handleCheckAllChange(checked,item.id)"
+              >{{item.name}}</el-checkbox>
+              <el-checkbox-group
+                style="padding: 0 20px"
+                @change="checked => handleCheckedModulesChange(checked,item.id)"
+                v-model="checkedWXModules[item.id]"
+              >
+                <el-checkbox
+                  v-for="items in item.items"
+                  :label="items.id"
+                  :key="items.create_time"
+                >{{items.name}}</el-checkbox>
+              </el-checkbox-group>
+            </div>
+            <div style="textAlign:center">
+              <el-button>确定</el-button>
+            </div>
           </el-card>
         </el-col>
-        <el-col :span="14">
-          <!--饭堂设置-->
-          <el-card body-style="paddingBottom: 5px">
-            <div slot="header" class="clearfix">
-              <span>饭堂设置</span>
-            </div>
-            <span style="margin-right: 8px">
-              饭堂名称
-              <el-input v-model="canteens" size="small" style="width:200px;" :disabled="isEdit"></el-input>
+      <el-col :span="14">-->
+      <!--饭堂设置-->
+      <el-card body-style="paddingBottom: 5px">
+        <div slot="header" class="clearfix">
+          <span>饭堂设置</span>
+        </div>
+        <span style="margin-right: 8px">
+          饭堂名称
+          <el-input v-model="canteens" size="small" style="width:200px;" :disabled="isEdit"></el-input>
+        </span>
+        <el-button
+          type="primary"
+          size="small"
+          @click="addCanteen"
+          :disabled="isEdit || canteen_id"
+        >新增饭堂</el-button>
+        <el-button type="primary" size="small" @click="handleClick">添加餐次</el-button>
+        <el-table style="width:100%" :data="dataTable" size="small">
+          <el-table-column label="餐次" width="60px" prop="name"></el-table-column>
+          <!-- <el-table-column label="订餐单位" width="80px" prop="" ></el-table-column> -->
+          <el-table-column label="订餐截止时间">
+            <span
+              slot-scope="scoped"
+            >{{scoped.row.type === 'day' ? `提前${scoped.row.type_number}天` : `周${scoped.row.type_number+1}前`}}</span>
+          </el-table-column>
+          <el-table-column label="就餐时间">
+            <span slot-scope="scoped">{{scoped.row.meal_time_begin}}-{{scoped.row.meal_time_end}}</span>
+          </el-table-column>
+          <el-table-column label="餐费状态">
+            <span slot-scope="scoped">{{scoped.row.fixed === 1 ? '固定' : '动态'}}</span>
+          </el-table-column>
+          <el-table-column label="操作">
+            <template slot-scope="scoped">
+              <el-button size="small" type="text">编辑</el-button>
+              <el-button size="small" type="text" @click="_delete(scoped.row)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-card>
+      <!--账户设置-->
+      <el-card class="box-card" body-style="paddingBottom: 5px">
+        <div slot="header" class="clearfix">账户设置</div>
+        <el-form ref="accountForm" :model="accountForm">
+          <el-form-item prop="dinningMode">
+            <el-radio-group v-model="accountForm.dining_mode">
+              <el-radio :label="1">堂食</el-radio>
+              <el-radio :label="2">外卖</el-radio>
+              <el-radio :label="3">全部</el-radio>
+            </el-radio-group>
+          </el-form-item>
+          <el-form-item prop="type">
+            <el-radio-group v-model="accountForm.type">
+              <el-radio :label="2">不可透支消费</el-radio>
+              <el-radio :label="1">可透支消费</el-radio>
+            </el-radio-group>
+            <span v-if="accountForm.type === 1" style="marginTop: 5px;">
+              可透支
+              <el-input
+                v-model="accountForm.limit_money"
+                style="width:120px"
+                size="small"
+                type="number"
+                min="0"
+              ></el-input>元
             </span>
-            <el-button
-              type="primary"
-              size="small"
-              @click="addCanteen"
-              :disabled="isEdit || canteen_id"
-            >新增饭堂</el-button>
-            <el-button type="primary" size="small" @click="handleClick">添加餐次</el-button>
-            <el-table style="width:100%" :data="dataTable" size="small">
-              <el-table-column label="餐次" width="60px" prop="name"></el-table-column>
-              <!-- <el-table-column label="订餐单位" width="80px" prop="" ></el-table-column> -->
-              <el-table-column label="订餐截止时间">
-                <span
-                  slot-scope="scoped"
-                >{{scoped.row.type === 'day' ? `提前${scoped.row.type_number}天` : `周${scoped.row.type_number+1}前`}}</span>
-              </el-table-column>
-              <el-table-column label="就餐时间">
-                <span
-                  slot-scope="scoped"
-                >{{scoped.row.meal_time_begin}}-{{scoped.row.meal_time_end}}</span>
-              </el-table-column>
-              <el-table-column label="餐费状态">
-                <span slot-scope="scoped">{{scoped.row.fixed === 1 ? '固定' : '动态'}}</span>
-              </el-table-column>
-              <el-table-column label="操作">
-                <template slot-scope="scoped">
-                  <el-button size="small" type="text">编辑</el-button>
-                  <el-button size="small" type="text" @click="_delete(scoped.row)">删除</el-button>
-                </template>
-              </el-table-column>
-            </el-table>
-          </el-card>
-          <!--账户设置-->
-          <el-card class="box-card" body-style="paddingBottom: 5px">
-            <div slot="header" class="clearfix">账户设置</div>
-            <el-form ref="accountForm" :model="accountForm">
-              <el-form-item prop="dinningMode">
-                <el-radio-group v-model="accountForm.dining_mode">
-                  <el-radio :label="1">堂食</el-radio>
-                  <el-radio :label="2">外卖</el-radio>
-                  <el-radio :label="3">全部</el-radio>
-                </el-radio-group>
-              </el-form-item>
-              <el-form-item prop="type">
-                <el-radio-group v-model="accountForm.type">
-                  <el-radio :label="2">不可透支消费</el-radio>
-                  <el-radio :label="1">可透支消费</el-radio>
-                </el-radio-group>
-                <span v-if="accountForm.type === 1" style="marginTop: 5px;">
-                  可透支
-                  <el-input
-                    v-model="accountForm.limit_money"
-                    style="width:120px"
-                    size="small"
-                    type="number"
-                    min="0"
-                  ></el-input>元
-                </span>
-              </el-form-item>
-              <el-form-item prop="clean_type">
-                <div style="marginTop: 5px">
-                  <el-radio-group v-model="accountForm.clean_type">
-                    <el-radio :label="2">非系统自动清零</el-radio>
-                    <el-radio :label="1">系统自动清零</el-radio>
-                  </el-radio-group>
-                  <span style="marginLeft: 5px" v-if="accountForm.clean_type === 1">
-                    每月
-                    <el-input
-                      style="width:100px"
-                      size="small"
-                      v-model="accountForm.clean_day"
-                      type="number"
-                      @change="changeDay"
-                      min="1"
-                      max="31"
-                    ></el-input>号清除
-                  </span>
-                </div>
-              </el-form-item>
-            </el-form>
-          </el-card>
-          <!--硬件设置-->
-          <el-card class="box-card" body-style="paddingBottom: 5px">
-            <div slot="header" class="clearfix">
-              <span>硬件设置</span>
-              <el-button
-                style="float: right; padding: 3px 0"
-                type="text"
-                @click="oprnMachineDialog"
-              >添加硬件</el-button>
-            </div>
-            <el-table :data="machineTable" style="width:100%" size="mini">
-              <el-table-column label="编号" prop="number"></el-table-column>
-              <el-table-column label="设备名称" prop="name"></el-table-column>
-              <el-table-column label="设备号" prop="code"></el-table-column>
-              <!-- <el-table-column label="密码" prop="pwd"></el-table-column> -->
-              <el-table-column label="状态">
-                <template slot-scope="scoped">
-                  <span>{{scoped.row.state===1?"正常":"异常"}}</span>
-                </template>
-              </el-table-column>
-              <el-table-column label="操作">
-                <template slot-scope="scoped">
-                  <el-button size="small" type="text" @click="_editMachine(scoped.row)">编辑</el-button>
-                  <!-- <el-button size="small" type="text" @click="_deleteMachine(scoped.row)">删除</el-button> -->
-                </template>
-              </el-table-column>
-            </el-table>
-          </el-card>
-        </el-col>
-      </el-row>
+          </el-form-item>
+        </el-form>
+      </el-card>
+      <!--硬件设置-->
+      <el-card class="box-card" body-style="paddingBottom: 5px">
+        <div slot="header" class="clearfix">
+          <span>硬件设置</span>
+          <el-button
+            style="float: right; padding: 3px 0"
+            type="text"
+            @click="oprnMachineDialog"
+          >添加硬件</el-button>
+        </div>
+        <el-table :data="machineTable" style="width:100%" size="mini">
+          <el-table-column label="编号" prop="number"></el-table-column>
+          <el-table-column label="设备名称" prop="name"></el-table-column>
+          <el-table-column label="设备号" prop="code"></el-table-column>
+          <!-- <el-table-column label="密码" prop="pwd"></el-table-column> -->
+          <el-table-column label="状态">
+            <template slot-scope="scoped">
+              <span>{{scoped.row.state===1?"正常":"异常"}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作">
+            <template slot-scope="scoped">
+              <el-button size="small" type="text" @click="_editMachine(scoped.row)">编辑</el-button>
+              <!-- <el-button size="small" type="text" @click="_deleteMachine(scoped.row)">删除</el-button> -->
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-card>
+
       <div slot="footer" class="dialog-footer">
         <el-button @click="handleClose">取 消</el-button>
         <el-button type="primary" @click="_submitOptions">确定</el-button>
@@ -271,7 +259,7 @@
 </template>
 <script>
 import $axios from "@/api/index";
-import { stringify } from "querystring";
+import { treeToArr } from "@/utils/flatternArr";
 const weekOptions = [
   { label: "周一", value: 0 },
   { label: "周二", value: 1 },
@@ -310,12 +298,7 @@ export default {
         number: "",
         pwd: ""
       },
-      checkAll: {},
-      modulesCheckbox: {}, //每一个小功能模块下所有的id
-      checkedModules: {},
-      isIndeterminate: {},
-      pcModules: [],
-      wxModules: [],
+
       canteen_id: null,
       canteens: null,
       advancedType: 1,
@@ -364,53 +347,10 @@ export default {
       if (this.isEdit) {
         this.machineTable = val;
       }
-    },
-    modules(val) {
-      this.pcModules = val.filter(item => item.type === 1);
-      this.pcModules.forEach(item => {
-        this.checkAll = Object.assign({}, this.checkAll, { [item.id]: false });
-        this.isIndeterminate = Object.assign({}, this.isIndeterminate, {
-          [item.id]: false
-        });
-        this.checkedModules = Object.assign({}, this.checkedModules, {
-          [item.id]: []
-        });
-        this.modulesCheckbox = Object.assign({}, this.modulesCheckbox, {
-          [item.id]: []
-        });
-      });
-
-      this.wxModules = val.filter(item => item.type === 2);
     }
   },
-  created() {
-    // this.getModules();
-  },
+  created() {},
   methods: {
-    test() {
-      // console.log(this.pcModules);
-      // console.log(this.checkAll);
-      // console.log(this.isIndeterminate);
-      // console.log(this.checkedModules);
-      this.pcModules.forEach((item, index) => {
-        for (let key in item) {
-          if (key === "items") {
-            console.log(item);
-            this.modulesCheckbox[this.pcModules[index].id].push(item.id);
-          }
-        }
-      });
-      // for (let i in this.pcModules) {
-      //   console.log(i);
-      //   if (i === "items") {
-      //     console.log(i, this.pcModules[i]);
-      //   }
-      // }
-      // this.pcModules.forEach(item => {
-      //   for (let i in item) {
-      //   }
-      // });
-    },
     handleClick() {
       this.dinnersVisible = true;
     },
@@ -514,65 +454,7 @@ export default {
           })
           .catch(err => console.log(err));
       }
-    },
-    // handleCheckAllChange(val, index) {
-    //   this.checkedModules["" + index] = val
-    //     ? this.modulesCheckbox["" + index]
-    //     : [];
-    //   this.isIndeterminate["" + index] = false;
-    // },
-    handleCheckedModulesChange(value, index) {
-      console.log(value, index);
-      let checkedCount = value.length;
-      this.checkAll[index] =
-        checkedCount === this.modulesCheckbox["" + index].length;
-      // this.isIndeterminate["" + index] =
-      //   checkedCount > 0 &&
-      //   checkedCount < this.modulesCheckbox["" + index].length;
     }
-    // getModules() {
-    //   let systemModules = $axios.get("/v1/modules?type=1");
-    //   let canteenModules = $axios.get("/v1/modules?type=2");
-    //   let shopModules = $axios.get("/v1/modules?type=3");
-    //   let modulesCheck = Promise.all([
-    //     systemModules,
-    //     canteenModules,
-    //     shopModules
-    //   ]);
-    //   modulesCheck.then(res => {
-    //     const systemModules = res[0].data;
-    //     const canteenModules = res[1].data;
-    //     const shopModules = res[2].data;
-    //     let arr = [];
-    //     for (let item in systemModules) {
-    //       if (item === "items") {
-    //         systemModules[item].forEach(i =>
-    //           this.modulesCheckbox.system.push(i.id)
-    //         );
-    //       }
-    //     }
-    //     for (let item in canteenModules) {
-    //       if (item === "items") {
-    //         canteenModules[item].forEach(i =>
-    //           this.modulesCheckbox.canteen.push(i.id)
-    //         );
-    //       }
-    //     }
-    //     for (let item in shopModules) {
-    //       if (item === "items") {
-    //         shopModules[item].forEach(i =>
-    //           this.modulesCheckbox.shop.push(i.id)
-    //         );
-    //       }
-    //     }
-    //     this.modules = Object.assign(
-    //       {},
-    //       { system: systemModules },
-    //       { canteen: canteenModules },
-    //       { shop: shopModules }
-    //     );
-    //   });
-    // },
   }
 };
 </script>

@@ -31,12 +31,12 @@
       </div>
       <div class="main-content">
         <el-table :data="datatable" style="width:100%">
-          <el-table-column label="归属公司" prop="company_name"></el-table-column>
+          <el-table-column label="归属公司" prop="company"></el-table-column>
           <el-table-column label="角色名称" prop="role"></el-table-column>
           <el-table-column label="账号" prop="account"></el-table-column>
           <el-table-column label="可见饭堂">
             <template slot-scope="scoped">
-              <span>{{scoped.row.canteen.toString()}}</span>
+              <span>{{scoped.row.canteen.map(item=> item.canteen_name).join(",")}}</span>
             </template>
           </el-table-column>
           <el-table-column label="状态">
@@ -50,12 +50,23 @@
           <el-table-column label="操作">
             <template slot-scope="scoped">
               <span>
-                <el-button type="text" @click="_edit(scoped.row)">编辑</el-button>
-                <el-button type="text">删除</el-button>
+                <el-button
+                  type="text"
+                  size="mini"
+                  @click="operateRoles(scoped.row)"
+                >{{scoped.row.state===1 ? '停用': '启用'}}</el-button>
+                <el-button type="text" size="mini" @click="_edit(scoped.row)">编辑</el-button>
+                <el-button type="text" size="mini">删除</el-button>
               </span>
             </template>
           </el-table-column>
         </el-table>
+        <pagination
+          :total="total"
+          :pageSize="size"
+          :currentPage="current_page"
+          @pagination="fetchList"
+        ></pagination>
       </div>
     </div>
     <el-dialog :visible.sync="newRoleDialogVisible" width="60%" center title="新增角色">
@@ -78,7 +89,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="可见饭堂" prop="canteen">
-              <el-checkbox-group v-model="roleForm.canteen">
+              <el-checkbox-group v-model="roleForm.canteens">
                 <el-checkbox
                   class="canteenCheckbox"
                   v-for="item in canteenGroup"
@@ -110,9 +121,12 @@
           </el-form>
         </el-col>
         <el-col :span="18">
-          <p style="fontSize:16px;padding:5px">
-            <b>可见模块</b>
-          </p>
+          <show-modules
+            :modules="modules"
+            @getModules="(modules,checkAll)=>getRoleRules(modules,checkAll)"
+            :isConfirm="isConfirmRules"
+            :disabled="false"
+          ></show-modules>
         </el-col>
       </el-row>
       <span slot="footer" class="dialog-footer">
@@ -125,21 +139,28 @@
 
 <script>
 import $axios from "@/api/index";
-import { flatten } from "@/utils/flatternArr";
+import ShowModules from "@/components/ShowModules";
+import Pagination from "@/components/Pagination";
+import { flatten, treeToArr } from "@/utils/flatternArr";
 export default {
+  components: { Pagination, ShowModules },
   data() {
     return {
+      modulesDialogType: "role",
       newRoleDialogVisible: false,
       queryForm: {},
       roleForm: {
-        canteen: []
+        canteens: [],
+        rules: ["12", "13", "14"]
       },
       companyOptions: [],
       canteenGroup: [],
       datatable: [],
       current_page: 1,
       total: 0,
-      size: 10
+      size: 10,
+      modules: [],
+      isConfirmRules: false
     };
   },
   created() {
@@ -153,9 +174,10 @@ export default {
         this.companyOptions = flatten(res.data);
       }
     },
-    async fetchList() {
+    async fetchList(page) {
+      page = page || 1;
       const res = await $axios.get(
-        "/v1/roles?page=" + this.current_page + "&size=" + this.size,
+        "/v1/roles?page=" + page + "&size=" + this.size,
         this.queryForm
       );
       if (res.msg === "ok") {
@@ -172,12 +194,16 @@ export default {
       if (res.msg === "ok") {
         this.canteenGroup = Array.from(res.data.canteen);
       }
+      return res;
     },
-    async getCanteenModuls(c_id) {
+    async getCanteenModuls(company_id) {
       const res = await $axios.get(
-        `/v1/modules/canteen/withSystem?c_id${c_id}`
+        `/v1/modules/canteen/withoutSystem?company_id=${company_id}`
       );
-      console.log(res);
+      if (res.msg === "ok") {
+        this.modules = Array.from(res.data);
+      }
+      return res;
     },
     openNewRoleDialog() {
       this.newRoleDialogVisible = true;
@@ -185,17 +211,88 @@ export default {
     closeNewRoleDialog() {
       this.newRoleDialogVisible = false;
     },
-    selectCompany(id) {
+    async selectCompany(id) {
       const company = this.companyOptions.filter(item => item.id === id);
       this.roleForm.company = company[0].name;
-      this.getCanteenList(id);
-      this.getCanteenModuls(id);
+      this.isConfirmRules = false;
+      await this.getCanteenList(id);
+      await this.getCanteenModuls(id);
     },
-    _confirm() {
-      console.log(this.roleForm);
+    async _confirm() {
+      if (!this.isConfirmRules) {
+        this.$message.warning("请先确定角色模块");
+      }
+      let canteens = [];
+      let newCanteen = [];
+      canteens = this.roleForm.canteens;
+      canteens.forEach(item => {
+        newCanteen.push({
+          c_id: item.id,
+          name: item.name
+        });
+      });
+      this.roleForm.canteens = JSON.stringify(newCanteen);
+      this.roleForm.rules = this.roleForm.rules.toString();
+      const res = await $axios.post("/v1/role/save", this.roleForm);
+      if (res.msg === "ok") {
+        this.$message.success("新增角色成功");
+        await this.fetchList();
+        this.newRoleDialogVisible = false;
+      }
     },
-    _edit(row) {
+    async _edit(row) {
       console.log(row);
+      // await this.getCanteenModuls(row.id);
+    },
+    async operateRoles(row) {
+      let state = row.state;
+      if (state == 1) {
+        state = 2;
+      } else {
+        state = 1;
+      }
+      const res = await $axios.post("/v1/role/handel", {
+        id: row.id,
+        state: state
+      });
+      if (res.msg === "ok") {
+        this.$message.success("修改成功");
+        await this.fetchList();
+      }
+    },
+    getRoleRules(modules, checkAll) {
+      console.log(modules, checkAll);
+      this.isConfirmRules = true;
+      let allModules = treeToArr(this.modules);
+      let checked = [];
+      for (let [key, val] of Object.entries(modules)) {
+        checked.push(val);
+      }
+      checked = checked.flat(Infinity);
+      checked.forEach(id => {
+        allModules.filter(item => {
+          if (item.id === id && item.parent_id) {
+            checked.push(item.parent_id);
+          }
+        });
+      });
+      for (let [key, val] of Object.entries(checkAll)) {
+        if (val) {
+          checked.push(Number(key)); //处理一级模块，如果 一级模块且无子模块的选项被选中 ，则插入一级模块的id，id为key
+        }
+      }
+      checked = Array.from(new Set(checked));
+      let rules = [];
+
+      let role_modules = treeToArr(this.modules);
+      checked.forEach(id => {
+        role_modules.forEach(item => {
+          if (item.id === id) {
+            rules.push(item.c_m_id);
+          }
+        });
+      });
+      this.roleForm.rules = rules;
     }
   }
 };

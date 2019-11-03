@@ -4,58 +4,83 @@
     <el-divider></el-divider>
     <div class="main">
       <div class="main-header">
-        <div class="filter-tree">
-          <el-input class="filter-input" v-model="filterText" placeholder="关键字查询"></el-input>
-          <el-tree
-            :data="companyList"
-            :props="defaultProps"
-            ref="tree"
-            @node-click="handleNodeClick"
-            :filter-node-method="filterNode"
-          ></el-tree>
-        </div>
-        <el-button type="primary" @click="addEnterprise">新增企业</el-button>
-        <el-button type="primary">更改名称</el-button>
+        <el-button type="primary" @click="() => addEnterprise({},{})">新增一级企业</el-button>
       </div>
       <div class="main-content">
-        <el-card>
-          <div slot="header" class="clearfix">
-            <span>云饭堂</span>
-          </div>
-          <div class="card-content">
-            <el-button @click="addCanteen" :disabled="!company_id">新增饭堂</el-button>
-            <el-button :disabled="!company_id" @click="addShop">新增小卖部</el-button>
-            <el-table style="width:50%;margin: 0 auto" size="mini" :data="canteensLocData">
-              <div slot="empty">暂无饭堂</div>
-              <el-table-column label="消费地点" prop="name"></el-table-column>
-              <el-table-column label="操作">
-                <template slot-scope="scoped">
-                  <span>
-                    <el-button type="text" size="mini" @click="_editCanteen(scoped.row)">操作</el-button>
-                    <el-button type="text" size="mini">删除</el-button>
+        <el-row :gutter="10">
+          <el-col :span="6">
+            <el-card>
+              <div>
+                <el-input v-model="filterText" placeholder="关键字查询" size="small"></el-input>
+                <el-tree
+                  :data="companyList"
+                  :props="defaultProps"
+                  node-key="id"
+                  ref="tree"
+                  :filter-node-method="filterNode"
+                >
+                  <span class="enterprise-tree-node" slot-scope="{ node, data }">
+                    <span>
+                      <el-button
+                        type="text"
+                        size="mini"
+                        @click="handleNodeClick(data)"
+                      >{{node.label}}</el-button>
+                    </span>
+                    <span class="btns-text">
+                      <el-button
+                        type="text"
+                        size="mini"
+                        @click="() => editEnterpriseDialog(node,data)"
+                      >编辑</el-button>
+                      <el-button type="text" size="mini" @click="() => addEnterprise(node,data)">新增</el-button>
+                    </span>
                   </span>
-                </template>
-              </el-table-column>
-            </el-table>
-            <el-table
-              style="width:50%;margin: 0 auto"
-              size="mini"
-              :data="shopLocData"
-              :show-header="false"
-            >
-              <div slot="empty">暂无小卖部</div>
-              <el-table-column prop="name"></el-table-column>
-              <el-table-column>
-                <template slot-scope="scoped">
-                  <span>
-                    <el-button type="text" size="mini" @click="_editShop(scoped.row)">操作</el-button>
-                    <el-button type="text" size="mini">删除</el-button>
-                  </span>
-                </template>
-              </el-table-column>
-            </el-table>
-          </div>
-        </el-card>
+                </el-tree>
+              </div>
+            </el-card>
+          </el-col>
+          <el-col :span="16">
+            <el-card>
+              <div slot="header" class="clearfix">
+                <span>云饭堂</span>
+              </div>
+              <div class="card-content">
+                <el-button @click="addCanteen" :disabled="!company_id">新增饭堂</el-button>
+                <el-button :disabled="!company_id" @click="addShop">新增小卖部</el-button>
+                <el-table style="width:50%;margin: 0 auto" size="mini" :data="canteensLocData">
+                  <div slot="empty">暂无饭堂</div>
+                  <el-table-column label="消费地点" prop="name"></el-table-column>
+                  <el-table-column label="操作">
+                    <template slot-scope="scoped">
+                      <span>
+                        <el-button type="text" size="mini" @click="_editCanteen(scoped.row)">操作</el-button>
+                        <el-button type="text" size="mini">删除</el-button>
+                      </span>
+                    </template>
+                  </el-table-column>
+                </el-table>
+                <el-table
+                  style="width:50%;margin: 0 auto"
+                  size="mini"
+                  :data="shopLocData"
+                  :show-header="false"
+                >
+                  <div slot="empty">暂无小卖部</div>
+                  <el-table-column prop="name"></el-table-column>
+                  <el-table-column>
+                    <template slot-scope="scoped">
+                      <span>
+                        <el-button type="text" size="mini">删除</el-button>
+                        <el-button type="text" size="mini" @click="_editShop(scoped.row)">操作</el-button>
+                      </span>
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </div>
+            </el-card>
+          </el-col>
+        </el-row>
       </div>
     </div>
     <el-dialog
@@ -73,7 +98,6 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button type="warning" @click="resetParent">重置</el-button>
         <el-button type="primary" @click="_addEnterprise">确 定</el-button>
       </span>
     </el-dialog>
@@ -101,6 +125,12 @@
       :machineList="machineList"
       @updateMachineTable="(val,type) => getMachineList(val,type)"
     ></add-shop-dialog>
+    <edit-enterprise-dialog
+      :visible="editEnterpriseDialogVisible"
+      :modules="modules"
+      :company_id="company_id"
+      @closeDialog="closeEditEnterprise"
+    ></edit-enterprise-dialog>
   </div>
 </template>
 
@@ -108,14 +138,16 @@
 import $axios from "@/api/index";
 import AddCanteenDialog from "./dialog";
 import AddShopDialog from "./addShop";
-import { async } from "q";
+import EditEnterpriseDialog from "./editEnterprise";
 export default {
   components: {
     AddCanteenDialog,
-    AddShopDialog
+    AddShopDialog,
+    EditEnterpriseDialog
   },
   data() {
     return {
+      editEnterpriseDialogVisible: false,
       addCanteenVisible: false,
       addEnterpriseVisible: false,
       addShopVisible: false,
@@ -165,9 +197,6 @@ export default {
     }
   },
   methods: {
-    resetParent() {
-      this.parent = {};
-    },
     handleNodeClick(val) {
       let { id, name } = val;
       this.company_id = id;
@@ -219,8 +248,23 @@ export default {
       this.isEdit = val;
       this.addShopVisible = val;
     },
-    addEnterprise() {
+    addEnterprise(node, data) {
+      this.parent.name = data.name;
+      this.parent.id = data.id;
       this.addEnterpriseVisible = true;
+    },
+    async editEnterpriseDialog(node, data) {
+      let id = data.id;
+      this.company_id = id;
+      const modules = await this.getSystemModules(id);
+      if (modules.msg === "ok") {
+        this.modules = Array.from(modules.data);
+      }
+      this.editEnterpriseDialogVisible = true;
+    },
+    closeEditEnterprise(val) {
+      this.editEnterpriseDialogVisible = val;
+      this.modules = [];
     },
     _addEnterprise() {
       $axios
@@ -248,9 +292,9 @@ export default {
         .catch(err => console.log(err));
       return data;
     },
-    async getSystemModules() {
+    async getSystemModules(id) {
       const res = $axios.get("/v1/modules/canteen/withSystem", {
-        c_id: this.company_id
+        c_id: id
       });
       return res;
     },
@@ -260,11 +304,7 @@ export default {
       this.editForm = val;
       this.canteenDialogTitle = "编辑饭堂";
       const data = await this.getCanteenConfig(id);
-      const modules = await this.getSystemModules(id);
       this.getMachineList(val, "canteen");
-      if (modules.msg === "ok") {
-        this.modules = Array.from(modules.data);
-      }
       if (data.msg === "ok") {
         this.editForm.dinnersList = data.dinners;
       }
@@ -299,15 +339,13 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.filter-tree {
-  width: 20%;
-  float: left;
-  min-height: 550px;
-
-  .filter-input {
-    width: 90%;
-    padding: 0 10px 18px 10px;
-  }
+.enterprise-tree-node {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  padding-right: 8px;
 }
 .tree::after {
   clear: both;

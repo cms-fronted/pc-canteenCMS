@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-dialog :visible.sync="isOpen" width="90%" @close="closeDialog" :title="dialogTitle">
+    <el-dialog :visible.sync="isOpen" width="40%" @close="closeDialog" center :title="dialogTitle">
       <el-dialog
         :visible.sync="addMachineVisible"
         width="40%"
@@ -27,83 +27,68 @@
           <el-button type="primary" @click="_submitMachineInfo">确 定</el-button>
         </div>
       </el-dialog>
-
-      <el-row :gutter="20">
-        <el-col :span="10">
-          <el-card class="box-card">
-            <div>PC端</div>
-            <div style="margin: 15px 0;" v-for="(items, index) in modules" :key="items.create_time">
-              <el-checkbox
-                :indeterminate="isIndeterminate[index]"
-                v-model="checkAll[index]"
-                @change="checked => handleCheckAllChange(checked,index)"
-              >{{items.name}}</el-checkbox>
-              <el-checkbox-group
-                v-model="checkedModules[index]"
-                @change="val => handleCheckedModulesChange(val,index)"
-              >
-                <el-checkbox
-                  v-for="items in items.items"
-                  :label="items.id"
-                  :key="items.id"
-                >{{items.name}}</el-checkbox>
-              </el-checkbox-group>
-            </div>
-          </el-card>
-        </el-col>
-        <el-col :span="14">
-          <el-card body-style="paddingBottom: 5px">
-            <div slot="header" class="clearfix">
-              <span>小卖部</span>
-            </div>
-            <div>
-              <span style="margin-right: 8px">
-                小卖部名称
-                <el-input
-                  v-model="shop_name"
-                  size="small"
-                  style="width:200px;marginRight:10px"
-                  :disabled="!!shop_id"
-                ></el-input>
-                <el-radio-group v-model="taking_mode">
-                  <el-radio :label="1">自取</el-radio>
-                  <el-radio :label="2">外卖</el-radio>
-                  <el-radio :label="3">全部</el-radio>
-                </el-radio-group>
-              </span>
-              <el-button type="primary" size="small" @click="addShop" v-if="!isEdit">新增小卖部</el-button>
-              <el-button type="primary" size="small" @click="editShop" v-else>编辑小卖部</el-button>
-            </div>
-          </el-card>
-          <el-card class="box-card" body-style="paddingBottom: 5px">
-            <div slot="header" class="clearfix">
-              <span>硬件设置</span>
-              <el-button
-                style="float: right; padding: 3px 0"
-                type="text"
-                @click="addNewMachine"
-              >添加硬件</el-button>
-            </div>
-            <el-table :data="machineTable" style="width:100%" size="mini">
-              <el-table-column label="编号" prop="number"></el-table-column>
-              <el-table-column label="设备名称" prop="name"></el-table-column>
-              <el-table-column label="设备号" prop="code"></el-table-column>
-              <!-- <el-table-column label="密码" prop="pwd"></el-table-column> -->
-              <el-table-column label="状态">
-                <template slot-scope="scoped">
-                  <span>{{scoped.row.state===1?"正常":"异常"}}</span>
-                </template>
-              </el-table-column>
-              <el-table-column label="操作">
-                <template slot-scope="scoped">
-                  <el-button size="small" type="text" @click="_editMachine(scoped.row)">编辑</el-button>
-                  <!-- <el-button size="small" type="text" @click="_deleteMachine(scoped.row)">删除</el-button> -->
-                </template>
-              </el-table-column>
-            </el-table>
-          </el-card>
-        </el-col>
-      </el-row>
+      <el-card body-style="paddingBottom: 5px">
+        <div slot="header" class="clearfix">
+          <span>小卖部</span>
+        </div>
+        <div>
+          <span style="margin-right: 8px">
+            小卖部名称
+            <el-input
+              v-model="shop_name"
+              size="small"
+              style="width:200px;marginRight:10px"
+              :disabled="!!shop_id"
+            ></el-input>
+          </span>
+          <div style="marginTop:5px">
+            <el-radio-group v-model="taking_mode">
+              <el-radio :label="1">自取</el-radio>
+              <el-radio :label="2">外卖</el-radio>
+              <el-radio :label="3">全部</el-radio>
+            </el-radio-group>
+            <el-button
+              style="marginLeft: 5px"
+              type="primary"
+              size="small"
+              @click="addShop"
+              v-if="!isEdit"
+              :disabled="!shop_name"
+            >新增小卖部</el-button>
+            <el-button
+              style="marginLeft: 5px"
+              type="primary"
+              size="small"
+              @click="editShop"
+              :disabled="!shop_name"
+              v-else
+            >编辑小卖部</el-button>
+          </div>
+        </div>
+      </el-card>
+      <el-card class="box-card" body-style="paddingBottom: 5px">
+        <div slot="header" class="clearfix">
+          <span>硬件设置</span>
+          <el-button style="float: right; padding: 3px 0" type="text" @click="addNewMachine">添加硬件</el-button>
+        </div>
+        <el-table :data="machineTable" style="width:100%" size="mini">
+          <el-table-column label="编号" prop="number"></el-table-column>
+          <el-table-column label="设备名称" prop="name"></el-table-column>
+          <el-table-column label="设备号" prop="code"></el-table-column>
+          <!-- <el-table-column label="密码" prop="pwd"></el-table-column> -->
+          <el-table-column label="状态">
+            <template slot-scope="scoped">
+              <span>{{scoped.row.state===1?"正常":"异常"}}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作">
+            <template slot-scope="scoped">
+              <el-button size="small" type="text" @click="_editMachine(scoped.row)">编辑</el-button>
+              <!-- <el-button size="small" type="text" @click="_deleteMachine(scoped.row)">删除</el-button> -->
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-card>
       <div slot="footer" class="dialog-footer">
         <el-button @click="closeDialog">取 消</el-button>
         <el-button @click="closeDialog" type="primary">确定</el-button>
@@ -192,49 +177,6 @@ export default {
         checkedCount > 0 &&
         checkedCount < this.modulesCheckbox["" + index].length;
     },
-    // getModules() {
-    //   let systemModules = $axios.get("/v1/modules?type=1");
-    //   let canteenModules = $axios.get("/v1/modules?type=2");
-    //   let shopModules = $axios.get("/v1/modules?type=3");
-    //   let modulesCheck = Promise.all([
-    //     systemModules,
-    //     canteenModules,
-    //     shopModules
-    //   ]);
-    //   modulesCheck.then(res => {
-    //     const systemModules = res[0].data[0];
-    //     const canteenModules = res[1].data[0];
-    //     const shopModules = res[2].data[0];
-    //     let arr = [];
-    //     for (let item in systemModules) {
-    //       if (item === "items") {
-    //         systemModules[item].forEach(i =>
-    //           this.modulesCheckbox.system.push(i.id)
-    //         );
-    //       }
-    //     }
-    //     for (let item in canteenModules) {
-    //       if (item === "items") {
-    //         canteenModules[item].forEach(i =>
-    //           this.modulesCheckbox.canteen.push(i.id)
-    //         );
-    //       }
-    //     }
-    //     for (let item in shopModules) {
-    //       if (item === "items") {
-    //         shopModules[item].forEach(i =>
-    //           this.modulesCheckbox.shop.push(i.id)
-    //         );
-    //       }
-    //     }
-    //     this.modules = Object.assign(
-    //       {},
-    //       { system: systemModules },
-    //       { canteen: canteenModules },
-    //       { shop: shopModules }
-    //     );
-    //   });
-    // },
     //打开添加硬件对话框
     addNewMachine() {
       this.addMachineVisible = true;
