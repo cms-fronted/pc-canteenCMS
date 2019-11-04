@@ -48,7 +48,6 @@ const actions = {
     return new Promise((resolve, reject) => {
       login(formdatas)
         .then(res => {
-          console.log("请求成功");
           console.log(res);
           if (res.code == "200") {
             commit("SET_TOKEN", res.data.token);
@@ -67,8 +66,6 @@ const actions = {
     return new Promise((resolve, reject) => {
       producerLogin(formdatas)
         .then(res => {
-          console.log("请求成功");
-          console.log(res);
           if (res.code == "200") {
             commit("SET_TOKEN", res.data.token);
             commit("SET_ROLE", res.data.role);

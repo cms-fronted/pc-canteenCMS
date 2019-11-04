@@ -6,6 +6,7 @@ import {
   Form,
   FormItem,
   Input,
+  InputNumber,
   Select,
   Option,
   Message,
@@ -57,6 +58,7 @@ Notification.install = () => {
   Vue.prototype.$notify = Notification;
 };
 
+Vue.use(InputNumber);
 Vue.use(TimeSelect);
 Vue.use(Checkbox);
 Vue.use(CheckboxGroup);

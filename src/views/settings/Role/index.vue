@@ -73,7 +73,7 @@
       <el-row :gutter="20">
         <el-col :span="6">
           <el-form :model="roleForm" ref="roleForm" label-width="70px" label-position="left">
-            <el-form-item label="公司名称" prop="c_id">
+            <el-form-item label="公司名称" prop="c_id" v-if="!isEdit">
               <el-select
                 v-model="roleForm.c_id"
                 placeholder="请输入公司"
@@ -88,7 +88,7 @@
                 ></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="可见饭堂" prop="canteen">
+            <el-form-item label="可见饭堂" prop="canteen" v-if="!isEdit">
               <el-checkbox-group v-model="roleForm.canteens">
                 <el-checkbox
                   class="canteenCheckbox"
@@ -98,16 +98,16 @@
                 >{{item.name}}</el-checkbox>
               </el-checkbox-group>
             </el-form-item>
-            <el-form-item label="手机号码" prop="phone">
+            <el-form-item label="手机号码" prop="phone" v-if="!isEdit">
               <el-input v-model="roleForm.phone" placeholder="请输入手机号"></el-input>
             </el-form-item>
             <el-form-item label="角色名称" prop="role">
               <el-input v-model="roleForm.role" placeholder="请输入名称"></el-input>
             </el-form-item>
-            <el-form-item label="角色账号" prop="account">
+            <el-form-item label="角色账号" prop="account" v-if="!isEdit">
               <el-input v-model="roleForm.account" placeholder="请输入账号"></el-input>
             </el-form-item>
-            <el-form-item label="角色密码" prop="passwd">
+            <el-form-item label="角色密码" prop="passwd" v-if="!isEdit">
               <el-input v-model="roleForm.passwd" placeholder="请输入密码" show-password></el-input>
             </el-form-item>
             <el-form-item label="角色说明" prop="remark">
@@ -147,6 +147,7 @@ export default {
   data() {
     return {
       modulesDialogType: "role",
+      isEdit: false,
       newRoleDialogVisible: false,
       queryForm: {},
       roleForm: {
@@ -209,6 +210,7 @@ export default {
       this.newRoleDialogVisible = true;
     },
     closeNewRoleDialog() {
+      this.isEdit = false;
       this.newRoleDialogVisible = false;
     },
     async selectCompany(id) {
@@ -224,7 +226,7 @@ export default {
       }
       let canteens = [];
       let newCanteen = [];
-      canteens = this.roleForm.canteens;
+      canteens = this.roleForm.canteens ? this.roleForm : [];
       canteens.forEach(item => {
         newCanteen.push({
           c_id: item.id,
@@ -233,16 +235,28 @@ export default {
       });
       this.roleForm.canteens = JSON.stringify(newCanteen);
       this.roleForm.rules = this.roleForm.rules.toString();
-      const res = await $axios.post("/v1/role/save", this.roleForm);
-      if (res.msg === "ok") {
-        this.$message.success("新增角色成功");
-        await this.fetchList();
-        this.newRoleDialogVisible = false;
+      if (this.isEdit) {
+        this.roleForm.canteen = []; //没有字段不传
+        const res = await $axios.post("/v1/role/update", this.roleForm);
+        console.log(res);
+      } else {
+        const res = await $axios.post("/v1/role/save", this.roleForm);
+        if (res.msg === "ok") {
+          this.$message.success("新增角色成功");
+          await this.fetchList();
+          this.newRoleDialogVisible = false;
+        }
       }
     },
     async _edit(row) {
-      console.log(row);
-      // await this.getCanteenModuls(row.id);
+      this.isEdit = true;
+      this.roleForm = Object.assign({}, row);
+      let id = row.id;
+      const res = await this.getEditRole(id);
+      if (res.msg === "ok") {
+        this.modules = Array.from(res.data.modules);
+      }
+      this.newRoleDialogVisible = true;
     },
     async operateRoles(row) {
       let state = row.state;
@@ -293,6 +307,10 @@ export default {
         });
       });
       this.roleForm.rules = rules;
+    },
+    async getEditRole(id) {
+      const res = await $axios.get(`/v1/role?id=${id}`);
+      return res;
     }
   }
 };
