@@ -24,7 +24,7 @@
                   type="datetime"
                 ></el-date-picker>
               </el-form-item>
-              <!-- <el-form-item label="公司"  v-if="companiesVisible">
+              <el-form-item label="公司"  v-if="companiesVisible">
                 <el-select v-model="formdata.company_ids" placeholder="请选择公司" style="width:200px">
                   <el-option
                     v-for="item in companiesList"
@@ -33,7 +33,7 @@
                     :value="item.id"
                   ></el-option>
                 </el-select>
-              </el-form-item> -->
+              </el-form-item>
               <el-form-item label="姓名">
                 <el-input placeholder="请输入姓名" v-model="formdata.username"></el-input>
               </el-form-item>
@@ -53,7 +53,7 @@
                   <el-option
                     v-for="item in adminList"
                     :key="item.id"
-                    :label="item.name"
+                    :label="item.role"
                     :value="item.id"
                   ></el-option>
                 </el-select>
@@ -93,6 +93,7 @@ export default {
   data (){
     return {
       grade: store.getters.grade,
+      // module_id: store.getters.module_id,
       formdata: {
         time_begin: "",
         time_end: "",
@@ -100,9 +101,15 @@ export default {
         type: "",  
         username: "",
         page: 1,
-        size: 10
+        size: 10,
+        company_ids: "",
       },
-      adminList: [],
+      companiesList: [],
+      adminList: [
+        {id: 1,"role": "饭堂管理员1"},
+        {id: 2,"role": "饭堂管理员2"},
+        {id: 3,"role": "饭堂管理员3"}
+      ],
       // 充值途径:目前有：cash：现金；weixin:微信；nonghang:农行；all：全部
       recharge_wayList: [
         {id: '0',name: '全部',type: "all"},
@@ -134,6 +141,7 @@ export default {
   },
   created(){
     this.fetchAdminList();
+    this.fetchCompanyList();
   },
   computed: {
     companiesVisible(){
@@ -142,9 +150,31 @@ export default {
   },
   components:{Pagination},
   methods:{
+    fetchCompanyList(){
+      $axios
+        .get("/v1/admin/companies")
+        .then(res => {
+          console.log('hi')
+          let arr = res.data;
+          let allCompanies = [];
+          let companiesList = flatten(arr);
+          companiesList.forEach(element => {
+            let id = element.id;
+            allCompanies.push(id);
+          });
+          allCompanies = allCompanies.join(",");
+          companiesList.unshift({
+            name: "全部",
+            id: allCompanies
+          });
+          this.companiesList = companiesList;
+          console.log(this.companiesList)
+        })
+        .catch(err => console.log(err));
+    },
     fetchAdminList(){
-      console.log("请求接口：")
-      console.log("/v1/wallet/recharge/admins?module_id=1")
+      /* console.log("请求接口：")
+      console.log("/v1/wallet/recharge/admins?module_id=1") */
       $axios
         .get("/v1/wallet/recharge/admins?module_id=1")
         .then(res => {
@@ -154,7 +184,7 @@ export default {
     },
     fetchTableList(){
       this.formdata.admin_id = 1;
-      console.log(this.formdata)
+      // console.log(this.formdata)
       $axios
         .get("/v1/recharges",this.formdata)
         .then(res => {

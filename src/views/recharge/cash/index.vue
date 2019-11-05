@@ -51,7 +51,7 @@
             :headers="header"
             accept=".xls,.xlsx"
             action="/v1/wallet/recharge/upload"
-            :show-file-list="false"
+            
             :on-success='handleSuccess'
             :auto-upload="false"
             :on-change="handleChange"
@@ -59,7 +59,7 @@
             >
             <el-button type="primary">选择上传文件</el-button>
           </el-upload>
-          <!--  -->
+          <!-- :show-file-list="false"  -->
         </div>
         <div slot="footer" class="dialog-footer">
           <el-button @click="handleClose">取 消</el-button>
@@ -196,7 +196,7 @@ export default {
     },
     handleClose(){
       this.dialogFormVisible = false;
-      this.$refs.upload.clearFiles();
+      // this.$refs.upload.clearFiles();
     }
   }
 }
@@ -231,6 +231,10 @@ export default {
     }
     .upload{
       float: right;
+      width: 177px;
+      .el-upload {
+        margin-left: 50px;
+      }
     }
   }
 </style>

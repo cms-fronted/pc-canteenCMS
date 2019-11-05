@@ -23,9 +23,9 @@
               <el-form-item label="手机号码">
                 <el-input placeholder="请输入手机号" v-model="formdata.phone"></el-input>
               </el-form-item>
-              <el-form-item label="余额">
+              <!-- <el-form-item label="余额">
                 <el-input placeholder="请输入余额" v-model="formdata.balance"></el-input>
-              </el-form-item>
+              </el-form-item> -->
             </el-form>
           </div>
           <div class="btn-area" :class="{'grade':grade === 2}">
