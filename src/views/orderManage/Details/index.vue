@@ -10,6 +10,7 @@
               <el-date-picker
                 v-model="formdata.time_begin"
                 value-format="yyyy-MM-dd HH:mm:ss"
+                format="yyyy-MM-dd"
                 type="datetime"
               ></el-date-picker>
             </el-form-item>
@@ -17,6 +18,7 @@
               <el-date-picker
                 v-model="formdata.time_end"
                 value-format="yyyy-MM-dd HH:mm:ss"
+                format="yyyy-MM-dd"
                 type="datetime"
               ></el-date-picker>
             </el-form-item>

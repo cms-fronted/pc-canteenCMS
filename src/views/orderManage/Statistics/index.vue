@@ -27,29 +27,31 @@
               </el-form-item>
               <el-form-item label="公司" v-if="companiesVisible">
                 <el-select
-                  v-model="company_id"
+                  v-model="formdata.company_ids"
                   placeholder="请选择公司"
                   style="width:200px"
                   @change="getList"
                 >
                   <el-option
-                    v-for="item in companyList"
+                    v-for="item in companyOptions"
                     :key="item.id"
                     :label="item.name"
                     :value="item.id"
                   ></el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="消费地点">
-                <el-select v-model="canteen_id" placeholder="请选择消费地点" style="width:200px">
+              <el-form-item label="消费地点" label-width="80px">
+                <el-select v-model="formdata.canteen_id" placeholder="请选择消费地点" style="width:200px">
                   <el-option
-                    v-for="item in canteenList"
+                    v-for="item in canteenOptions"
                     :key="item.id"
                     :label="item.name"
                     :value="item.id"
                   ></el-option>
                 </el-select>
               </el-form-item>
+              <el-button type="primary" @click="queryList(1)" :disabled="isDisabled">查询</el-button>
+              <el-button type="primary">导出</el-button>
             </el-form>
           </div>
         </div>
@@ -63,99 +65,91 @@
 
 <script>
 import $axios from "@/api/index";
-import { flatten } from "@/utils/flatternArr";
+import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
+import Pagination from "@/components/Pagination";
 import store from "@/store";
 export default {
+  components: {
+    Pagination
+  },
   data() {
     return {
       grade: store.getters.grade,
       formdata: {
         time_begin: "",
-        time_end: ""
+        time_end: "",
+        company_ids: "",
+        canteen_id: ""
       },
       company_id: "",
-      companyOptions: [],
       canteen_id: "",
+      companyOptions: [],
       canteenOptions: [],
-      tableData: []
+      tableData: [],
+      isDisabled: true,
+      current_page: 1,
+      size: 10,
+      total: 0
     };
   },
   created() {
-    this.fetchCompanyList();
+    this.getCompanies();
   },
   computed: {
     companiesVisible() {
       return this.grade !== 3;
+    },
+    isAble() {
+      return (
+        !!this.formdata.time_end &&
+        !!this.formdata.time_begin &&
+        !!this.formdata.company_ids
+      );
+    }
+  },
+  watch: {
+    isAble(val) {
+      this.isDisabled = !val;
     }
   },
   methods: {
-    fetchCompanyList() {
+    getList(val) {
+      this.formdata.canteen_id = "";
+      if (String(val).includes(",")) {
+        this.canteenOptions = [{ name: "全部", id: 0 }];
+        this.formdata.canteen_id = 0;
+      } else {
+        this.getLocationList(val);
+      }
+    },
+    getCompanies() {
       $axios
         .get("/v1/admin/companies")
         .then(res => {
           let arr = res.data;
           let allCompanies = [];
-          let companyList = flatten(arr);
-          companyList.forEach(element => {
-            let id = element.id;
-            allCompanies.push(id);
-          });
-          allCompanies = allCompanies.join(",");
-          companyList.unshift({
-            name: "全部",
-            id: allCompanies
-          });
-          this.companyList = companyList;
+          let companiesList = getAllOptions(flatten(arr));
+          this.companyOptions = companiesList;
         })
         .catch(err => console.log(err));
     },
-    getCanteenList(val) {
-      this.canteenOptions = [];
-      if (String(val).includes(",")) {
-        this.canteenList = [{ name: "全部" }];
-        this.formdata.canteen_id = "";
-      } else {
-        this.getCanteenList(val);
+    async getLocationList(company_id) {
+      if (company_id) {
+        const res = await $axios.get(
+          `/v1/company/consumptionLocation?company_id=${company_id}`
+        );
+        if (res.msg === "ok") {
+          this.canteenOptions = unshiftAllOptions(Array.from(res.data.canteen));
+        }
       }
     },
-    getCanteenList(company_id) {
-      this.canteen_id = "";
-      if (this.companiesVisible) {
-        // 企业 grade 不为3
-        $axios
-          .get(`/v1/canteens?company_id=${company_id}`)
-          .then(res => {
-            this.canteenList = Array.from(res.data);
-            console.log(this.canteenList);
-          })
-          .catch(err => console.log(err));
-      } else {
-        // 企业 grade 为3
-        $axios
-          .get("/v1/managerCanteens")
-          .then(res => {
-            this.canteenList = Array.from(res.data);
-          })
-          .catch(err => console.log(err));
-      }
-    },
-    queryList() {
-      $axios
-        .get("/v1/order/orderStatistic", {
-          company_ids: this.company_id,
-          canteen_id: this.canteen_id,
-          time_begin: this.formdata.time_begin,
-          time_end: this.formdata.time_end,
-          page: 1,
-          size: 10
-        })
-        .then(res => {
-          console.log(res);
-          this.tableData = Array.from(res.data.data);
-          /* this.total = res.data.total;
-        this.current_page = res.data.current_page; */
-        })
-        .catch(err => console.log(err));
+    async queryList(page) {
+      page = page || 1;
+      const res = await $axios.get(
+        `/v1/order/orderStatistic?page=${page}&size=${this.size}`,
+        this.formdata
+      );
+      console.log(res);
     }
   }
 };
