@@ -40,7 +40,7 @@
         </el-form>
         <div class="main-content">
           <el-row :gutter="10">
-            <el-col :span="5">
+            <el-col :span="4">
               <el-input size="small" v-model="filterText" placeholder="关键字查询"></el-input>
               <el-tree
                 class="tree"
@@ -69,7 +69,7 @@
                 </span>
               </el-tree>
             </el-col>
-            <el-col :span="19">
+            <el-col :span="20">
               <el-table style="width:100%" :data="tabledata">
                 <el-table-column label="归属饭堂">
                   <template slot-scope="scoped">
@@ -88,10 +88,10 @@
                 <el-table-column label="姓名" prop="username"></el-table-column>
                 <el-table-column label="手机号码" prop="phone"></el-table-column>
                 <el-table-column label="卡号" prop="card_num"></el-table-column>
-                <el-table-column label="二维码有效周期" prop="expiry_date"></el-table-column>
-                <el-table-column label="新增人员" prop="new">
+                <el-table-column label="二维码有效周期" show-overflow-tooltip>
                   <template slot-scope="scoped">
                     <el-button
+<<<<<<< HEAD
                       size="mini"
                       style="marginRight:5px;marginBottom: 5px"
                       @click="editStaff(scoped.row)"
@@ -107,6 +107,25 @@
                       @click="_deleteStaff(scoped.row)"
                     >删除</el-button>
                     <el-button size="mini" @click="openQRSettingDialog(scoped.row)">生成二维码</el-button>
+=======
+                      type="text"
+                      @click="showQRcode(scoped.row)"
+                    >{{scoped.row.expiry_date}}</el-button>
+                  </template>
+                </el-table-column>
+                <el-table-column label="操作" prop="new">
+                  <template slot-scope="scoped">
+                    <div style="display:flex; flex-wrap:wrap">
+                      <el-button size="mini" style="marginBottom: 2px" @click="edit(scoped.row)">编辑</el-button>
+                      <el-button size="mini" style="marginBottom: 2px" @click="edit(scoped.row)">移动</el-button>
+                      <el-button
+                        size="mini"
+                        style="marginBottom: 2px"
+                        @click="_deleteStaff(scoped.row)"
+                      >删除</el-button>
+                      <el-button size="mini" @click="openQRSettingDialog(scoped.row)">生成二维码</el-button>
+                    </div>
+>>>>>>> 23f9448744587f7db9ef0236f59a338b8ba7ec80
                   </template>
                 </el-table-column>
               </el-table>
@@ -212,6 +231,7 @@
         <el-button type="primary" @click="_comfirmSettingQR">确 定</el-button>
       </span>
     </el-dialog>
+<<<<<<< HEAD
 
     <el-dialog
       :visible.sync="moveDialogVisible"
@@ -256,6 +276,15 @@
         <el-button @click="closeRoleTypeDialog">取 消</el-button>
         <el-button type="primary" @click="_addRoleType">确 定</el-button>
       </span>
+=======
+    <el-dialog :visible.sync="QRcodeVisible" width="20%" center title="二维码信息">
+      <img width="100%" :src="QRcodeDetail.url" alt />
+      <ul class="qr-detail">
+        <li>员工姓名：{{QRcodeDetail.username}}</li>
+        <li>生成时间：{{QRcodeDetail.create_time}}</li>
+        <li>失效时间：{{QRcodeDetail.expiry_date}}</li>
+      </ul>
+>>>>>>> 23f9448744587f7db9ef0236f59a338b8ba7ec80
     </el-dialog>
   </div>
 </template>
@@ -279,8 +308,12 @@ export default {
       newDepartmentVisible: false,
       isEditDepartment: false,
       QRsettingVisible: false,
+<<<<<<< HEAD
       moveDialogVisible: false,
       roleTypeDialogVisible: false,
+=======
+      QRcodeVisible: false,
+>>>>>>> 23f9448744587f7db9ef0236f59a338b8ba7ec80
       filterText: "",
       canteens: [],
       haveCanteens: [],
@@ -302,6 +335,7 @@ export default {
         month: "",
         year: ""
       },
+      QRcodeDetail: {},
       addFormData: {
         id: "",
         canteens_arr: [],
@@ -337,6 +371,11 @@ export default {
       size: 5,
       total: 10
     };
+  },
+  filters: {
+    showTime(val, str) {
+      return this.$moment(val).format(str);
+    }
   },
   watch: {
     filterText(val) {
@@ -700,9 +739,10 @@ export default {
     },
     async _deleteStaff(row) {
       let id = row.id;
-      const res = await $axios.post("/v1/staff/delete", { id });
+      const res = await $axios.post("/v1/department/staff/delete", { id });
       if (res.msg === "ok") {
         this.$message.success("删除成功");
+        await this.fetchList(this.current_page);
       }
     },
     openQRSettingDialog(row) {
@@ -721,10 +761,12 @@ export default {
       if (res.msg === "ok") {
         this.$message.success("设置成功");
         this.closeQRSettingDialog();
+        await this.fetchList(this.current_page);
       } else {
         this.$message.error(res.msg);
       }
     },
+<<<<<<< HEAD
     closeMoveDialog() {
       this.cureentDepartment = {};
       this.moveDialogVisible = false;
@@ -775,6 +817,16 @@ export default {
       } else {
         this.$message.error(res.msg);
       }
+=======
+    showQRcode(row) {
+      console.log(row);
+      this.QRcodeDetail = Object.assign({}, this.QRcodeDetail, row);
+      this.QRcodeVisible = true;
+    },
+    closeQRcode() {
+      this.QRcodeVisible = false;
+      this.QRcodeDetail = {};
+>>>>>>> 23f9448744587f7db9ef0236f59a338b8ba7ec80
     }
   }
 };
@@ -790,11 +842,21 @@ export default {
   flex: 1;
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  justify-content: space-between;
   font-size: 14px;
   padding-right: 8px;
 }
 .canteenCheckbox {
   margin-bottom: -5px;
+}
+.qr-detail {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  li {
+    flex: 1;
+    display: block;
+  }
 }
 </style>
