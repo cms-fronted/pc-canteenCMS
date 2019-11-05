@@ -92,7 +92,9 @@ export default {
         .then(res => {
           console.log(res)
           this.departmentList = res.data;
-          this.departmentList.unshift({id:0,name:"全部"})
+          if(this.departmentList.length  > 1){
+            this.departmentList.unshift({id:0,name:"全部"})
+          }
         })
         .catch(err => console.log(err));
     },

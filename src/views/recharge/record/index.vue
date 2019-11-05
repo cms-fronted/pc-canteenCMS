@@ -4,7 +4,7 @@
       <div class="nav-title">充值记录明细</div>
       <el-divider></el-divider>
       <div class="main">
-        <div class="main-header">
+        <div class="main-header clearfix">
           <div class="select-title">
             <el-form :inline="true" :model="formdata" label-width="80px">
               <el-form-item label="开始">
@@ -15,7 +15,6 @@
                   type="datetime"
                 ></el-date-picker>
               </el-form-item>
-              <!-- value-format="yyyy-MM-dd HH:mm:ss" -->
               <el-form-item label="结束">
                 <el-date-picker
                   v-model="formdata.time_end"
@@ -24,7 +23,7 @@
                   type="datetime"
                 ></el-date-picker>
               </el-form-item>
-              <el-form-item label="公司"  v-if="companiesVisible">
+              <!-- <el-form-item label="公司"  v-if="companiesVisible">
                 <el-select v-model="formdata.company_ids" placeholder="请选择公司" style="width:200px">
                   <el-option
                     v-for="item in companiesList"
@@ -33,7 +32,7 @@
                     :value="item.id"
                   ></el-option>
                 </el-select>
-              </el-form-item>
+              </el-form-item> -->
               <el-form-item label="姓名">
                 <el-input placeholder="请输入姓名" v-model="formdata.username"></el-input>
               </el-form-item>
@@ -48,7 +47,6 @@
                 </el-select>
               </el-form-item>
               <el-form-item label="充值人员">
-                <!-- <el-input placeholder="请输入" v-model="formdata.recharge_personnel" style="width:200px"></el-input> -->
                 <el-select v-model="formdata.admin_id" placeholder="请选择" style="width:200px">
                   <el-option
                     v-for="item in adminList"
@@ -83,8 +81,6 @@
 </template>
 
 <script>
-// http://canteen.tonglingok.com/api/v1/recharges?time_begin=2019-09-01&time_end=2019-11-01&admin_id=0&username&type=all&page=1&size=10
-// 需要的参数 time_begin time_end username type √ admin_id    page size
 import $axios from "@/api/index";
 import Pagination from '@/components/Pagination'
 import { flatten } from "@/utils/flatternArr";
@@ -93,7 +89,6 @@ export default {
   data (){
     return {
       grade: store.getters.grade,
-      // module_id: store.getters.module_id,
       formdata: {
         time_begin: "",
         time_end: "",
@@ -102,15 +97,13 @@ export default {
         username: "",
         page: 1,
         size: 10,
-        // company_ids: "",
       },
       companiesList: [],
       adminList: [
-        {id: 1,"role": "饭堂管理员1"},
+        /* {id: 1,"role": "饭堂管理员1"},
         {id: 2,"role": "饭堂管理员2"},
-        {id: 3,"role": "饭堂管理员3"}
+        {id: 3,"role": "饭堂管理员3"} */
       ],
-      // 充值途径:目前有：cash：现金；weixin:微信；nonghang:农行；all：全部
       recharge_wayList: [
         {id: '0',name: '全部',type: "all"},
         {id: '1',name: '现金',type: "cash"},
@@ -118,7 +111,7 @@ export default {
         {id: '3',name: '农行',type: "nonghang"}
       ],
       tableData: [
-        {
+        /* {
           "create_time": "2019-10-31 18:32:47",
           "username": '李四',
           "money": "200.00",
@@ -133,7 +126,7 @@ export default {
           "type": "cash",
           "admin": "系统超级管理员",
           "remark": ""
-        }
+        }, */
       ],
       total: 0,
       current_page: 1
@@ -141,7 +134,7 @@ export default {
   },
   created(){
     this.fetchAdminList();
-    this.getCompanies();
+    // this.getCompanies();
   },
   computed: {
     companiesVisible(){
@@ -151,12 +144,9 @@ export default {
   components:{Pagination},
   methods:{
     getCompanies() {
-      console.log('hi')
       $axios
         .get("/v1/admin/companies")
         .then(res => {
-          console.log('请求公司列表')
-          console.log(res)
           let arr = res.data;
           let allCompanies = [];
           let companiesList = flatten(arr);
@@ -164,36 +154,40 @@ export default {
             let id = element.id;
             allCompanies.push(id);
           });
-          allCompanies = allCompanies.join(",");
-          companiesList.unshift({
-            name: "全部",
-            id: allCompanies
-          });
+          if(allCompanies.length > 1){
+            allCompanies = allCompanies.join(",");
+            companiesList.unshift({
+              name: "全部",
+              id: allCompanies
+            });
+          }
           this.companiesList = companiesList;
         })
         .catch(err => console.log(err));
     },
     fetchAdminList(){
-      /* console.log("请求接口：")
-      console.log("/v1/wallet/recharge/admins?module_id=1") */
+      // module_id 暂时固定为14
       $axios
-        .get("/v1/wallet/recharge/admins?module_id=13")
+        .get("/v1/wallet/recharge/admins?module_id=14")
         .then(res => {
-          console.log('/v1/wallet/recharge/admins?module_id=13')
           console.log(res)
           this.adminList = res.data;
+          if(this.adminList.length > 1){
+            this.adminList.unshift({
+              id: 0,
+              role: "全部"
+            })
+          }
         })
         .catch(err => console.log(err));
     },
     fetchTableList(){
-      this.formdata.admin_id = 1;
-      // console.log(this.formdata)
+      this.formdata.page = this.current_page;
       $axios
-        .get("/v1/recharges",this.formdata)
+        .get("/v1/wallet/recharges",this.formdata)
         .then(res => {
-          console.log(res)
+          // console.log(res)
           this.tableData = Array.from(res.data.data);
-          // current_page total
           this.current_page = res.data.current_page;
           this.total = res.data.total;
         })
@@ -208,6 +202,11 @@ export default {
 </script>
 
 <style lang="scss" scpoed>
+.clearfix::after{
+  content: "";
+  display: block;
+  clear: both;
+}
 .main-header {
   .select-title {
     float: left;
@@ -241,7 +240,7 @@ export default {
     display: flex;
     justify-content: flex-end;
     font-size: 14px;
-    margin-top: 10px;
+    // margin-top: 10px;
   }
 }
 </style>
