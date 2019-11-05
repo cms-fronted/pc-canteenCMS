@@ -510,7 +510,7 @@ export default {
                 status: k.status,
                 sub_money: k.sub_money,
                 num_type: j.number,
-                consumption_count: i.consumption_count,
+                consumption_count: i.detail.length,
                 unordered_meals: i.unordered_meals,
                 ordered_count: i.ordered_count
               });

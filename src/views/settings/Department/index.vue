@@ -21,8 +21,22 @@
             @click="()=>openDepartmentDialog({},{id: 0})"
           >新增一级部门</el-button>
           <el-button type="primary" @click="openStaffDialog" :disabled="!!!d_id">新增人员</el-button>
-          <el-button type="primary" :disabled="!!!d_id">批量新增人员</el-button>
+          <el-upload
+            class="upload-excel"
+            ref="upload"
+            :limit="1"
+            :headers="header"
+            :show-file-list="false"
+            accept=".xls, .xlsx"
+            action="/v1/department/staff/upload"
+            :on-success="handleSuccess"
+            :data="{c_id:c_id}"
+            name="staffs"
+          >
+            <el-button type="primary" :disabled="!!!c_id">批量导入人员</el-button>
+          </el-upload>
           <el-button type="danger" :disabled="!!!d_id" @click="deleteDepartment">删除部门</el-button>
+          <el-button type="primary" @click="openRoleTypeDialog">新增类型</el-button>
         </el-form>
         <div class="main-content">
           <el-row :gutter="10">
@@ -80,12 +94,12 @@
                     <el-button
                       size="mini"
                       style="marginRight:5px;marginBottom: 5px"
-                      @click="edit(scoped.row)"
+                      @click="editStaff(scoped.row)"
                     >编辑</el-button>
                     <el-button
                       size="mini"
                       style="marginRight:5px;marginBottom: 5px"
-                      @click="edit(scoped.row)"
+                      @click="openMoveStaff(scoped.row)"
                     >移动</el-button>
                     <el-button
                       size="mini"
@@ -109,7 +123,7 @@
     </div>
 
     <el-dialog
-      title="新增员工"
+      :title="staffTitle"
       width="30%"
       center
       :visible.sync="addStaffVisible"
@@ -117,8 +131,8 @@
       @close="closeStaffDialog"
     >
       <el-form :model="addFormData" ref="addFormData" label-width="100px">
-        <el-form-item label="归属饭堂" prop="canteens">
-          <el-checkbox-group v-model="canteens" @change="chooseCanteen">
+        <el-form-item label="归属饭堂" prop="canteens_arr">
+          <el-checkbox-group v-model="addFormData.canteens_arr">
             <el-checkbox
               v-for="item in canteenGroup"
               :label="item"
@@ -198,11 +212,57 @@
         <el-button type="primary" @click="_comfirmSettingQR">确 定</el-button>
       </span>
     </el-dialog>
+
+    <el-dialog
+      :visible.sync="moveDialogVisible"
+      width="30%"
+      title="移动员工"
+      @close="closeMoveDialog"
+      center
+    >
+      <el-form ref="moveStaff" label-width="80px">
+        <el-form-item label="当前部门">
+          <el-input v-model="cureentDepartment.department" disabled></el-input>
+        </el-form-item>
+        <el-form-item label="移至">
+          <el-select filterable placeholder="请选择部门" v-model="cureentDepartment.new_d_id">
+            <el-option
+              v-for="item in departmentOptions"
+              :key="item.id"
+              :value="item.id"
+              :label="item.name"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="closeMoveDialog">取 消</el-button>
+        <el-button type="primary" @click="_comfirmMove">确 定</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog
+      width="30%"
+      :visible.sync="roleTypeDialogVisible"
+      center
+      title="新增角色类型"
+      @close="closeRoleTypeDialog"
+    >
+      <el-form :model="roleTypeForm" ref="roleTypeForm" label-width="80px">
+        <el-form-item label="角色名称" prop="name">
+          <el-input v-model="roleTypeForm.name" />
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="closeRoleTypeDialog">取 消</el-button>
+        <el-button type="primary" @click="_addRoleType">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 import { mapState } from "vuex";
+import store from "@/store";
 import Pagination from "@/components/Pagination";
 import $axios from "@/api/index";
 import { flatten } from "@/utils/flatternArr";
@@ -210,14 +270,21 @@ export default {
   components: { Pagination },
   data() {
     return {
+      header: {
+        token: store.getters.token
+      },
       d_id: "", //该页面全局部门id
       c_id: "", //该页面全局企业id
       addStaffVisible: false,
       newDepartmentVisible: false,
       isEditDepartment: false,
       QRsettingVisible: false,
+      moveDialogVisible: false,
+      roleTypeDialogVisible: false,
       filterText: "",
       canteens: [],
+      haveCanteens: [],
+      isEditStaff: false,
       departmentDetail: {},
       queryForm: {
         c_id: ""
@@ -236,6 +303,8 @@ export default {
         year: ""
       },
       addFormData: {
+        id: "",
+        canteens_arr: [],
         company_id: "", //新增员工归属企业id
         canteens: [],
         d_id: "",
@@ -245,10 +314,19 @@ export default {
         card_num: "",
         username: ""
       },
-      treeData: [],
+      treeData: [], //部门树状数据
+      departmentOptions: [], //将部门树状数据转换为扁平化数据
       defaultProps: {
         children: "items",
         label: "name"
+      },
+      cureentDepartment: {
+        department: "", //当前部门名称
+        id: "", //员工id
+        new_d_id: "" //新部门id
+      },
+      roleTypeForm: {
+        name: ""
       },
       value: "",
       canteenGroup: [],
@@ -268,8 +346,14 @@ export default {
   computed: {
     ...mapState({
       role: state => state.user.role,
-      grade: state => state.user.grade
+      grade: state => state.user.grade,
+      token: state => state.user.token
     }),
+    staffTitle: {
+      get() {
+        return this.isEditStaff ? "编辑员工" : "新增员工";
+      }
+    },
     year: {
       get() {
         let val = this.QRForm.year.toString().replace(/[^\d]/g, "");
@@ -386,12 +470,47 @@ export default {
       if (!value) return true;
       return data.name.indexOf(value) !== -1;
     },
+    async getCompanies() {
+      const res = await $axios.get("/v1/admin/companies");
+      if (res.msg === "ok") {
+        this.companyOptions = flatten(res.data);
+      }
+    },
+    async getRoleType() {
+      const res = await $axios.get("/v1/role/types");
+      if (res.msg === "ok") {
+        this.roleOptions = res.data.data;
+      }
+    },
+    async fetchDepartmentTreeData(c_id) {
+      c_id = c_id || this.queryForm.c_id || "";
+      const res = await $axios.get(`/v1/departments?c_id=${c_id}`);
+      if (res.msg === "ok") {
+        this.treeData = Array.from(res.data);
+        this.departmentOptions = flatten(res.data);
+      }
+    },
+    async fetchList(page) {
+      page = page || this.current_page;
+      const res = await $axios.get(
+        `/v1/staffs?page=${page}&size=${this.size}`,
+        {
+          c_id: this.c_id, //company_id,
+          d_id: this.d_id //d_id,
+        }
+      );
+      if (res.msg === "ok") {
+        this.tabledata = Array.from(res.data.data);
+        this.current_page = res.data.current_page;
+        this.total = res.data.total;
+      }
+    },
     async selectCompany(c_id) {
       await this.getCanteenOptions(c_id);
       await this.fetchDepartmentTreeData(c_id);
       this.c_id = c_id;
-      this.addFormData.company_id = c_id;
       this.d_id = "";
+      this.addFormData.company_id = c_id;
       this.addFormData.d_id = "";
       this.departmentDetail = {};
     },
@@ -411,17 +530,6 @@ export default {
       }
       return res;
     },
-    chooseCanteen(val) {
-      this.addFormData.canteens = [];
-      let _canteen = [];
-      val.forEach(item => {
-        _canteen.push({
-          canteen_id: item.id
-        });
-      });
-      this.addFormData.canteens = JSON.stringify(_canteen);
-    },
-
     editDepartmentDialog(node, data) {
       this.isEditDepartment = true;
       this.departmentForm = Object.assign({}, this.departmentForm, data);
@@ -497,61 +605,97 @@ export default {
           });
         });
     },
-    async getCompanies() {
-      const res = await $axios.get("/v1/admin/companies");
-      if (res.msg === "ok") {
-        this.companyOptions = flatten(res.data);
-      }
-    },
-    async getRoleType() {
-      const res = await $axios.get("/v1/role/types");
-      if (res.msg === "ok") {
-        this.roleOptions = res.data.data;
-      }
-    },
-    async fetchDepartmentTreeData(c_id) {
-      c_id = c_id || this.queryForm.c_id || "";
-      const res = await $axios.get(`/v1/departments?c_id=${c_id}`);
-      if (res.msg === "ok") {
-        this.treeData = Array.from(res.data);
-      }
-    },
-    async fetchList(page) {
-      page = page || this.current_page;
-      const res = await $axios.get(
-        `/v1/staffs?page=${page}&size=${this.size}`,
-        {
-          c_id: this.c_id, //company_id,
-          d_id: this.d_id //d_id,
-        }
-      );
-      if (res.msg === "ok") {
-        this.tabledata = Array.from(res.data.data);
-        this.current_page = res.data.current_page;
-        this.total = res.data.total;
-      }
-    },
+
     openStaffDialog() {
       this.addStaffVisible = true;
     },
-    edit(val) {
-      console.log(val);
+    editStaff(val) {
+      this.isEditStaff = true;
+      let canteensChecked = val.canteens.map(item => item.canteen_id);
+      canteensChecked.filter(id => {
+        //饭堂多选框的值 是一个对象数组，判断 id为数组的哪一个对象插入
+        this.canteenGroup.forEach(item => {
+          if (item.id === id) {
+            this.addFormData.canteens_arr.push(item);
+          }
+        });
+      });
+      this.haveCanteens = canteensChecked;
+      this.addFormData = Object.assign({}, this.addFormData, val);
+      this.addStaffVisible = true;
     },
     closeStaffDialog() {
-      this.$refs.addFormData.resetFields();
+      this.addFormData = {
+        id: "",
+        canteens_arr: [],
+        company_id: "", //新增员工归属企业id
+        canteens: [],
+        d_id: "",
+        t_id: "",
+        code: "",
+        phone: "",
+        card_num: "",
+        username: ""
+      };
       this.addStaffVisible = false;
+      this.isEditStaff = false;
     },
     async _addNewStaff() {
-      const res = await $axios.post(
-        "/v1/department/staff/save",
-        this.addFormData
-      );
-      if (res.msg === "ok") {
-        this.$message.success("添加成功");
-        this.closeStaffDialog();
-        await this.fetchList(1);
+      if (!this.isEditStaff) {
+        //新增员工
+        this.addFormData.company_id = this.c_id;
+        this.addFormData.d_id = this.d_id;
+        this.addFormData.canteens = [];
+        let _canteen = [];
+        this.addFormData.canteens_arr.forEach(item => {
+          _canteen.push({
+            canteen_id: item.id
+          });
+        });
+        this.addFormData.canteens = JSON.stringify(_canteen);
+        const res = await $axios.post(
+          "/v1/department/staff/save",
+          this.addFormData
+        );
+        if (res.msg === "ok") {
+          this.$message.success("添加成功");
+          this.closeStaffDialog();
+          await this.fetchList(this.current_page);
+        } else {
+          this.$message.error(res.msg);
+        }
       } else {
-        this.$message.error(res.msg);
+        let checked = this.addFormData.canteens_arr.map(item => item.id);
+        let add = [];
+        let cancel = [];
+        this.haveCanteens.forEach(id => {
+          //已有模块中搜索 选中的每一项，找不到的则为被移除， 再去找到与用户饭堂关系的饭堂id
+          if (checked.indexOf(id) === -1) {
+            this.addFormData.canteens.forEach(item => {
+              if (item.canteen_id === id) {
+                cancel.push(item.id);
+              }
+            });
+          }
+        });
+
+        checked.forEach(id => {
+          if (this.haveCanteens.indexOf(id) === -1) {
+            //选中模块中所搜 已有的每一项， 找不到的则为新增
+            add.push(id);
+          }
+        });
+        this.addFormData.cancel_canteens = JSON.stringify(cancel);
+        this.addFormData.canteens = JSON.stringify(add);
+        const res = await $axios.post(
+          "/v1/department/staff/update",
+          this.addFormData
+        );
+        if (res.msg === "ok") {
+          this.$message.success("修改成功");
+          this.closeStaffDialog();
+          await this.fetchList(this.current_page);
+        }
       }
     },
     async _deleteStaff(row) {
@@ -580,12 +724,68 @@ export default {
       } else {
         this.$message.error(res.msg);
       }
+    },
+    closeMoveDialog() {
+      this.cureentDepartment = {};
+      this.moveDialogVisible = false;
+    },
+    openMoveStaff(row) {
+      this.moveDialogVisible = true;
+      console.log(row);
+      let d_id = row.d_id; //当前所属部门id
+      this.cureentDepartment = Object.assign(
+        {},
+        { department: row.department, id: row.id }
+      );
+    },
+    async _comfirmMove() {
+      let staff_id = this.cureentDepartment.id;
+      let new_d_id = this.cureentDepartment.new_d_id;
+      const res = await $axios.post("/v1/department/staff/move", {
+        id: staff_id,
+        d_id: new_d_id
+      });
+      if (res.msg === "ok") {
+        this.$message.success("操作成功");
+        this.closeMoveDialog();
+      } else {
+        this.$message.error(res.msg);
+      }
+    },
+    handleSuccess(res, file, fileList) {
+      if (res.msg === "ok") {
+        this.$message.success("操作成功");
+      } else {
+        this.$message.error("请上传正确模板文件");
+      }
+    },
+    openRoleTypeDialog() {
+      this.roleTypeDialogVisible = true;
+    },
+    closeRoleTypeDialog() {
+      this.$refs.roleTypeForm.resetFields();
+      this.roleTypeDialogVisible = false;
+    },
+    async _addRoleType() {
+      const res = await $axios.post("/v1/role/type/save", this.roleTypeForm);
+      if (res.msg === "ok") {
+        this.$message.success("新增成功");
+        await this.getRoleType();
+        this.closeRoleTypeDialog();
+      } else {
+        this.$message.error(res.msg);
+      }
     }
   }
 };
 </script>
 
 <style lang="scss" scoped>
+.department {
+  .upload-excel {
+    display: inline-block;
+  }
+}
 .department-tree-node {
   flex: 1;
   display: flex;

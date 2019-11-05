@@ -79,13 +79,7 @@
           <el-table-column prop="canteen" label="消费地点"></el-table-column>
           <el-table-column prop="department" label="部门"></el-table-column>
           <el-table-column prop="name" label="姓名"></el-table-column>
-          <el-table-column label="餐次">
-            <template slot-scope="scoped">
-              <span>
-                <el-button type="text">{{scoped.row.name}}</el-button>
-              </span>
-            </template>
-          </el-table-column>
+          <el-table-column prop="dinner" label="餐次"></el-table-column>
         </el-table>
         <pagination v-if="!tableData" :total="total" :page="current_page" @pagination="queryList"></pagination>
       </div>
