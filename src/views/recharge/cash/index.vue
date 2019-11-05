@@ -6,12 +6,13 @@
       <div class="main">
         <div class="main-header">
           <span class="content-header">人员信息</span>
-          <el-input class="filter-input" v-model="filterText" placeholder="关键字查询"  style="width:200px"></el-input>
+          <el-input class="filter-input" v-model="key" placeholder="关键字查询" prefix-icon="el-icon-search" style="width:180px"></el-input>
+          <el-button type="primary" @click="fetchPersonnelList">查询</el-button>
           <span class="content-header">充值金额</span>
-          <el-input v-model="balance" placeholder="请输入"  style="width:200px"></el-input>
+          <el-input v-model="money" placeholder="请输入"  style="width:180px"></el-input>
           <span class="content-header">备注</span>
-          <el-input v-model="balance" placeholder="请输入"  style="width:200px"></el-input>
-          <el-button type="primary">充值</el-button>
+          <el-input v-model="remark" placeholder="请输入"  style="width:180px"></el-input>
+          <el-button type="primary" @click="recharge">充值</el-button>
           <el-button type="primary" @click="batchRecharge">批量充值</el-button>
         </div>
         <div class="main-content clearfix">
@@ -37,30 +38,34 @@
               <el-table-column label="姓名" prop="username"></el-table-column>
               <el-table-column label="手机号码" prop="phone"></el-table-column>
             </el-table>
+            <pagination v-show="total > 10" :total="total" :page.sync="current_page" @pagination="getList"></pagination>
           </div>
         </div>
       </div>
-      <el-dialog title="批量充值" :visible.sync="dialogFormVisible">
+      <el-dialog title="批量充值" :visible.sync="dialogFormVisible" @close="handleClose">
         <div class="dialog-header clearfix">
-          <span class="download">下载模板：<a href="#" download>团体充值模板.xls</a></span>
+          <span class="download">下载模板：<a style="color: blue;" href="http://canteen.tonglingok.com/static/excel/template/%E6%89%B9%E9%87%8F%E7%8E%B0%E9%87%91%E5%85%85%E5%80%BC%E6%A8%A1%E6%9D%BF.xlsx" download>团体充值模板.xls</a></span>
           <el-upload
             class="upload-excel upload"
             ref="upload"
             :limit="limit"
             :headers="header"
-            :show-file-list="false"
             accept=".xls,.xlsx"
-            action=""
+            action="/v1/wallet/recharge/upload"
+            
             :on-success='handleSuccess'
-            :data="{}"
-            name=""
+            :auto-upload="false"
+            :on-change="handleChange"
+            name="cash"
             >
-            <el-button type="primary">点击上传</el-button>
+            <el-button type="primary">选择上传文件</el-button>
           </el-upload>
+          <!-- :show-file-list="false"  -->
         </div>
         <div slot="footer" class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">取 消</el-button>
-          <el-button type="primary" @click="dialogFormVisible = false">确 定</el-button>
+          <el-button @click="handleClose">取 消</el-button>
+          <el-button type="primary" @click="submitUpload">确 定</el-button>
+          <!-- @click="dialogFormVisible = false"   -->
         </div>
       </el-dialog>
     </div>
@@ -69,6 +74,8 @@
 
 <script>
 // 人员信息 充值金额 备注 充值 批量充值
+// http://canteen.tonglingok.com/api/v1/department/staffs/recharge?page=1&size=10&department_id=4&key=
+// page  size department_id key
 import $axios from "@/api/index";
 import Pagination from '@/components/Pagination';
 import store from '@/store'
@@ -78,9 +85,10 @@ export default {
       header: {
         token: store.getters.token
       },
-      filterText: "",
-      balance: "",
+      key: "",
+      money: "",
       remark: "",
+      detail: [],
       tableData: [],
       defaultProps: {
         children: "items",
@@ -89,17 +97,19 @@ export default {
       departmentList: [],
       department_id: "",
       personnelList: [
-        {company:"公司A",department:"后勤部",code:"123456",username:"测试1",phone:"13512345654"},
-        {company:"公司B",department:"后勤部1",code:"123456",username:"测试2",phone:"13512345654"},
-        {company:"公司C",department:"后勤部",code:"123456",username:"测试3",phone:"13512345654"}
+        /* {"id": 364,"company": "一级企业","department": "董事会-修改","code": "0080808","username": "黄工","phone": "13411111111","card_num":"123"},
+        {"id": 365,"company": "一级企业","department": "部门A","code": "0080808","username": "肖工","phone": "13411111132","card_num":"234"}, */
       ],
       dialogFormVisible: false,
       limit: 1,
+      total: 0,
+      current_page: 1,
     }
   },
   created(){
     this.fetchDepartmentList();
   },
+  components:{Pagination},
   methods: {
     sendMessage(msg){
       if(msg === 'ok'){
@@ -115,10 +125,12 @@ export default {
       }
     },
     fetchDepartmentList(){
-      // 先默认获取 c_id为2的公司的部门列表
+      // 先默认获取 c_id为2的公司的部门列表 到时需要修改成 /v1/departments/recharge
+      // get("/v1/departments?c_id=2") /v1/departments/recharge
       $axios
-        .get("/v1/departments?c_id=2")
+        .get("/v1/departments/recharge")
         .then(res => {
+          // console.log(res)
           this.departmentList = res.data;
         })
         .catch(err => console.log(err));
@@ -126,6 +138,7 @@ export default {
     handleNodeClick(val) {
       let {id,name} = val;
       this.department_id = id;
+      // 点击某个部门，出现右边的这个部门的人员明细
       this.fetchPersonnelList();
     },
     renderContent(h, { node, data, store }) {
@@ -137,21 +150,61 @@ export default {
     },
     fetchPersonnelList(){
       $axios
-        .get("/v1/staffs?page=1&size=10&c_id=2&d_id=${this.department_id}")
+        .get("/v1/department/staffs/recharge",{
+          "page": 1,
+          "size": 10,
+          "department_id": this.department_id,
+          "key": this.key
+        })
         .then(res => {
-          console.log(res)
-          // this.personnelList = res.data.data;
+          this.personnelList = res.data.data;
         })
         .catch(err => console.log(err));
     },
-    handleSelectionChange(){
-
+    handleSelectionChange(arr){
+      this.detail = [];
+      arr.forEach(item => {
+        this.detail.push({"phone":item.phone,"card_num":item.card_num})
+      })
+    },
+    recharge(){
+      $axios
+        .post("/v1/wallet/recharge/cash",{
+          "money": this.money,
+          "remark": this.remark,
+          "detail": JSON.stringify(this.detail)
+        })
+        .then(res => {
+          this.sendMessage(res.msg);
+        })
+        .catch(err => console.log(err));
     },
     batchRecharge(){
       this.dialogFormVisible = true;
     },
-    handleSuccess(){
+    handleSuccess(res, file, fileList){
+      this.$refs.upload.clearFiles();
       this.sendMessage(res.msg);
+    },
+    handleChange(file, fileList){
+      if(file.status === 'ready'){
+        this.$message({
+          type: 'info',
+          message: "已成功选择文件上传，请点击确定按钮确认"
+        });
+      }
+    },
+    submitUpload() {
+      this.$refs.upload.submit();
+      this.dialogFormVisible = false;
+    },
+    handleClose(){
+      this.dialogFormVisible = false;
+      // this.$refs.upload.clearFiles();
+    },
+    getList(val){
+      this.current_page = val;
+      this.fetchTableList();
     }
   }
 }
@@ -186,6 +239,10 @@ export default {
     }
     .upload{
       float: right;
+      width: 177px;
+      .el-upload {
+        margin-left: 50px;
+      }
     }
   }
 </style>

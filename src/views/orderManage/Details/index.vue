@@ -10,6 +10,7 @@
               <el-date-picker
                 v-model="formdata.time_begin"
                 value-format="yyyy-MM-dd HH:mm:ss"
+                format="yyyy-MM-dd"
                 type="datetime"
               ></el-date-picker>
             </el-form-item>
@@ -17,6 +18,7 @@
               <el-date-picker
                 v-model="formdata.time_end"
                 value-format="yyyy-MM-dd HH:mm:ss"
+                format="yyyy-MM-dd"
                 type="datetime"
               ></el-date-picker>
             </el-form-item>
@@ -100,14 +102,8 @@
           ></el-table-column>
           <el-table-column prop="canteen" label="消费地点"></el-table-column>
           <el-table-column prop="department" label="部门"></el-table-column>
-          <el-table-column prop="name" label="姓名"></el-table-column>
-          <el-table-column label="餐次">
-            <template slot-scope="scoped">
-              <span>
-                <el-button type="text">{{ scoped.row.name }}</el-button>
-              </span>
-            </template>
-          </el-table-column>
+          <el-table-column prop="username" label="姓名"></el-table-column>
+          <el-table-column prop="dinner" label="餐次"></el-table-column>
         </el-table>
         <pagination
           v-if="!tableData"
@@ -164,7 +160,6 @@ export default {
   },
   watch: {
     isAble(val) {
-      console.log(val);
       this.isDisabled = !val;
     }
   },
@@ -235,7 +230,6 @@ export default {
         canteen_id,
         department_id
       } = this.formdata;
-      console.log(this.formdata);
       $axios
         .get("/v1/order/orderStatistic/detail", {
           name: name,

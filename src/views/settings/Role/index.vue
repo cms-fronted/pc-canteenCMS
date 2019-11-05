@@ -87,6 +87,10 @@
       width="60%"
       center
       title="新增角色"
+<<<<<<< HEAD
+=======
+      @close="closeNewRoleDialog"
+>>>>>>> 19050d27428eae8af4cccf736b7978304f854b29
     >
       <el-row :gutter="20">
         <el-col :span="6">
@@ -248,6 +252,8 @@ export default {
     },
     closeNewRoleDialog() {
       this.isEdit = false;
+      this.roleForm = {};
+      this.modules = [];
       this.newRoleDialogVisible = false;
     },
     async selectCompany(id) {
@@ -263,7 +269,8 @@ export default {
       }
       let canteens = [];
       let newCanteen = [];
-      canteens = this.roleForm.canteens ? this.roleForm : [];
+      canteens = this.roleForm.canteens ? this.roleForm.canteens : [];
+      console.log(canteens);
       canteens.forEach(item => {
         newCanteen.push({
           c_id: item.id,
@@ -272,10 +279,10 @@ export default {
       });
       this.roleForm.canteens = JSON.stringify(newCanteen);
       this.roleForm.rules = this.roleForm.rules.toString();
+      return;
       if (this.isEdit) {
         this.roleForm.canteen = []; //没有字段不传
         const res = await $axios.post("/v1/role/update", this.roleForm);
-        console.log(res);
       } else {
         const res = await $axios.post("/v1/role/save", this.roleForm);
         if (res.msg === "ok") {

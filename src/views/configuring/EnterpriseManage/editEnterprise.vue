@@ -81,8 +81,14 @@ export default {
       this.isOpen = val;
     },
     modules(val) {
+      this.initData(val);
+    }
+  },
+  methods: {
+    initData(val) {
       let allModules = treeToArr(val);
       this.allModules = allModules;
+      this.defaultModules = [];
       val.forEach(item => {
         let id = item.id;
         this.checkAll = Object.assign({}, this.checkAll, {
@@ -127,9 +133,7 @@ export default {
           this.defaultModules.push(item.id); //保存 该企业已有模块
         }
       });
-    }
-  },
-  methods: {
+    },
     initCheckBox(
       arr, //传入 pc端 / 微信 模块数组
       modulesCheckbox, // 一级模块下的对应的所有id
@@ -225,7 +229,9 @@ export default {
       let add_modules = [];
       let formdata = {
         company_id: this.company_id,
-        canteen: {}
+        canteen: {
+          cancel_modules: ""
+        }
       };
       if (_add.length) {
         _add.forEach((id, index) => {
