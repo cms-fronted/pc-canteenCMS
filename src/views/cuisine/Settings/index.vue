@@ -11,10 +11,19 @@
           style="width:150px"
           @change="getLocationList(company_id)"
         >
-          <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          <el-option
+            v-for="item in companyList"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          ></el-option>
         </el-select>
         <span class="content-header">消费地点：</span>
-        <el-select v-model="canteen_id" placeholder="请选择" style="width:150px">
+        <el-select
+          v-model="canteen_id"
+          placeholder="请选择"
+          style="width:150px"
+        >
           <el-option
             v-for="item in locationList"
             :key="item.id"
@@ -26,10 +35,20 @@
         <el-button @click="fetchTableList(1)">查询</el-button>
       </div>
       <div class="main-content">
-        <el-table style="width:100%" :data="tableList" :span-method="objectSpanMethod">
+        <el-table
+          style="width:100%"
+          :data="tableList"
+          :span-method="objectSpanMethod"
+        >
           <el-table-column label="公司级别" prop="grade"></el-table-column>
-          <el-table-column label="公司名称" prop="company_name"></el-table-column>
-          <el-table-column label="消费地点" prop="canteen_name"></el-table-column>
+          <el-table-column
+            label="公司名称"
+            prop="company_name"
+          ></el-table-column>
+          <el-table-column
+            label="消费地点"
+            prop="canteen_name"
+          ></el-table-column>
           <el-table-column label="餐类" prop="category_name"></el-table-column>
           <el-table-column label="菜类明细" prop="category"></el-table-column>
           <el-table-column label="状态">
@@ -44,7 +63,9 @@
           <el-table-column label="操作">
             <template slot-scope="scope">
               <el-button size="mini" @click="_edit(scope.row)">编辑</el-button>
-              <el-button size="mini" type="danger" @click="_delete(scope.row)">Delete</el-button>
+              <el-button size="mini" type="danger" @click="_delete(scope.row)"
+                >Delete</el-button
+              >
             </template>
           </el-table-column>
         </el-table>
@@ -59,7 +80,11 @@
     <el-dialog :visible.sync="AddVisible" title="新增菜单">
       <el-form ref="addMenuForm" :model="menuForm" label-width="100px">
         <el-form-item label="饭堂">
-          <el-select v-model="menuForm.c_id" placeholder="请选择" @change="getDinnersList">
+          <el-select
+            v-model="menuForm.c_id"
+            placeholder="请选择"
+            @change="getDinnersList"
+          >
             <el-option
               v-for="item in locationList"
               :key="item.id"
@@ -79,8 +104,16 @@
           </el-select>
         </el-form-item>
         <el-form-item label="菜类">
-          <div v-for="(item, index) in listObj" :key="index" style="margin:5px 0">
-            <el-input v-model="item.category" :disabled="item.disabled" style="width:150px"></el-input>
+          <div
+            v-for="(item, index) in listObj"
+            :key="index"
+            style="margin:5px 0"
+          >
+            <el-input
+              v-model="item.category"
+              :disabled="item.disabled"
+              style="width:150px"
+            ></el-input>
             <el-button
               @click.prevent="removeInput(item)"
               icon="el-icon-delete"
@@ -95,7 +128,7 @@
             <el-radio :label="2">动态</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="数量" v-if="menuForm.status===1">
+        <el-form-item label="数量" v-if="menuForm.status === 1">
           <el-input v-model="menuForm.number"></el-input>
         </el-form-item>
       </el-form>
@@ -116,7 +149,7 @@
             <el-radio :label="2">动态</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="数量" v-if="editForm.status===1">
+        <el-form-item label="数量" v-if="editForm.status === 1">
           <el-input v-model="editForm.number"></el-input>
         </el-form-item>
       </el-form>
@@ -276,7 +309,9 @@ export default {
       page = page || 1;
       $axios
         .get(
-          `/v1/menus/company?company_id=${this.company_id}&canteen_id=${this.canteen_id}&size=${this.size}&page=${page}`
+          `/v1/menus/company?company_id=${this.company_id}&canteen_id=${
+            this.canteen_id
+          }&size=${this.size}&page=${page}`
         )
         .then(res => {
           let _data = Array.from(res.data.data);
@@ -384,5 +419,4 @@ export default {
 };
 </script>
 
-<style>
-</style>
+<style></style>

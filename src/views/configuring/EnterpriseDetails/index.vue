@@ -5,7 +5,12 @@
       <el-divider></el-divider>
       <div class="main">
         <div class="main-header">
-          <el-form :inline="true" ref="queryForm" label-position="left" :model="queryForm">
+          <el-form
+            :inline="true"
+            ref="queryForm"
+            label-position="left"
+            :model="queryForm"
+          >
             <el-form-item label="企业名称" prop="name" label-width="80px">
               <el-select v-model="queryForm.name">
                 <el-option
@@ -29,15 +34,21 @@
         </div>
         <div class="main-content">
           <el-table style="width:100%" :data="companyList">
-            <el-table-column prop="create_time" label="创建时间" width="200px"></el-table-column>
+            <el-table-column
+              prop="create_time"
+              label="创建时间"
+              width="200px"
+            ></el-table-column>
             <el-table-column label="公司级别" prop="grade">
               <template slot-scope="props">
-                <span>{{props.row.grade | handleGrades}}</span>
+                <span>{{ props.row.grade | handleGrades }}</span>
               </template>
             </el-table-column>
             <el-table-column label="归属企业">
               <template slot-scope="scoped">
-                <span>{{scoped.row.parent_name ? scoped.row.parent_name : "无"}}</span>
+                <span>{{
+                  scoped.row.parent_name ? scoped.row.parent_name : "无"
+                }}</span>
               </template>
             </el-table-column>
             <el-table-column label="公司名称">
@@ -45,7 +56,8 @@
                 <el-button
                   type="text"
                   @click="() => openDetailDialog(scoped.row)"
-                >{{scoped.row.name}}</el-button>
+                  >{{ scoped.row.name }}</el-button
+                >
               </template>
             </el-table-column>
           </el-table>
@@ -72,12 +84,12 @@
             <el-table class="canteen-table" size="mini" :data="canteenList">
               <el-table-column label="饭堂名称">
                 <template slot-scope="scoped">
-                  <el-button type="text">{{scoped.row.name}}</el-button>
+                  <el-button type="text">{{ scoped.row.name }}</el-button>
                 </template>
               </el-table-column>
             </el-table>
             <p style="padding: 5px 0">
-              <el-tag>企业人数：{{staffs}}人</el-tag>
+              <el-tag>企业人数：{{ staffs }}人</el-tag>
             </p>
           </div>
         </el-col>
@@ -90,7 +102,7 @@
             <el-table :data="machineList" size="mini">
               <el-table-column label="设备类别">
                 <template slot-scope="scoped">
-                  <span>{{scoped.row.machine_type | showMachineType}}</span>
+                  <span>{{ scoped.row.machine_type | showMachineType }}</span>
                 </template>
               </el-table-column>
               <el-table-column label="设备序号" prop="number"></el-table-column>
@@ -98,13 +110,15 @@
               <el-table-column label="硬件号" prop="code"></el-table-column>
               <el-table-column label="状态" prop="state">
                 <template slot-scope="scoped">
-                  <span>{{scoped.row.state | showState}}</span>
+                  <span>{{ scoped.row.state | showState }}</span>
                 </template>
               </el-table-column>
               <el-table-column label="操作">
                 <template slot-scope="scoped">
                   <span>
-                    <el-button type="text" @click="_delete(scoped.row)">删除</el-button>
+                    <el-button type="text" @click="_delete(scoped.row)"
+                      >删除</el-button
+                    >
                   </span>
                 </template>
               </el-table-column>

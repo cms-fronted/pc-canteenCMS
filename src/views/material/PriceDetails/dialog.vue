@@ -70,35 +70,35 @@ export default {
     handleClick() {
       console.log(this.GLOBAL_ROLE);
       let data = this.formdata;
-      if(this.type === '_add'){
+      if (this.type === "_add") {
         this.sendPostRequest("/v1/material/save", data);
         this.$refs["addMaterialForm"].resetFields();
-      }else{
-        const {id,name,price,unit} = data;
-        this.sendPostRequest("/v1/material/update", {id,name,price,unit});
+      } else {
+        const { id, name, price, unit } = data;
+        this.sendPostRequest("/v1/material/update", { id, name, price, unit });
       }
     },
-    sendPostRequest(url,data){
+    sendPostRequest(url, data) {
       $axios
-        .post(url,data)
+        .post(url, data)
         .then(res => {
           this.doClose();
           this.sendMessage(res.msg);
-          this.$emit("confirm",res.msg);
+          this.$emit("confirm", res.msg);
         })
         .catch(err => console.log(err));
     },
-    sendMessage(msg){
-      if(msg === 'ok'){
+    sendMessage(msg) {
+      if (msg === "ok") {
         this.$message({
           type: "success",
           message: "操作成功!"
         });
-      }else {
+      } else {
         this.$message({
           type: "info",
           message: "操作失败"
-        })
+        });
       }
     }
   }

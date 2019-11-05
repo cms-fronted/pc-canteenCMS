@@ -6,7 +6,12 @@
       <div class="main">
         <div class="main-header">
           <div class="select-title">
-            <el-form :inline="true" :model="formdata" label-width="40px" label-position="left">
+            <el-form
+              :inline="true"
+              :model="formdata"
+              label-width="40px"
+              label-position="left"
+            >
               <el-form-item label="开始">
                 <el-date-picker
                   v-model="formdata.time_begin"
@@ -26,7 +31,11 @@
                 ></el-date-picker>
               </el-form-item>
               <el-form-item label="公司">
-                <el-select v-model="company_id" placeholder="请选择公司" @change="getCanteenList">
+                <el-select
+                  v-model="company_id"
+                  placeholder="请选择公司"
+                  @change="getCanteenList"
+                >
                   <el-option
                     v-for="item in companyOptions"
                     :key="item.id"
@@ -128,5 +137,4 @@ export default {
 };
 </script>
 
-<style lang="scss" scpoed>
-</style>
+<style lang="scss" scpoed></style>

@@ -59,9 +59,13 @@
               <el-option label="未打印" :value="2"></el-option>
             </el-select>
           </el-form-item>
-          <el-button type="primary" @click="queryList" :disabled="isDisabled">查询</el-button>
+          <el-button type="primary" @click="queryList" :disabled="isDisabled"
+            >查询</el-button
+          >
           <el-button type="primary">导出</el-button>
-          <el-button type="success" @click="openDetailDialog">打印小票</el-button>
+          <el-button type="success" @click="openDetailDialog"
+            >打印小票</el-button
+          >
         </el-form>
       </div>
       <div class="main-content">
@@ -78,25 +82,36 @@
                 <el-button
                   type="text"
                   @click="openDetailDialog(scoped.row.dinner)"
-                >{{scoped.row.dinner}}</el-button>
+                  >{{ scoped.row.dinner }}</el-button
+                >
               </span>
             </template>
           </el-table-column>
           <el-table-column label="金额" prop="money"></el-table-column>
           <el-table-column label="送货地点" show-overflow-tooltip>
             <template slot-scope="scoped">
-              <span>{{scoped.row.province + scoped.row.area+ scoped.row.city+ scoped.row.address}}</span>
+              <span>{{
+                scoped.row.province +
+                  scoped.row.area +
+                  scoped.row.city +
+                  scoped.row.address
+              }}</span>
             </template>
           </el-table-column>
           <el-table-column label="状态">
             <template slot-scope="scoped">
-              <el-tag
-                :type="scoped.row.used===1 ? 'success' :'warning'"
-              >{{scoped.row.used === 1 ? '已派单' : '未派单'}}</el-tag>
+              <el-tag :type="scoped.row.used === 1 ? 'success' : 'warning'">{{
+                scoped.row.used === 1 ? "已派单" : "未派单"
+              }}</el-tag>
             </template>
           </el-table-column>
         </el-table>
-        <pagination v-if="!tableData" :total="total" :page="current_page" @pagination="queryList"></pagination>
+        <pagination
+          v-if="!tableData"
+          :total="total"
+          :page="current_page"
+          @pagination="queryList"
+        ></pagination>
       </div>
     </div>
     <el-dialog
@@ -117,7 +132,9 @@
         <el-table-column label="菜品" prop="name"></el-table-column>
         <el-table-column label="数量" prop="count"></el-table-column>
         <el-table-column label="金额" prop="price">
-          <template slot-scope="scoped">{{scoped.row.price ? scoped.row.price: '/'}}</template>
+          <template slot-scope="scoped">{{
+            scoped.row.price ? scoped.row.price : "/"
+          }}</template>
         </el-table-column>
       </el-table>
     </el-dialog>
@@ -232,7 +249,9 @@ export default {
       queryForm.canteen_id = queryForm.canteen_id ? queryForm.canteen_id : 0;
       queryForm.dinner_id = queryForm.dinner_id ? queryForm.dinner_id : 0;
       const res = await $axios.get(
-        `/v1/order/takeoutStatistic?page=${this.current_page}&size=${this.size}`,
+        `/v1/order/takeoutStatistic?page=${this.current_page}&size=${
+          this.size
+        }`,
         queryForm
       );
       if (res.msg === "ok") {

@@ -4,10 +4,9 @@
     <el-divider></el-divider>
     <div class="main">
       <div class="main-header">
-        <el-button
-          type="primary"
-          @click="changeDefault"
-        >{{changeDefaultStatus ? '完成默认设置' : '更改默认设置'}}</el-button>
+        <el-button type="primary" @click="changeDefault">{{
+          changeDefaultStatus ? "完成默认设置" : "更改默认设置"
+        }}</el-button>
         <el-button type="primary" @click="openModuleDialog">增加模块</el-button>
         <el-button type="primary">删除模块</el-button>
         <el-button type="primary">编辑模块</el-button>
@@ -15,7 +14,7 @@
       <div class="main-content">
         <el-card class="box-card">
           <div slot="header" class="clearfix">
-            <span>{{title}}</span>
+            <span>{{ title }}</span>
           </div>
           <el-row :gutter="20">
             <el-col :span="8">
@@ -28,23 +27,32 @@
                     node-key="id"
                     :props="defaultProps"
                     :show-checkbox="changeDefaultStatus"
-                    @check-change="(obj,checked,childrenChecked) => checkChange(obj,checked,childrenChecked,2)"
+                    @check-change="
+                      (obj, checked, childrenChecked) =>
+                        checkChange(obj, checked, childrenChecked, 2)
+                    "
                     default-expand-all
                   >
                     <span class="modules-tree-node" slot-scope="{ node, data }">
-                      <span>{{data.type === 1 ? "PC端" : "移动端"}}——{{ node.label }}</span>
+                      <span
+                        >{{ data.type === 1 ? "PC端" : "移动端" }}——{{
+                          node.label
+                        }}</span
+                      >
                       <span class="btns-text">
                         <el-button
                           type="text"
                           size="mini"
-                          @click="() => openEditModuleDialog(data,2)"
-                        >编辑</el-button>
+                          @click="() => openEditModuleDialog(data, 2)"
+                          >编辑</el-button
+                        >
                         <el-button
                           type="text"
                           size="mini"
-                          @click="() => openModuleDialog(node,data)"
+                          @click="() => openModuleDialog(node, data)"
                           v-if="data.type === 1"
-                        >新增</el-button>
+                          >新增</el-button
+                        >
                       </span>
                     </span>
                   </el-tree>
@@ -63,7 +71,12 @@
       width="30%"
       @close="closeModuleDialog"
     >
-      <el-form :model="modulesForm" ref="modulesForm" label-width="80px" label-position="right">
+      <el-form
+        :model="modulesForm"
+        ref="modulesForm"
+        label-width="80px"
+        label-position="right"
+      >
         <el-form-item label="功能类型" prop="system" v-if="false">
           <el-radio-group v-model="systemType">
             <el-radio :label="1">系统功能</el-radio>
@@ -113,7 +126,9 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="closeEditModuleDialog">取 消</el-button>
-        <el-button type="primary" @click="submitEditModulesForm">确定</el-button>
+        <el-button type="primary" @click="submitEditModulesForm"
+          >确定</el-button
+        >
       </div>
     </el-dialog>
   </div>

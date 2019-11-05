@@ -19,9 +19,7 @@
       </transition>
     </div>
     <div class="loginBox">
-      <h2 class="loginH2">
-        <strong>Vue</strong> 后台管理系统
-      </h2>
+      <h2 class="loginH2"><strong>Vue</strong> 后台管理系统</h2>
       <div class="loginCon">
         <div class="titleDiv">
           <h3>Sign up now</h3>
@@ -30,7 +28,11 @@
         </div>
         <el-form ref="loginForm" :rules="rules" :model="ruleForm">
           <el-form-item prop="account">
-            <el-input placeholder="请输入账号" prefix-icon="el-icon-user" v-model="ruleForm.account"></el-input>
+            <el-input
+              placeholder="请输入账号"
+              prefix-icon="el-icon-user"
+              v-model="ruleForm.account"
+            ></el-input>
           </el-form-item>
           <el-form-item prop="passwd">
             <el-input
@@ -40,7 +42,12 @@
               show-password
             ></el-input>
           </el-form-item>
-          <el-button type="primary" class="loginBtn" @click="loginYz('loginForm')">登录</el-button>
+          <el-button
+            type="primary"
+            class="loginBtn"
+            @click="loginYz('loginForm')"
+            >登录</el-button
+          >
         </el-form>
       </div>
     </div>

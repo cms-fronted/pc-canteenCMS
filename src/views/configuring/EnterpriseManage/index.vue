@@ -4,14 +4,20 @@
     <el-divider></el-divider>
     <div class="main">
       <div class="main-header">
-        <el-button type="primary" @click="() => addEnterprise({},{})">新增一级企业</el-button>
+        <el-button type="primary" @click="() => addEnterprise({}, {})"
+          >新增一级企业</el-button
+        >
       </div>
       <div class="main-content">
         <el-row :gutter="10">
           <el-col :span="6">
             <el-card>
               <div>
-                <el-input v-model="filterText" placeholder="关键字查询" size="small"></el-input>
+                <el-input
+                  v-model="filterText"
+                  placeholder="关键字查询"
+                  size="small"
+                ></el-input>
                 <el-tree
                   :data="companyList"
                   :props="defaultProps"
@@ -19,21 +25,31 @@
                   ref="tree"
                   :filter-node-method="filterNode"
                 >
-                  <span class="enterprise-tree-node" slot-scope="{ node, data }">
+                  <span
+                    class="enterprise-tree-node"
+                    slot-scope="{ node, data }"
+                  >
                     <span>
                       <el-button
                         type="text"
                         size="mini"
                         @click="handleNodeClick(data)"
-                      >{{node.label}}</el-button>
+                        >{{ node.label }}</el-button
+                      >
                     </span>
                     <span class="btns-text">
                       <el-button
                         type="text"
                         size="mini"
-                        @click="() => editEnterpriseDialog(node,data)"
-                      >编辑</el-button>
-                      <el-button type="text" size="mini" @click="() => addEnterprise(node,data)">新增</el-button>
+                        @click="() => editEnterpriseDialog(node, data)"
+                        >编辑</el-button
+                      >
+                      <el-button
+                        type="text"
+                        size="mini"
+                        @click="() => addEnterprise(node, data)"
+                        >新增</el-button
+                      >
                     </span>
                   </span>
                 </el-tree>
@@ -46,15 +62,31 @@
                 <span>云饭堂</span>
               </div>
               <div class="card-content">
-                <el-button @click="addCanteen" :disabled="!company_id">新增饭堂</el-button>
-                <el-button :disabled="!company_id" @click="addShop">新增小卖部</el-button>
-                <el-table style="width:50%;margin: 0 auto" size="mini" :data="canteensLocData">
+                <el-button @click="addCanteen" :disabled="!company_id"
+                  >新增饭堂</el-button
+                >
+                <el-button :disabled="!company_id" @click="addShop"
+                  >新增小卖部</el-button
+                >
+                <el-table
+                  style="width:50%;margin: 0 auto"
+                  size="mini"
+                  :data="canteensLocData"
+                >
                   <div slot="empty">暂无饭堂</div>
-                  <el-table-column label="消费地点" prop="name"></el-table-column>
+                  <el-table-column
+                    label="消费地点"
+                    prop="name"
+                  ></el-table-column>
                   <el-table-column label="操作">
                     <template slot-scope="scoped">
                       <span>
-                        <el-button type="text" size="mini" @click="_editCanteen(scoped.row)">操作</el-button>
+                        <el-button
+                          type="text"
+                          size="mini"
+                          @click="_editCanteen(scoped.row)"
+                          >操作</el-button
+                        >
                         <el-button type="text" size="mini">删除</el-button>
                       </span>
                     </template>
@@ -72,7 +104,12 @@
                     <template slot-scope="scoped">
                       <span>
                         <el-button type="text" size="mini">删除</el-button>
-                        <el-button type="text" size="mini" @click="_editShop(scoped.row)">操作</el-button>
+                        <el-button
+                          type="text"
+                          size="mini"
+                          @click="_editShop(scoped.row)"
+                          >操作</el-button
+                        >
                       </span>
                     </template>
                   </el-table-column>
@@ -112,7 +149,7 @@
       :editAccount="editAccount"
       :machineList="machineList"
       :modules="modules"
-      @updateMachineTable="(val,type) => getMachineList(val,type)"
+      @updateMachineTable="(val, type) => getMachineList(val, type)"
       @updateCanteenList="getComsumptionLoc"
     ></add-canteen-dialog>
     <add-shop-dialog
@@ -123,7 +160,7 @@
       :isEdit="isEdit"
       :formdata="editForm"
       :machineList="machineList"
-      @updateMachineTable="(val,type) => getMachineList(val,type)"
+      @updateMachineTable="(val, type) => getMachineList(val, type)"
     ></add-shop-dialog>
     <edit-enterprise-dialog
       :visible="editEnterpriseDialogVisible"

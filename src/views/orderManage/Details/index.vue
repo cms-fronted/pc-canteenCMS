@@ -21,7 +21,11 @@
               ></el-date-picker>
             </el-form-item>
             <el-form-item label="公司">
-              <el-select v-model="formdata.company_ids" @change="getList" placeholder="请选择公司">
+              <el-select
+                v-model="formdata.company_ids"
+                @change="getList"
+                placeholder="请选择公司"
+              >
                 <el-option
                   v-for="item in companiesList"
                   :key="item.id"
@@ -31,7 +35,11 @@
               </el-select>
             </el-form-item>
             <el-form-item label="消费地点">
-              <el-select v-model="formdata.canteen_id" @change="getDinnersList" placeholder="请选择饭堂">
+              <el-select
+                v-model="formdata.canteen_id"
+                @change="getDinnersList"
+                placeholder="请选择饭堂"
+              >
                 <el-option
                   v-for="item in locationList"
                   :key="item.id"
@@ -41,7 +49,10 @@
               </el-select>
             </el-form-item>
             <el-form-item label="部门">
-              <el-select v-model="formdata.department_id" placeholder="请选择部门">
+              <el-select
+                v-model="formdata.department_id"
+                placeholder="请选择部门"
+              >
                 <el-option
                   v-for="item in departmentList"
                   :key="item.id"
@@ -51,10 +62,16 @@
               </el-select>
             </el-form-item>
             <el-form-item label="姓名">
-              <el-input placeholder="请输入姓名" v-model="formdata.name"></el-input>
+              <el-input
+                placeholder="请输入姓名"
+                v-model="formdata.name"
+              ></el-input>
             </el-form-item>
             <el-form-item label="手机号码">
-              <el-input placeholder="请输入手机号码" v-model="formdata.phone"></el-input>
+              <el-input
+                placeholder="请输入手机号码"
+                v-model="formdata.phone"
+              ></el-input>
             </el-form-item>
             <el-form-item label="餐次">
               <el-select v-model="formdata.dinner_id" placeholder="请选择部门">
@@ -69,25 +86,35 @@
           </el-form>
         </div>
         <div class="btn-area">
-          <el-button type="primary" @click="queryList" :disabled="isDisabled">查询</el-button>
+          <el-button type="primary" @click="queryList" :disabled="isDisabled"
+            >查询</el-button
+          >
           <el-button type="primary">导出</el-button>
         </div>
       </div>
       <div class="main-content">
         <el-table style="width:100%" :data="tableData" border>
-          <el-table-column prop="ordering_date" label="订餐日期"></el-table-column>
+          <el-table-column
+            prop="ordering_date"
+            label="订餐日期"
+          ></el-table-column>
           <el-table-column prop="canteen" label="消费地点"></el-table-column>
           <el-table-column prop="department" label="部门"></el-table-column>
           <el-table-column prop="name" label="姓名"></el-table-column>
           <el-table-column label="餐次">
             <template slot-scope="scoped">
               <span>
-                <el-button type="text">{{scoped.row.name}}</el-button>
+                <el-button type="text">{{ scoped.row.name }}</el-button>
               </span>
             </template>
           </el-table-column>
         </el-table>
-        <pagination v-if="!tableData" :total="total" :page="current_page" @pagination="queryList"></pagination>
+        <pagination
+          v-if="!tableData"
+          :total="total"
+          :page="current_page"
+          @pagination="queryList"
+        ></pagination>
       </div>
     </div>
   </div>

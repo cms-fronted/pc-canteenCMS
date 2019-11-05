@@ -24,8 +24,10 @@
                 ></el-option>
               </el-select>
             </el-form-item>
-            <el-button @click="queryList" :disabled="!!!queryForm.c_id">查询</el-button>
-            <el-button @click="settingDialogVisible  =true">新增</el-button>
+            <el-button @click="queryList" :disabled="!!!queryForm.c_id"
+              >查询</el-button
+            >
+            <el-button @click="settingDialogVisible = true">新增</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -38,26 +40,48 @@
         border
         style="width: 100%"
       >
-        <el-table-column prop="canteen" label="消费地点" width="120px"></el-table-column>
-        <el-table-column prop="role" label="人员类型" width="120px"></el-table-column>
-        <el-table-column prop="dinner" label="餐饮" width="120px"></el-table-column>
+        <el-table-column
+          prop="canteen"
+          label="消费地点"
+          width="120px"
+        ></el-table-column>
+        <el-table-column
+          prop="role"
+          label="人员类型"
+          width="120px"
+        ></el-table-column>
+        <el-table-column
+          prop="dinner"
+          label="餐饮"
+          width="120px"
+        ></el-table-column>
         <el-table-column label="未定餐允许就餐" width="150px">
           <template slot-scope="scoped">
             <span>
-              {{
-              scoped.row.unordered_meals === 1 ? "允许" : "拒绝"
-              }}
+              {{ scoped.row.unordered_meals === 1 ? "允许" : "拒绝" }}
             </span>
           </template>
         </el-table-column>
-        <el-table-column prop="consumption_count" label="允许消费次数" width="150px"></el-table-column>
-        <el-table-column prop="ordered_count" label="订餐数量" width="100px"></el-table-column>
+        <el-table-column
+          prop="consumption_count"
+          label="允许消费次数"
+          width="150px"
+        ></el-table-column>
+        <el-table-column
+          prop="ordered_count"
+          label="订餐数量"
+          width="100px"
+        ></el-table-column>
         <el-table-column prop="status" label="消费状态" width="120px">
           <template slot-scope="scope">
-            <span>{{scope.row.status | consumptionType}}</span>
+            <span>{{ scope.row.status | consumptionType }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="num_type" label="次数类型" width="80px"></el-table-column>
+        <el-table-column
+          prop="num_type"
+          label="次数类型"
+          width="80px"
+        ></el-table-column>
         <el-table-column label="金额">
           <template slot-scope="scoped">
             <el-tag
@@ -65,14 +89,19 @@
               size="small"
               effect="dark"
               style="marginRight:5px"
-            >标准金额:{{scoped.row.money}}元</el-tag>
-            <el-tag type="warning" size="small" effect="dark">附加金额:{{scoped.row.money}}元</el-tag>
+              >标准金额:{{ scoped.row.money }}元</el-tag
+            >
+            <el-tag type="warning" size="small" effect="dark"
+              >附加金额:{{ scoped.row.money }}元</el-tag
+            >
           </template>
         </el-table-column>
         <el-table-column label="操作" width="80px">
           <template slot-scope="scoped">
             <span>
-              <el-button type="text" @click="_editSetting(scoped.row)">编辑</el-button>
+              <el-button type="text" @click="_editSetting(scoped.row)"
+                >编辑</el-button
+              >
             </span>
           </template>
         </el-table-column>
@@ -86,7 +115,10 @@
     >
       <el-form :model="newSettingForm" ref="newSettingForm" label-width="100px">
         <el-form-item label="公司" prop="company_id">
-          <el-select v-model="newSettingForm.company_id" @change="getDialogCanteenList">
+          <el-select
+            v-model="newSettingForm.company_id"
+            @change="getDialogCanteenList"
+          >
             <el-option
               v-for="item in companiesList"
               :key="item.id"
@@ -142,7 +174,7 @@
       >
         <el-form :model="countDetailForm">
           <el-form-item label="次数类型">
-            <p>第{{detail.length + 1}}次</p>
+            <p>第{{ detail.length + 1 }}次</p>
           </el-form-item>
           <el-form-item label="订餐就餐">
             <span>
@@ -211,7 +243,11 @@
         </span>
       </el-dialog>
 
-      <el-form :model="editSettingForm" ref="editSettingForm" label-width="100px">
+      <el-form
+        :model="editSettingForm"
+        ref="editSettingForm"
+        label-width="100px"
+      >
         <el-form-item label="未定餐就餐" prop="unordered_meals">
           <el-radio-group v-model="editSettingForm.unordered_meals">
             <el-radio :label="1">允许</el-radio>
@@ -219,23 +255,32 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="订餐数量">
-          <el-input type="number" v-model="editSettingForm.ordered_count" style="width:100px"></el-input>
+          <el-input
+            type="number"
+            v-model="editSettingForm.ordered_count"
+            style="width:100px"
+          ></el-input>
         </el-form-item>
       </el-form>
       <el-card class="box-card" body-style="paddingBottom: 5px">
         <div slot="header" class="clearfix">
           <span>消费设置</span>
-          <el-button style="float: right; padding: 3px 0" type="text" @click="_openCountDialog">添加次数</el-button>
+          <el-button
+            style="float: right; padding: 3px 0"
+            type="text"
+            @click="_openCountDialog"
+            >添加次数</el-button
+          >
         </div>
         <el-table style="width:100%" :data="detailStrategy" height="250">
           <el-table-column label="次数" width="80px">
             <template slot-scope="scoped">
-              <span>第{{scoped.row.number}}次</span>
+              <span>第{{ scoped.row.number }}次</span>
             </template>
           </el-table-column>
           <el-table-column label="类型">
             <template slot-scope="scope">
-              <span>{{scope.row.status | consumptionType}}</span>
+              <span>{{ scope.row.status | consumptionType }}</span>
             </template>
           </el-table-column>
           <el-table-column label="金额">
@@ -245,8 +290,11 @@
                 size="mini"
                 effect="dark"
                 style="marginRight:5px"
-              >标准:{{scoped.row.money}}元</el-tag>
-              <el-tag type="warning" size="mini" effect="dark">附加:{{scoped.row.money}}元</el-tag>
+                >标准:{{ scoped.row.money }}元</el-tag
+              >
+              <el-tag type="warning" size="mini" effect="dark"
+                >附加:{{ scoped.row.money }}元</el-tag
+              >
             </template>
           </el-table-column>
         </el-table>

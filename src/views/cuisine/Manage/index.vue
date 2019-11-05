@@ -7,7 +7,10 @@
         <div class="main-header">
           <el-form :inline="true" label-width="80px" :model="queryForm">
             <el-form-item label="公司" prop="company_ids">
-              <el-select v-model="queryForm.company_id" @change="getLocationList">
+              <el-select
+                v-model="queryForm.company_id"
+                @change="getLocationList"
+              >
                 <el-option
                   v-for="item in companyList"
                   :label="item.name"
@@ -17,7 +20,10 @@
               </el-select>
             </el-form-item>
             <el-form-item label="消费地点" prop="canteen_id">
-              <el-select v-model="queryForm.canteen_id" @change="getDinnersList">
+              <el-select
+                v-model="queryForm.canteen_id"
+                @change="getDinnersList"
+              >
                 <el-option
                   v-for="item in locationList"
                   :label="item.name"
@@ -27,7 +33,10 @@
               </el-select>
             </el-form-item>
             <el-form-item label="餐次" prop="dinner_id">
-              <el-select v-model="queryForm.dinner_id" @change="getCategoryList">
+              <el-select
+                v-model="queryForm.dinner_id"
+                @change="getCategoryList"
+              >
                 <el-option
                   v-for="item in dinnersList"
                   :label="item.name"
@@ -47,14 +56,16 @@
               </el-select>
             </el-form-item>
             <el-button type="primary" @click="fetchList">查询</el-button>
-            <el-button @click="addCuisine" :disabled="locationList.length===0">新增</el-button>
+            <el-button @click="addCuisine" :disabled="locationList.length === 0"
+              >新增</el-button
+            >
           </el-form>
         </div>
         <div class="main-content">
           <el-card
             class="card"
-            :body-style="{ padding:0, }"
-            v-for="(item) in goodsList"
+            :body-style="{ padding: 0 }"
+            v-for="item in goodsList"
             :key="item.postID"
           >
             <div class="image">
@@ -62,21 +73,23 @@
             </div>
             <div style="padding: 14px;">
               <ul class="main-title">
-                <li class="list">名称:{{item.name}}</li>
+                <li class="list">名称:{{ item.name }}</li>
                 <!-- <li class="list">库存:{{item.goods_total}}</li> -->
-                <li class="list">价格:{{item.price}}</li>
-                <li class="list">类型:{{item.menu}}</li>
-                <li class="list">主厨:{{item.chef}}</li>
+                <li class="list">价格:{{ item.price }}</li>
+                <li class="list">类型:{{ item.menu }}</li>
+                <li class="list">主厨:{{ item.chef }}</li>
               </ul>
               <div class="btns">
-                <el-button type="danger" plain @click="handleDelete(item)">删除</el-button>
+                <el-button type="danger" plain @click="handleDelete(item)"
+                  >删除</el-button
+                >
                 <el-button type="primary" @click="_edit(item)">编辑</el-button>
               </div>
             </div>
           </el-card>
         </div>
         <pagination
-          v-if="goodsList.length>0"
+          v-if="goodsList.length > 0"
           :total="total"
           :page="current_page"
           :pageSize="pageSize"
@@ -139,7 +152,7 @@
             :on-preview="handlePictureCardPreview"
             :on-remove="handleRemove"
             :on-change="handleChange"
-            :class="{hide:hideUpload}"
+            :class="{ hide: hideUpload }"
             :on-success="handleSuccess"
           >
             <i class="el-icon-plus"></i>

@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :visible.sync="isOpen" title="更改商品类型"  @close="handleClose">
+  <el-dialog :visible.sync="isOpen" title="更改商品类型" @close="handleClose">
     <el-form ref="reviseGoodsForm" label-width="100px">
       <el-form-item label="公司">
         <el-select
@@ -7,7 +7,12 @@
           v-model="company_id"
           style="width: 265px;"
         >
-          <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          <el-option
+            v-for="item in companyList"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          ></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="商品类型">
@@ -29,7 +34,7 @@ export default {
       type: Boolean
     },
     editData: Object,
-    c_id: [Number,String]
+    c_id: [Number, String]
   },
   data() {
     return {
@@ -37,22 +42,22 @@ export default {
       companyList: [],
       reviseForm: {},
       company_id: this.c_id
-    }
+    };
   },
   watch: {
     visible(val) {
       this.reviseForm = Object.assign({}, this.reviseForm, this.editData);
       this.isOpen = val;
     },
-    c_id(val){
-        this.company_id = val;
+    c_id(val) {
+      this.company_id = val;
     }
   },
-  created(){
+  created() {
     this.fetchCompanyList();
   },
   methods: {
-    fetchCompanyList(){
+    fetchCompanyList() {
       $axios
         .get("/v1/companies")
         .then(res => {
@@ -60,21 +65,20 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    handleClose(){
+    handleClose() {
       this.$emit("closeDialog2", false);
       this.reviseForm = {};
     },
-    ConfirmRevise(){
+    ConfirmRevise() {
       $axios
-        .post("/v1/category/update",this.reviseForm)
+        .post("/v1/category/update", this.reviseForm)
         .then(res => {
           this.$emit("closeDialog2", false, res.msg);
         })
         .catch(err => console.log(err));
-    },
+    }
   }
 };
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

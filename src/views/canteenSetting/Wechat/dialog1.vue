@@ -7,7 +7,12 @@
           v-model="goodsForm.c_id"
           style="width: 265px;"
         >
-          <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          <el-option
+            v-for="item in companyList"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          ></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="商品类型">
@@ -36,7 +41,7 @@ export default {
       isOpen: this.visible,
       companyList: [],
       goodsForm: {}
-    }
+    };
   },
   watch: {
     visible(val) {
@@ -44,11 +49,11 @@ export default {
       this.isOpen = val;
     }
   },
-  created(){
+  created() {
     this.fetchCompanyList();
   },
   methods: {
-    fetchCompanyList(){
+    fetchCompanyList() {
       $axios
         .get("/v1/companies")
         .then(res => {
@@ -56,13 +61,13 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    handleClose(){
+    handleClose() {
       this.$emit("closeDialog1", false);
-      this.goodsForm = {}
+      this.goodsForm = {};
     },
-    handleConfirm(){
+    handleConfirm() {
       $axios
-        .post("/v1/category/save",this.goodsForm)
+        .post("/v1/category/save", this.goodsForm)
         .then(res => {
           this.$emit("closeDialog1", false, res.msg);
         })
@@ -72,5 +77,4 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

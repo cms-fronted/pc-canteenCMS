@@ -46,7 +46,7 @@ import {
   Radio,
   RadioGroup,
   Checkbox,
-  CheckboxGroup,
+  CheckboxGroup
 } from "element-ui";
 Message.install = () => {
   Vue.prototype.$message = Message;

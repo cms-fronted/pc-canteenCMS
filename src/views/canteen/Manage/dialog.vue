@@ -11,8 +11,16 @@
         <el-input v-model="formdata.price"></el-input>
       </el-form-item>
       <el-form-item label="库存">
-        <el-input v-model="formdata.stock" v-if="formdata.stock" :disabled="disabled"></el-input>
-        <el-input v-model="formdata.count" v-else :disabled="disabled"></el-input>
+        <el-input
+          v-model="formdata.stock"
+          v-if="formdata.stock"
+          :disabled="disabled"
+        ></el-input>
+        <el-input
+          v-model="formdata.count"
+          v-else
+          :disabled="disabled"
+        ></el-input>
       </el-form-item>
       <el-form-item label="图片">
         <el-upload
@@ -28,7 +36,7 @@
           <i class="el-icon-plus"></i>
         </el-upload>
         <el-dialog :visible.sync="dialogVisible">
-          <img width="100%" :src="dialogImageUrl" alt/>
+          <img width="100%" :src="dialogImageUrl" alt />
         </el-dialog>
       </el-form-item>
     </el-form>
@@ -68,60 +76,59 @@ export default {
       param: {},
       requiredParam: {},
       fileList: []
-    }
+    };
   },
   methods: {
-    handleClose(){
-      this.$emit('closeDialog',false);
+    handleClose() {
+      this.$emit("closeDialog", false);
       this.formdata = {};
       this.fileList = [];
     },
-    handlePictureCardPreview(file){
+    handlePictureCardPreview(file) {
       this.dialogImageUrl = file.url;
       this.dialogVisible = true;
     },
-    handleRemove(file, fileList){
+    handleRemove(file, fileList) {
       // console.log(file,fileList);
     },
-    handleSuccess(res, file, fileList){
-      if(res.code === 200){
+    handleSuccess(res, file, fileList) {
+      if (res.code === 200) {
         this.formdata.image = res.data.url;
-        console.log(file)
+        console.log(file);
       }
     },
-    handleClick(){
-      if(this.state === 'revise'){
-        this.requiredParam = Object.assign({},this.param, this.formdata);
-        this.$emit('confirm',this.requiredParam);
+    handleClick() {
+      if (this.state === "revise") {
+        this.requiredParam = Object.assign({}, this.param, this.formdata);
+        this.$emit("confirm", this.requiredParam);
         this.formdata = {};
         this.fileList = [];
-      }else if(this.state === 'add'){
-        this.$emit('confirm',this.formdata);
+      } else if (this.state === "add") {
+        this.$emit("confirm", this.formdata);
         this.formdata = {};
       }
     },
-    initImageUrl(){
+    initImageUrl() {
       this.fileList = [];
-      let imgData = Object.assign({},this.formdata);
-      imgData['url'] = imgData['image'];
-      delete imgData['image'];
+      let imgData = Object.assign({}, this.formdata);
+      imgData["url"] = imgData["image"];
+      delete imgData["image"];
       this.fileList.push(imgData);
     }
   },
   watch: {
-    visible(val){
-      this.formdata = Object.assign({},this.formdata, this.editData);
+    visible(val) {
+      this.formdata = Object.assign({}, this.formdata, this.editData);
       this.isOpen = val;
-      if(this.visible && this.state === 'revise'){
+      if (this.visible && this.state === "revise") {
         this.initImageUrl();
       }
     },
-    reivseParam(val){
-      this.param = Object.assign({},this.param, this.reivseParam);
+    reivseParam(val) {
+      this.param = Object.assign({}, this.param, this.reivseParam);
     }
   }
 };
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

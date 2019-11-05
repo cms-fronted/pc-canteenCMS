@@ -1,5 +1,11 @@
 <template>
-  <el-dialog title="菜品管理" :visible.sync="isOpen" class="diaForm" width="40%" @close="handleClose">
+  <el-dialog
+    title="菜品管理"
+    :visible.sync="isOpen"
+    class="diaForm"
+    width="40%"
+    @close="handleClose"
+  >
     <!-- <el-dialog :visible.sync="materialDialogVisible" width="20%" title="添加材料" center append-to-body>
       <el-form ref="materialForm" :model="materialForm" label-width="60px">
         <el-form-item label="名称" prop="name">
@@ -14,7 +20,12 @@
         <el-button type="primary" @click="_addMaterial">确 定</el-button>
       </span>
     </el-dialog>-->
-    <el-form ref="cuisineManageForm" :model="formdata" :rules="rules" label-width="80px">
+    <el-form
+      ref="cuisineManageForm"
+      :model="formdata"
+      :rules="rules"
+      label-width="80px"
+    >
       <el-form-item label="饭堂名称" prop="canteen_id">
         <el-select
           v-model="formdata.canteen_id"
@@ -22,7 +33,12 @@
           style="width:120px"
           @change="getDinnersList"
         >
-          <el-option v-for="item in canteenList" :key="item.id" :value="item.id" :label="item.name"></el-option>
+          <el-option
+            v-for="item in canteenList"
+            :key="item.id"
+            :value="item.id"
+            :label="item.name"
+          ></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="餐次" prop="dinner_id">
@@ -32,11 +48,20 @@
           style="width:120px"
           @change="getCategoryList"
         >
-          <el-option v-for="item in dinnerList" :key="item.id" :value="item.id" :label="item.name"></el-option>
+          <el-option
+            v-for="item in dinnerList"
+            :key="item.id"
+            :value="item.id"
+            :label="item.name"
+          ></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="类型" prop="m_id">
-        <el-select v-model="formdata.m_id" placeholder="请选择" style="width:120px">
+        <el-select
+          v-model="formdata.m_id"
+          placeholder="请选择"
+          style="width:120px"
+        >
           <el-option
             v-for="item in categoryList"
             :key="item.id"
@@ -69,7 +94,7 @@
             :on-remove="handleRemove"
             :on-change="handleChange"
             :on-success="handleSuccess"
-            :class="{hide:hideUpload}"
+            :class="{ hide: hideUpload }"
           >
             <i class="el-icon-plus"></i>
           </el-upload>

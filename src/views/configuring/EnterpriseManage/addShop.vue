@@ -1,6 +1,12 @@
 <template>
   <div>
-    <el-dialog :visible.sync="isOpen" width="40%" @close="closeDialog" center :title="dialogTitle">
+    <el-dialog
+      :visible.sync="isOpen"
+      width="40%"
+      @close="closeDialog"
+      center
+      :title="dialogTitle"
+    >
       <el-dialog
         :visible.sync="addMachineVisible"
         width="40%"
@@ -24,7 +30,9 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="closeMachineDialog">取 消</el-button>
-          <el-button type="primary" @click="_submitMachineInfo">确 定</el-button>
+          <el-button type="primary" @click="_submitMachineInfo"
+            >确 定</el-button
+          >
         </div>
       </el-dialog>
       <el-card body-style="paddingBottom: 5px">
@@ -54,7 +62,8 @@
               @click="addShop"
               v-if="!isEdit"
               :disabled="!shop_name"
-            >新增小卖部</el-button>
+              >新增小卖部</el-button
+            >
             <el-button
               style="marginLeft: 5px"
               type="primary"
@@ -62,14 +71,20 @@
               @click="editShop"
               :disabled="!shop_name"
               v-else
-            >编辑小卖部</el-button>
+              >编辑小卖部</el-button
+            >
           </div>
         </div>
       </el-card>
       <el-card class="box-card" body-style="paddingBottom: 5px">
         <div slot="header" class="clearfix">
           <span>硬件设置</span>
-          <el-button style="float: right; padding: 3px 0" type="text" @click="addNewMachine">添加硬件</el-button>
+          <el-button
+            style="float: right; padding: 3px 0"
+            type="text"
+            @click="addNewMachine"
+            >添加硬件</el-button
+          >
         </div>
         <el-table :data="machineTable" style="width:100%" size="mini">
           <el-table-column label="编号" prop="number"></el-table-column>
@@ -78,12 +93,17 @@
           <!-- <el-table-column label="密码" prop="pwd"></el-table-column> -->
           <el-table-column label="状态">
             <template slot-scope="scoped">
-              <span>{{scoped.row.state===1?"正常":"异常"}}</span>
+              <span>{{ scoped.row.state === 1 ? "正常" : "异常" }}</span>
             </template>
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scoped">
-              <el-button size="small" type="text" @click="_editMachine(scoped.row)">编辑</el-button>
+              <el-button
+                size="small"
+                type="text"
+                @click="_editMachine(scoped.row)"
+                >编辑</el-button
+              >
               <!-- <el-button size="small" type="text" @click="_deleteMachine(scoped.row)">删除</el-button> -->
             </template>
           </el-table-column>

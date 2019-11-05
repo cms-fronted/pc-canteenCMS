@@ -1,7 +1,7 @@
 <template>
   <el-card class="box-card">
     <div slot="header" class="clearfix">
-      <span>{{title}}</span>
+      <span>{{ title }}</span>
     </div>
     <div>PC端</div>
     <div v-for="item in pcModules" :key="item.create_time">
@@ -9,12 +9,13 @@
         :indeterminate="isIndeterminate[item.id]"
         :disabled="disabled"
         v-model="checkAll[item.id]"
-        @change="checked => handleCheckAllChange(checked,item.id)"
-      >{{item.name}}</el-checkbox>
+        @change="checked => handleCheckAllChange(checked, item.id)"
+        >{{ item.name }}</el-checkbox
+      >
       <el-checkbox-group
         style="padding: 0 20px"
         :disabled="disabled"
-        @change="checked => handleCheckedModulesChange(checked,item.id)"
+        @change="checked => handleCheckedModulesChange(checked, item.id)"
         v-model="checkedModules[item.id]"
       >
         <el-checkbox
@@ -22,7 +23,8 @@
           v-for="items in item.items"
           :label="items.id"
           :key="items.create_time"
-        >{{items.name}}</el-checkbox>
+          >{{ items.name }}</el-checkbox
+        >
       </el-checkbox-group>
     </div>
     <div>微信端</div>
@@ -31,8 +33,9 @@
         :indeterminate="isIndeterminate[item.id]"
         v-model="checkAll[item.id]"
         :disabled="disabled"
-        @change="checked => handleCheckAllChange(checked,item.id)"
-      >{{item.name}}</el-checkbox>
+        @change="checked => handleCheckAllChange(checked, item.id)"
+        >{{ item.name }}</el-checkbox
+      >
       <!-- <el-checkbox-group
           style="padding: 0 20px"
           @change="checked => handleCheckedModulesChange(checked,item.id)"

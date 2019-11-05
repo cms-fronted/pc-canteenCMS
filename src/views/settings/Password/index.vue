@@ -12,14 +12,22 @@
             label-width="60px"
           >
             <el-form-item label="旧密码" prop="old">
-              <el-input v-model="passwordForm.oldPassword" show-password></el-input>
+              <el-input
+                v-model="passwordForm.oldPassword"
+                show-password
+              ></el-input>
             </el-form-item>
             <el-form-item label="新密码" prop="new">
-              <el-input v-model="passwordForm.newPassword" show-password></el-input>
+              <el-input
+                v-model="passwordForm.newPassword"
+                show-password
+              ></el-input>
             </el-form-item>
           </el-form>
           <div class="btn">
-            <el-button type="primary" :disabled="isDisabled" @click="modifyPsw">确认</el-button>
+            <el-button type="primary" :disabled="isDisabled" @click="modifyPsw"
+              >确认</el-button
+            >
           </div>
         </el-card>
       </div>

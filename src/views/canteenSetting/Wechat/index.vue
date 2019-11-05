@@ -6,13 +6,17 @@
       <div class="main">
         <div class="main-header">
           <span class="content-header">公司：</span>
-          <el-select
-            v-model="company_id"
-            placeholder="请选择"
-          >
-            <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          <el-select v-model="company_id" placeholder="请选择">
+            <el-option
+              v-for="item in companyList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
           </el-select>
-          <el-button type="primary" @click="fetchTableList">查询商品类型</el-button>
+          <el-button type="primary" @click="fetchTableList"
+            >查询商品类型</el-button
+          >
           <el-button type="primary" @click="addGoods">增加商品类型</el-button>
         </div>
         <div class="main-content">
@@ -21,17 +25,33 @@
             <el-table-column label="商品类型" prop="name"></el-table-column>
             <el-table-column label="操作">
               <template slot-scope="scope">
-                <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>
-                <el-button size="mini" type="danger" @click="handleDelete(scope.row)">Delete</el-button>
+                <el-button size="mini" @click="handleEdit(scope.row)"
+                  >编辑</el-button
+                >
+                <el-button
+                  size="mini"
+                  type="danger"
+                  @click="handleDelete(scope.row)"
+                  >Delete</el-button
+                >
               </template>
             </el-table-column>
           </el-table>
-          <pagination v-show="total > 10" :total="total" :page.sync="page" @pagination="getList"></pagination>
+          <pagination
+            v-show="total > 10"
+            :total="total"
+            :page.sync="page"
+            @pagination="getList"
+          ></pagination>
         </div>
       </div>
     </div>
     <!-- 增加商品类型弹窗  -->
-    <add-dialog :visible="AddVisible" @closeDialog1="closeDialog1" :editData="goodsForm"></add-dialog>
+    <add-dialog
+      :visible="AddVisible"
+      @closeDialog1="closeDialog1"
+      :editData="goodsForm"
+    ></add-dialog>
     <!-- 更改商品类型弹窗 -->
     <revise-dialog
       :visible="reviseVisible"
@@ -164,15 +184,16 @@ export default {
 </script>
 
 <style lang="scss" scpoed>
-  .main{
-    .main-content{
-      .el-table{
-        th,td{
-          text-align: center;
-        }
+.main {
+  .main-content {
+    .el-table {
+      th,
+      td {
+        text-align: center;
       }
     }
   }
+}
 .el-dialog__wrapper {
   .el-dialog {
     width: 30%;
