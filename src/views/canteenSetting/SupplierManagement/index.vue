@@ -5,15 +5,16 @@
       <el-divider></el-divider>
       <div class="main">
         <div class="main-header">
-          <span class="content-header">公司：</span>
+          <span class="content-header" v-if="companiesVisible">公司：</span>
           <el-select
             v-model="company_id"
             placeholder="请选择"
+            v-if="companiesVisible"
           >
             <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
           </el-select>
           <el-button type="primary" @click="fetchSupplierList">查询供应商</el-button>
-          <el-button type="primary" @click="showAddSupplier">增加供应商</el-button>
+          <el-button type="primary" @click="handleClick()">增加供应商</el-button>
         </div>
         <div class="main-content">
           <el-table style="width:100%" border :data="supplierList">
@@ -22,8 +23,8 @@
             <el-table-column label="账号" prop="account"></el-table-column>
             <el-table-column label="操作">
               <template slot-scope="scope">
-                <el-button size="mini" @click="handleEdit(scope.row)">编辑</el-button>
                 <el-button size="mini" type="danger" @click="handleDelete(scope.row)">Delete</el-button>
+                <el-button size="mini" @click="handleEdit(scope.row)">重置密码</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -31,14 +32,18 @@
         </div>
         <add-dialog 
           :visible="addVisible" 
-          @closeDialog1="closeDialog1" 
-          :editData="addSupplierForm"
+          @close="closeDialog" 
+          :editData="editFormdata"
+          :companiesVisible="companiesVisible"
         ></add-dialog>
-        <revise-dialog 
-          :visible="reviseVisible" 
-          @closeDialog2="closeDialog2" 
-          :editData="reviseSupplierForm"
-        ></revise-dialog>
+        <el-dialog title="重置密码" :visible.sync="resetpwdVisible" @close="handleClose">
+          <span class="content-header">密码：</span>
+          <el-input placeholder="请输入" type="password" v-model="pwd" style="width: 320px;"></el-input>
+          <span slot="footer" class="dialog-footer">
+            <el-button @click="handleClose">取 消</el-button>
+            <el-button type="primary" @click="confirmReset">确 定</el-button>
+          </span>
+        </el-dialog>
       </div>
     </div>
   </div>
@@ -46,12 +51,13 @@
 
 <script>
 import $axios from "@/api/index";
-import AddDialog from "./dialog1";
-import ReviseDialog from "./dialog2";
-import Pagination from '@/components/Pagination'
+import AddDialog from "./dialog";
+import Pagination from '@/components/Pagination';
+import store from '@/store';
 export default {
   data(){
     return {
+      grade: store.getters.grade,
       company_id: "",
       companyList: [],
       supplierList: [],
@@ -61,22 +67,29 @@ export default {
         "account": "",
         "pwd": ""
       },
-      addSupplierForm: {
+      addVisible: false,
+      reviseVisible: false,
+      currentSupplierId: "",
+      page: 1,
+      total: 0,
+      editFormdata: {
         "c_id": "",
         "name": "",
         "account": "",
         "pwd": ""
       },
-      addVisible: false,
-      reviseVisible: false,
-      currentSupplierId: "",
-      page: 1,
-      total: 0
+      pwd: "",
+      resetpwdVisible: false
     }
   },
-  components: { AddDialog,ReviseDialog,Pagination },
+  components: { AddDialog,Pagination },
   created(){
     this.fetchCompanyList();
+  },
+  computed: {
+    companiesVisible(){
+      return this.grade !== 3;
+    }
   },
   methods:{
     fetchCompanyList(){
@@ -88,22 +101,31 @@ export default {
         .catch(err => console.log(err));
     },
     fetchSupplierList(){
-      $axios
-        .get(`/v1/suppliers?c_id=${this.company_id}&page=${this.page}&size=10`)
-        .then(res => {
-          this.supplierList = Array.from(res.data.data);
-          this.total = res.data.total;
-        })
-        .catch(err => console.log(err));
+      if(this.companiesVisible){
+        $axios
+          .get(`/v1/suppliers?c_id=${this.company_id}&page=${this.page}&size=10`)
+          .then(res => {
+            this.supplierList = Array.from(res.data.data);
+            this.total = res.data.total;
+          })
+          .catch(err => console.log(err));
+      }else{
+        $axios
+          .get(`/v1/suppliers?page=${this.page}&size=10`)
+          .then(res => {
+            this.supplierList = Array.from(res.data.data);
+            this.total = res.data.total;
+          })
+          .catch(err => console.log(err));
+      }
     },
     showAddSupplier(){
       this.addVisible = true;
     },
     handleEdit(val){
-      this.reviseVisible = true;
-      this.reviseSupplierForm.id = val.id;
-      this.reviseSupplierForm.name = val.name;
-      this.reviseSupplierForm.account = val.account;
+      this.resetpwdVisible = true;
+      let {id,name,account} = val;
+      this.reviseSupplierForm = {id,name,account};
     },
     handleDelete(val){
       this.currentSupplierId = val.id;
@@ -137,27 +159,8 @@ export default {
         })
       }
     },
-    closeDialog1(val,msg){
-      this.addSupplierForm = {
-        "c_id": "",
-        "name": "",
-        "account": "",
-        "pwd": ""
-      }
+    closeDialog(val,msg){
       this.addVisible = val;
-      if(msg === 'ok'){
-        this.fetchSupplierList();
-        this.sendMessage(msg);
-      }
-    },
-    closeDialog2(val,msg){
-      this.reviseSupplierForm = {
-        "id": "",
-        "name": "",
-        "account": "",
-        "pwd": ""
-      }
-      this.reviseVisible = val;
       if(msg === 'ok'){
         this.fetchSupplierList();
         this.sendMessage(msg);
@@ -166,6 +169,24 @@ export default {
     getList(val){
       this.page = val;
       this.fetchSupplierList();
+    },
+    handleClick(row = {}){
+      this.addVisible = true;
+    },
+    handleClose(){
+      this.pwd = "";
+      this.resetpwdVisible = false;
+    },
+    confirmReset(){
+      this.reviseSupplierForm.pwd = this.pwd;
+      $axios
+        .post("/v1/supplier/update",this.reviseSupplierForm)
+        .then(res => {
+          this.resetpwdVisible = false;
+          this.pwd = "";
+          this.sendMessage(res.msg);
+        })
+        .catch(err => console.log(err));
     }
   }
 }
