@@ -20,7 +20,7 @@
                 type="datetime"
               ></el-date-picker>
             </el-form-item>
-            <!-- <el-form-item label="公司">
+            <el-form-item label="公司">
               <el-select v-model="formdata.company_ids" @change="getList" placeholder="请选择公司">
                 <el-option
                   v-for="item in companiesList"
@@ -29,7 +29,7 @@
                   :value="item.id"
                 ></el-option>
               </el-select>
-            </el-form-item> -->
+            </el-form-item>
             <el-form-item label="消费地点">
               <el-select v-model="formdata.canteen_id" @change="getDinnersList" placeholder="请选择饭堂">
                 <el-option
@@ -78,7 +78,7 @@
           <el-table-column prop="ordering_date" label="订餐日期"></el-table-column>
           <el-table-column prop="canteen" label="消费地点"></el-table-column>
           <el-table-column prop="department" label="部门"></el-table-column>
-          <el-table-column prop="name" label="姓名"></el-table-column>
+          <el-table-column prop="username" label="姓名"></el-table-column>
           <el-table-column prop="dinner" label="餐次"></el-table-column>
         </el-table>
         <pagination v-if="!tableData" :total="total" :page="current_page" @pagination="queryList"></pagination>
@@ -131,7 +131,6 @@ export default {
   },
   watch: {
     isAble(val) {
-      console.log(val);
       this.isDisabled = !val;
     }
   },
@@ -202,7 +201,6 @@ export default {
         canteen_id,
         department_id
       } = this.formdata;
-      console.log(this.formdata);
       $axios
         .get("/v1/order/orderStatistic/detail", {
           name: name,
