@@ -22,7 +22,7 @@
                 type="datetime"
               ></el-date-picker>
             </el-form-item>
-            <el-form-item label="公司">
+            <!-- <el-form-item label="公司">
               <el-select v-model="formdata.company_ids" @change="getList" placeholder="请选择公司">
                 <el-option
                   v-for="item in companiesList"
@@ -31,7 +31,7 @@
                   :value="item.id"
                 ></el-option>
               </el-select>
-            </el-form-item>
+            </el-form-item> -->
             <el-form-item label="消费地点">
               <el-select v-model="formdata.canteen_id" @change="getDinnersList" placeholder="请选择饭堂">
                 <el-option

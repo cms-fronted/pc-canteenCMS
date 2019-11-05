@@ -102,7 +102,7 @@ export default {
         username: "",
         page: 1,
         size: 10,
-        company_ids: "",
+        // company_ids: "",
       },
       companiesList: [],
       adminList: [
@@ -141,7 +141,7 @@ export default {
   },
   created(){
     this.fetchAdminList();
-    this.fetchCompanyList();
+    this.getCompanies();
   },
   computed: {
     companiesVisible(){
@@ -150,11 +150,13 @@ export default {
   },
   components:{Pagination},
   methods:{
-    fetchCompanyList(){
+    getCompanies() {
+      console.log('hi')
       $axios
         .get("/v1/admin/companies")
         .then(res => {
-          console.log('hi')
+          console.log('请求公司列表')
+          console.log(res)
           let arr = res.data;
           let allCompanies = [];
           let companiesList = flatten(arr);
@@ -168,7 +170,6 @@ export default {
             id: allCompanies
           });
           this.companiesList = companiesList;
-          console.log(this.companiesList)
         })
         .catch(err => console.log(err));
     },
@@ -176,9 +177,11 @@ export default {
       /* console.log("请求接口：")
       console.log("/v1/wallet/recharge/admins?module_id=1") */
       $axios
-        .get("/v1/wallet/recharge/admins?module_id=1")
+        .get("/v1/wallet/recharge/admins?module_id=13")
         .then(res => {
+          console.log('/v1/wallet/recharge/admins?module_id=13')
           console.log(res)
+          this.adminList = res.data;
         })
         .catch(err => console.log(err));
     },
@@ -196,8 +199,9 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    getList(){
-
+    getList(val){
+      this.current_page = val;
+      this.fetchTableList();
     }
   }
 }

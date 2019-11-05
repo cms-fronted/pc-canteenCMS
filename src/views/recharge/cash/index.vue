@@ -38,6 +38,7 @@
               <el-table-column label="姓名" prop="username"></el-table-column>
               <el-table-column label="手机号码" prop="phone"></el-table-column>
             </el-table>
+            <pagination v-show="total > 10" :total="total" :page.sync="current_page" @pagination="getList"></pagination>
           </div>
         </div>
       </div>
@@ -101,11 +102,14 @@ export default {
       ],
       dialogFormVisible: false,
       limit: 1,
+      total: 0,
+      current_page: 1,
     }
   },
   created(){
     this.fetchDepartmentList();
   },
+  components:{Pagination},
   methods: {
     sendMessage(msg){
       if(msg === 'ok'){
@@ -197,6 +201,10 @@ export default {
     handleClose(){
       this.dialogFormVisible = false;
       // this.$refs.upload.clearFiles();
+    },
+    getList(val){
+      this.current_page = val;
+      this.fetchTableList();
     }
   }
 }
