@@ -97,14 +97,14 @@ export const currencyRoutes = [
           title: "消费明细"
         }
       },
-      {
-        path: "person-summary",
-        name: "Settlement-personSummary",
-        component: () => import("@/views/settlement/PersonSummary"),
-        meta: {
-          title: "个人消费汇总"
-        }
-      }
+      // {
+      //   path: "person-summary",
+      //   name: "Settlement-personSummary",
+      //   component: () => import("@/views/settlement/PersonSummary"),
+      //   meta: {
+      //     title: "个人消费汇总"
+      //   }
+      // }
     ]
   },
   {
@@ -214,9 +214,17 @@ export const currencyRoutes = [
         }
       },
       {
-        path: "order",
+        path: "good-search",
+        name: "Canteen-search",
+        component: () => import("@/views/canteen/GoodSearch"),
+        meta: {
+          title: "商品查询"
+        }
+      },
+      {
+        path: "order-detail-p",
         name: "Canteen-order",
-        component: () => import("@/views/canteen/Order"),
+        component: () => import("@/views/canteen/OrderDetailP"),
         meta: {
           title: "订单查询"
         }
@@ -230,9 +238,9 @@ export const currencyRoutes = [
         }
       },
       {
-        path: "statistics",
+        path: "statistics-p",
         name: "Canteen-statistics",
-        component: () => import("@/views/canteen/Statistics"),
+        component: () => import("@/views/canteen/StatisticsP"),
         meta: {
           title: "统计报表"
         }

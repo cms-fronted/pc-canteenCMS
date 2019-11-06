@@ -33,29 +33,7 @@
                   ></el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="部门" prop="department_id">
-                <el-select v-model="formdata.department_id" placeholder="请选择部门">
-                  <el-option
-                    v-for="item in departmentOptions"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id"
-                  ></el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item label="姓名">
-                <el-input placeholder="请输入姓名" style="80px" v-model="formdata.name"></el-input>
-              </el-form-item>
-              <el-form-item label="餐次">
-                <el-select v-model="formdata.dinner_id" placeholder="请选择餐次">
-                  <el-option
-                    v-for="item in dinnersOptions"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id"
-                  ></el-option>
-                </el-select>
-              </el-form-item>
+
               <el-form-item label="消费地点" label-width="80px">
                 <el-select
                   v-model="formdata.canteen_id"
@@ -70,6 +48,29 @@
                   ></el-option>
                 </el-select>
               </el-form-item>
+              <el-form-item label="餐次">
+                <el-select v-model="formdata.dinner_id" placeholder="请选择餐次">
+                  <el-option
+                    v-for="item in dinnersOptions"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="部门" prop="department_id">
+                <el-select v-model="formdata.department_id" placeholder="请选择部门">
+                  <el-option
+                    v-for="item in departmentOptions"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  ></el-option>
+                </el-select>
+              </el-form-item>
+              <el-form-item label="姓名">
+                <el-input placeholder="请输入姓名" style="80px" v-model="formdata.name"></el-input>
+              </el-form-item>
               <el-form-item label="手机号码" label-width="80px">
                 <el-input placeholder="请输入手机号码" v-model="formdata.phone"></el-input>
               </el-form-item>
@@ -83,7 +84,7 @@
             </el-form>
           </div>
           <div class="btn-area">
-            <el-button type="primary" @click="queryList" :disabled="isDisabled">查询</el-button>
+            <el-button type="primary" @click="queryList(1)" :disabled="isDisabled">查询</el-button>
             <el-button type="primary">导出</el-button>
           </div>
         </div>
@@ -101,7 +102,12 @@
         <el-table-column prop="deliver_way" label="配送方式"></el-table-column>
         <el-table-column prop="note" label="备注" width="300"></el-table-column>
       </el-table>
-      <pagination v-if="!tableData" :total="total" :page="current_page" @pagination="queryList"></pagination>
+      <pagination
+        :total="total"
+        :pageSize="size"
+        :currentPage="current_page"
+        @pagination="queryList"
+      ></pagination>
     </div>
   </div>
 </template>
@@ -182,9 +188,10 @@ export default {
         }
       }
     },
-    async queryList() {
+    async queryList(page) {
+      page = page || 1;
       const res = await $axios.get(
-        `/v1/order/orderSettlement?page=${this.current_page}&size=${this.size}`,
+        `/v1/order/orderSettlement?page=${page}&size=${this.size}`,
         this.formdata
       );
       if (res.msg === "ok") {
@@ -221,10 +228,10 @@ export default {
       justify-content: space-between;
       flex-wrap: wrap;
       .el-input {
-        width: 140px;
+        width: 160px;
       }
       .el-select {
-        width: 140px;
+        width: 160px;
       }
     }
   }

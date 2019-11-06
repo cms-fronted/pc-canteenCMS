@@ -106,9 +106,8 @@
           <el-table-column prop="dinner" label="餐次"></el-table-column>
         </el-table>
         <pagination
-          v-if="!tableData"
           :total="total"
-          :page="current_page"
+          :currentPage="current_page"
           @pagination="queryList"
         ></pagination>
       </div>

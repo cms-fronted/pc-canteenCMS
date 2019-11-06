@@ -8,24 +8,13 @@
           <div class="select-title">
             <el-form :model="queryform" :inline="true">
               <el-form-item label="姓名：">
-                <el-input
-                  placeholder="请输入姓名"
-                  v-model="queryform.name"
-                  style="width:217px"
-                ></el-input>
+                <el-input placeholder="请输入姓名" v-model="queryform.name" style="width:217px"></el-input>
               </el-form-item>
               <el-form-item label="手机号码：">
-                <el-input
-                  placeholder="请输入手机号码"
-                  v-model="queryform.phone"
-                  style="width:217px"
-                ></el-input>
+                <el-input placeholder="请输入手机号码" v-model="queryform.phone" style="width:217px"></el-input>
               </el-form-item>
               <el-form-item label="所属企业：">
-                <el-select
-                  v-model="queryform.company_id"
-                  placeholder="请选择企业"
-                >
+                <el-select v-model="queryform.company_id" placeholder="请选择企业">
                   <el-option
                     v-for="item in queryform.companyList"
                     :key="item.value"
@@ -35,10 +24,7 @@
                 </el-select>
               </el-form-item>
               <el-form-item label="部门：">
-                <el-select
-                  v-model="queryform.department_id"
-                  placeholder="请选择部门"
-                >
+                <el-select v-model="queryform.department_id" placeholder="请选择部门">
                   <el-option
                     v-for="item in queryform.departmentList"
                     :key="item.value"
@@ -48,24 +34,13 @@
                 </el-select>
               </el-form-item>
               <el-form-item label="开始时间：">
-                <el-date-picker
-                  v-model="queryform.begin_time"
-                  style="width:217px"
-                  type="datetime"
-                ></el-date-picker>
+                <el-date-picker v-model="queryform.begin_time" style="width:217px" type="datetime"></el-date-picker>
               </el-form-item>
               <el-form-item label="结束时间：">
-                <el-date-picker
-                  v-model="queryform.end_time"
-                  style="width:217px"
-                  type="datetime"
-                ></el-date-picker>
+                <el-date-picker v-model="queryform.end_time" style="width:217px" type="datetime"></el-date-picker>
               </el-form-item>
               <el-form-item label="状态：">
-                <el-select
-                  v-model="queryform.goodsState"
-                  placeholder="请选择状态"
-                >
+                <el-select v-model="queryform.goodsState" placeholder="请选择状态">
                   <el-option
                     v-for="item in queryform.stateList"
                     :key="item.value"
@@ -85,10 +60,7 @@
                 </el-select>
               </el-form-item>
               <el-form-item label="商品名称：">
-                <el-select
-                  v-model="queryform.goodsName"
-                  placeholder="请选择商品名称"
-                >
+                <el-select v-model="queryform.goodsName" placeholder="请选择商品名称">
                   <el-option
                     v-for="item in queryform.goodList"
                     :key="item.value"
@@ -107,27 +79,15 @@
         <div class="main-content">
           <el-table style="width:100%" :data="tableData" border>
             <el-table-column label="序号" prop="ordinal"></el-table-column>
-            <el-table-column
-              label="下单时间"
-              prop="begin_time"
-            ></el-table-column>
+            <el-table-column label="下单时间" prop="begin_time"></el-table-column>
             <el-table-column label="结束时间" prop="end_time"></el-table-column>
             <el-table-column label="姓名" prop="name"></el-table-column>
             <el-table-column label="手机号码" prop="phone"></el-table-column>
             <el-table-column label="类型" prop="goodsType"></el-table-column>
-            <el-table-column
-              label="商品名称"
-              prop="goodsName"
-            ></el-table-column>
+            <el-table-column label="商品名称" prop="goodsName"></el-table-column>
             <el-table-column label="单位" prop="goodsUnit"></el-table-column>
-            <el-table-column
-              label="商品数量"
-              prop="goodsStock"
-            ></el-table-column>
-            <el-table-column
-              label="商品金额(元)"
-              prop="goodsPrice"
-            ></el-table-column>
+            <el-table-column label="商品数量" prop="goodsStock"></el-table-column>
+            <el-table-column label="商品金额(元)" prop="goodsPrice"></el-table-column>
             <el-table-column label="状态" prop="goodsState"></el-table-column>
             <el-table-column label="地址" prop="address"></el-table-column>
             <!-- 用户打印的话，发送请求到后台，后台返回一个地址，然后进行下载 -->
@@ -137,8 +97,7 @@
                   size="mini"
                   @click="handleEdit(props.$index, props.row)"
                   v-if="props.row.print"
-                  >打印</el-button
-                >
+                >打印</el-button>
                 <span v-else>/</span>
               </template>
             </el-table-column>

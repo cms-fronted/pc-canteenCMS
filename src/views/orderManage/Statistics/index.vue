@@ -63,6 +63,12 @@
             <el-table-column label="餐次" prop="dinner"></el-table-column>
             <el-table-column label="消费人数" prop="count"></el-table-column>
           </el-table>
+          <pagination
+            @pagination="queryList"
+            :total="total"
+            :pageSize="size"
+            :currentPage="current_page"
+          ></pagination>
         </div>
       </div>
     </div>
@@ -166,7 +172,6 @@ export default {
         this.rowspan(2, "canteen_name");
         this.rowspan(3, "category_name");
       }
-      console.log(res);
     },
     rowspan(idx, prop) {
       this.spanArr[idx] = [];
