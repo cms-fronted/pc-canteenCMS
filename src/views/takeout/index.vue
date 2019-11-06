@@ -14,7 +14,7 @@
               style="width:140px"
             ></el-date-picker>
           </el-form-item>
-          <el-form-item label="公司">
+          <el-form-item label="公司" v-if="companiesVisible">
             <el-select
               v-model="queryForm.company_ids"
               @change="getCanteenOptions"
@@ -145,9 +145,11 @@
 import $axios from "@/api/index";
 import Pagination from "@/components/Pagination";
 import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
+import store from "@/store";
 export default {
   data() {
     return {
+      grade: store.getters.grade,
       detailDialogVisible: false,
       queryForm: {
         ordering_date: "",
@@ -203,7 +205,10 @@ export default {
   computed: {
     isAble() {
       return !!this.queryForm.ordering_date && !!this.queryForm.company_ids;
-    }
+    },
+    companiesVisible() {
+      return this.grade !== 3;
+    },
   },
   watch: {
     isAble(val) {
@@ -211,7 +216,11 @@ export default {
     }
   },
   created() {
-    this.getCompanyOptions();
+    if(this.companiesVisible){
+      this.getCompanyOptions();
+    }else{
+      this.getCanteenOptions();
+    }
   },
   methods: {
     async getCompanyOptions() {
@@ -225,12 +234,17 @@ export default {
       this.dinnersOptions = [];
       this.queryForm.dinner_id = null;
       this.queryForm.canteen_id = null;
-      if (!Number(company_ids)) return;
-      const res = await $axios.get(
-        `/v1/company/consumptionLocation?company_id=${company_ids}`
-      );
+      let res;
+      if (company_ids) {
+        if (!Number(company_ids)) return;
+        res = await $axios.get(
+          `/v1/canteens?company_id=${company_ids}`
+        );
+      }else{
+        res = await $axios.get("/v1/managerCanteens");
+      }
       if (res.msg === "ok") {
-        this.canteenOptions = unshiftAllOptions(Array.from(res.data.canteen)); //给数组添加一个全部option
+        this.canteenOptions = unshiftAllOptions(Array.from(res.data));
       }
     },
     async getDinnersOptions(canteen_id) {
