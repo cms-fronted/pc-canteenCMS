@@ -226,7 +226,7 @@ export const currencyRoutes = [
         name: "Canteen-order",
         component: () => import("@/views/canteen/OrderDetailP"),
         meta: {
-          title: "订单查询"
+          title: "订单查询(供)"
         }
       },
       {
@@ -242,7 +242,7 @@ export const currencyRoutes = [
         name: "Canteen-statistics",
         component: () => import("@/views/canteen/StatisticsP"),
         meta: {
-          title: "统计报表"
+          title: "统计报表(供)"
         }
       }
     ]

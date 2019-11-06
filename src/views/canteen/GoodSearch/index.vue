@@ -6,10 +6,24 @@
       <div class="main-header">
         <el-form :inline="true" ref="queryForm" :model="queryForm">
           <el-form-item label="供应商">
-            <el-select v-model="queryForm.supplier_id"></el-select>
+            <el-select v-model="queryForm.supplier_id">
+              <el-option
+                v-for="item in supplierOptions"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id"
+              ></el-option>
+            </el-select>
           </el-form-item>
           <el-form-item label="类型">
-            <el-select v-model="queryForm.category_id"></el-select>
+            <el-select v-model="queryForm.category_id">
+              <el-option
+                v-for="item in categoryOptions"
+                :label="item.name"
+                :key="item.id"
+                :value="item.id"
+              ></el-option>
+            </el-select>
           </el-form-item>
           <el-button type="primary" @click="queryList(1)">查询</el-button>
         </el-form>
