@@ -73,7 +73,6 @@ export default {
   data() {
     return {
       grade: store.getters.grade,
-      grade: 2,
       formdata: {
         department_id: "",
         user: "",

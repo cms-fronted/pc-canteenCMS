@@ -22,7 +22,7 @@
                 type="datetime"
               ></el-date-picker>
             </el-form-item>
-            <el-form-item label="公司">
+            <el-form-item label="公司" v-if="companiesVisible">
               <el-select v-model="formdata.company_ids" @change="getList" placeholder="请选择公司">
                 <el-option
                   v-for="item in companiesList"
@@ -42,7 +42,7 @@
                 ></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="部门">
+            <el-form-item label="部门" v-if="companiesVisible">
               <el-select v-model="formdata.department_id" placeholder="请选择部门">
                 <el-option
                   v-for="item in departmentList"
@@ -53,7 +53,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="餐次">
-              <el-select v-model="formdata.dinner_id" placeholder="请选择部门">
+              <el-select v-model="formdata.dinner_id" placeholder="请选择餐次">
                 <el-option
                   v-for="item in dinnersList"
                   :key="item.id"
@@ -133,6 +133,7 @@
 import $axios from "@/api/index";
 import Pagination from "@/components/Pagination";
 import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
+import store from '@/store';
 const consumption_options = [
   { id: 0, name: "全部" },
   { id: 1, name: "订餐就餐" },
@@ -144,6 +145,7 @@ export default {
   components: { Pagination },
   data() {
     return {
+      grade: store.getters.grade,
       company_id: "",
       canteen_id: "",
       formdata: {},
@@ -167,6 +169,9 @@ export default {
         !!this.formdata.time_begin &&
         !!this.formdata.company_ids
       );
+    },
+    companiesVisible(){
+      return this.grade !== 3;
     }
   },
   watch: {
@@ -175,7 +180,12 @@ export default {
     }
   },
   created() {
-    this.getCompanies();
+    if(this.companiesVisible){
+      this.getCompanies();
+    }else{
+      this.getLocationList();
+    }
+    // this.getCompanies();
     this.getRoleType();
   },
   methods: {
@@ -231,9 +241,16 @@ export default {
     getLocationList(company_id) {
       if (company_id) {
         $axios
-          .get(`/v1/company/consumptionLocation?company_id=${company_id}`)
+          .get(`/v1/canteens?company_id=${company_id}`)
           .then(res => {
-            this.locationList = unshiftAllOptions(Array.from(res.data.canteen));
+            this.locationList = unshiftAllOptions(Array.from(res.data));
+          })
+          .catch(err => console.log(err));
+      }else{
+        $axios
+          .get("/v1/managerCanteens")
+          .then(res => {
+            this.locationList = unshiftAllOptions(Array.from(res.data));
           })
           .catch(err => console.log(err));
       }
