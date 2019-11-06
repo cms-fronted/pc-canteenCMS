@@ -15,6 +15,7 @@
           <el-button type="primary" @click="recharge">充值</el-button>
           <el-button type="primary" @click="batchRecharge">批量充值</el-button>
         </div>
+        <div class="total" v-show="total > 0"><span>共有 <strong>{{total}}</strong> 条记录</span></div>
         <div class="main-content clearfix">
           <div class="department-tree">
             <el-tree
@@ -215,6 +216,14 @@ export default {
     content: "";
     display: block;
     clear: both;
+  }
+  .main {
+    .total{
+      display: flex;
+      justify-content: flex-end;
+      font-size: 14px;
+      margin-top: 10px;
+    }
   }
   .main-header{
     .content-header{
