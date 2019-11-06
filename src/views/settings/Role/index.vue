@@ -10,7 +10,7 @@
           :inline="true"
           label-width="60px"
         >
-          <el-form-item label="公司" prop="c_name">
+          <el-form-item label="公司" prop="c_name" v-if="companiesVisible">
             <el-select v-model="queryForm.c_name">
               <el-option
                 v-for="item in companyOptions"
@@ -183,10 +183,13 @@ import $axios from "@/api/index";
 import ShowModules from "@/components/ShowModules";
 import Pagination from "@/components/Pagination";
 import { flatten, treeToArr } from "@/utils/flatternArr";
+import store from "@/store";
 export default {
   components: { Pagination, ShowModules },
   data() {
     return {
+      grade: store.getters.grade,
+      grade: 3,
       modulesDialogType: "role",
       isEdit: false,
       newRoleDialogVisible: false,
@@ -208,6 +211,11 @@ export default {
   created() {
     this.getCompanies();
     this.fetchList();
+  },
+  computed: {
+    companiesVisible() {
+      return this.grade !== 3;
+    },
   },
   methods: {
     async getCompanies() {

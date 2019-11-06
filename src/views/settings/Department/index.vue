@@ -5,7 +5,7 @@
     <div class="main">
       <div class="main-header">
         <el-form :inline="true">
-          <el-form-item label="公司">
+          <el-form-item label="公司" v-if="companiesVisible">
             <el-select v-model="queryForm.c_id" @change="selectCompany">
               <el-option
                 v-for="item in companyOptions"
@@ -301,6 +301,7 @@ export default {
       header: {
         token: store.getters.token
       },
+      grade: store.getters.grade,
       d_id: "", //该页面全局部门id
       c_id: "", //该页面全局企业id
       addStaffVisible: false,
@@ -443,7 +444,10 @@ export default {
         val = this.validateNumber(val, "minute");
         this.QRForm.minute = val;
       }
-    }
+    },
+    companiesVisible() {
+      return this.grade !== 3;
+    },
   },
   created() {
     this.fetchDepartmentTreeData();
