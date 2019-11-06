@@ -159,7 +159,7 @@ export default {
         .post("/v1/food/save", this.formdata)
         .then(res => {
           this.$message.success("操作成功！");
-          this.$emit("updateList")
+          this.$emit("updateList");
           this.handleClose();
         })
         .catch(err => console.log(err));
@@ -180,6 +180,7 @@ export default {
         .catch(err => console.log(err));
     },
     getCategoryList(dinner_id) {
+      this.formdata.m_id = "";
       $axios
         .get(`/v1/menus/dinner?dinner_id=${dinner_id}`)
         .then(res => (this.categoryList = Array.from(res.data)))
