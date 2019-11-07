@@ -11,7 +11,7 @@
             label-position="left"
             :model="queryForm"
           >
-            <el-form-item label="企业名称" prop="name" label-width="80px">
+            <el-form-item label="企业名称" prop="name" label-width="80px" v-if="companiesVisible">
               <el-select v-model="queryForm.name">
                 <el-option
                   v-for="item in companyOptions"
@@ -142,10 +142,12 @@ import $axios from "@/api/index";
 import ShowModules from "@/components/ShowModules";
 import Pagination from "@/components/Pagination";
 import { flatten } from "@/utils/flatternArr";
+import store from "@/store";
 export default {
   components: { ShowModules, Pagination },
   data() {
     return {
+      grade: store.getters.grade,
       detailDialogVisible: false,
       company_id: "",
       companyOptions: [],
@@ -197,6 +199,11 @@ export default {
   created() {
     this.fetchList();
     this.getCompaniesList();
+  },
+  computed: {
+    companiesVisible() {
+      return this.grade !== 3;
+    },
   },
   methods: {
     async fetchList(page) {
