@@ -1,12 +1,6 @@
 <template>
   <div>
-    <el-dialog
-      :visible.sync="isOpen"
-      width="45%"
-      :title="dialogTitle"
-      center
-      @close="handleClose"
-    >
+    <el-dialog :visible.sync="isOpen" width="45%" :title="dialogTitle" center @close="handleClose">
       <!-- 餐次信息对话框 -->
       <el-dialog
         center
@@ -26,30 +20,19 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item label="订餐截止日期" label-width="120px" prop="type">
-            <el-radio-group
-              v-model="dinnerForm.type"
-              @change="dinnerForm.type_number = ''"
-            >
+            <el-radio-group v-model="dinnerForm.type" @change="dinnerForm.type_number = ''">
               <el-radio label="day">
                 天
                 <span v-if="dinnerForm.type == 'day'">
                   提前
-                  <el-input
-                    v-model="dinnerForm.type_number"
-                    style="width:50px"
-                  ></el-input
-                  >天
+                  <el-input v-model="dinnerForm.type_number" style="width:50px"></el-input>天
                 </span>
               </el-radio>
               <el-radio label="week">
                 周
                 <span v-if="dinnerForm.type == 'week'">
                   提前
-                  <el-select
-                    v-model="dinnerForm.type_number"
-                    placeholder="请选择"
-                    style="width:120px"
-                  >
+                  <el-select v-model="dinnerForm.type_number" placeholder="请选择" style="width:120px">
                     <el-option
                       v-for="item in weekOptions"
                       :key="item.value"
@@ -120,9 +103,7 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="closeMachineDialog">取 消</el-button>
-          <el-button type="primary" @click="_submitMachineInfo"
-            >确 定</el-button
-          >
+          <el-button type="primary" @click="_submitMachineInfo">确 定</el-button>
         </div>
       </el-dialog>
       <!-- <el-row :gutter="50">
@@ -185,55 +166,45 @@
         </div>
         <span style="margin-right: 8px">
           饭堂名称
-          <el-input
-            v-model="canteens"
-            size="small"
-            style="width:200px;"
-            :disabled="isEdit"
-          ></el-input>
+          <el-input v-model="canteens" size="small" style="width:200px;" :disabled="isEdit"></el-input>
         </span>
         <el-button
           type="primary"
           size="small"
           @click="addCanteen"
           :disabled="isEdit || canteen_id"
-          >新增饭堂</el-button
-        >
-        <el-button type="primary" size="small" @click="handleClick"
-          >添加餐次</el-button
-        >
+        >新增饭堂</el-button>
+        <el-button type="primary" size="small" @click="handleClick">添加餐次</el-button>
         <el-table style="width:100%" :data="dataTable" size="small">
-          <el-table-column
-            label="餐次"
-            width="60px"
-            prop="name"
-          ></el-table-column>
+          <el-table-column label="餐次" width="60px" prop="name"></el-table-column>
           <!-- <el-table-column label="订餐单位" width="80px" prop="" ></el-table-column> -->
           <el-table-column label="订餐截止时间">
-            <span slot-scope="scoped">{{
+            <span slot-scope="scoped">
+              {{
               scoped.row.type === "day"
-                ? `提前${scoped.row.type_number}天`
-                : `周${scoped.row.type_number + 1}前`
-            }}</span>
+              ? `提前${scoped.row.type_number}天`
+              : `周${scoped.row.type_number + 1}前`
+              }}
+            </span>
           </el-table-column>
           <el-table-column label="就餐时间">
-            <span slot-scope="scoped"
-              >{{ scoped.row.meal_time_begin }}-{{
-                scoped.row.meal_time_end
-              }}</span
-            >
+            <span slot-scope="scoped">
+              {{ scoped.row.meal_time_begin }}-{{
+              scoped.row.meal_time_end
+              }}
+            </span>
           </el-table-column>
           <el-table-column label="餐费状态">
-            <span slot-scope="scoped">{{
+            <span slot-scope="scoped">
+              {{
               scoped.row.fixed === 1 ? "固定" : "动态"
-            }}</span>
+              }}
+            </span>
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scoped">
               <el-button size="small" type="text">编辑</el-button>
-              <el-button size="small" type="text" @click="_delete(scoped.row)"
-                >删除</el-button
-              >
+              <el-button size="small" type="text" @click="_delete(scoped.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -262,8 +233,7 @@
                 size="small"
                 type="number"
                 min="0"
-              ></el-input
-              >元
+              ></el-input>元
             </span>
           </el-form-item>
         </el-form>
@@ -276,8 +246,7 @@
             style="float: right; padding: 3px 0"
             type="text"
             @click="oprnMachineDialog"
-            >添加硬件</el-button
-          >
+          >添加硬件</el-button>
         </div>
         <el-table :data="machineTable" style="width:100%" size="mini">
           <el-table-column label="编号" prop="number"></el-table-column>
@@ -291,13 +260,8 @@
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scoped">
-              <el-button
-                size="small"
-                type="text"
-                @click="_editMachine(scoped.row)"
-                >编辑</el-button
-              >
-              <!-- <el-button size="small" type="text" @click="_deleteMachine(scoped.row)">删除</el-button> -->
+              <el-button size="small" type="text" @click="_editMachine(scoped.row)">编辑</el-button>
+              <el-button size="small" type="text" @click="_deleteMachine(scoped.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -464,10 +428,29 @@ export default {
       this.isEditMachine = false;
       this.machineForm = {};
     },
-    _deleteMachine(row) {
-      this.machineTable = this.machineTable.filter(item => {
-        return item.name != row.name;
-      });
+    async _deleteMachine(row) {
+      let id = row.id;
+      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(async () => {
+          const res = await $axios.post("/v1/canteen/deleteMachine", { id });
+          if (res.msg === "ok") {
+            this.$message({
+              type: "success",
+              message: "删除成功!"
+            });
+            await this.getCompanyMachine(this.company_id);
+          }
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
     },
     _editMachine(row) {
       this.isEditMachine = true;
