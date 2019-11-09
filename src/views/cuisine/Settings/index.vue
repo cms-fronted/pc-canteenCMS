@@ -4,12 +4,13 @@
     <el-divider></el-divider>
     <div class="main">
       <div class="main-header">
-        <span class="content-header">公司：</span>
+        <span class="content-header"  v-if="companiesVisible">公司：</span>
         <el-select
           v-model="company_id"
           placeholder="请选择"
           style="width:150px"
           @change="getLocationList(company_id)"
+          v-if="companiesVisible"
         >
           <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
@@ -136,11 +137,13 @@
 <script>
 import $axios from "@/api/index";
 import Pagination from "@/components/Pagination";
-import { flatten } from "@/utils/flatternArr";
+import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
+import store from "@/store";
 export default {
   components: { Pagination },
   data() {
     return {
+      grade: store.getters.grade,
       editVisible: false,
       editForm: {
         category: "",
@@ -176,7 +179,16 @@ export default {
     listObj: function() {}
   },
   created() {
-    this.getCompanies();
+    if(this.companiesVisible){
+      this.getCompanies();
+    }else{
+      this.getLocationList('');
+    }
+  },
+  computed: {
+    companiesVisible() {
+      return this.grade !== 3;
+    },
   },
   methods: {
     getCompanies() {
@@ -205,16 +217,26 @@ export default {
       this.menuForm.m_id = "";
       this.canteen_id = "";
       if (!isNaN(company_id)) {
-        $axios
-          .get(`/v1/company/consumptionLocation?company_id=${company_id}`)
-          .then(res => {
-            this.locationList = Array.from(res.data.canteen);
-          })
-          .catch(err => console.log(err));
+        if(company_id){
+          $axios
+            .get(`/v1/canteens?company_id=${company_id}`)
+            .then(res => {
+              this.locationList = unshiftAllOptions(Array.from(res.data));
+            })
+            .catch(err => console.log(err));
+        }else{
+          $axios
+            .get("/v1/managerCanteens")
+            .then(res => {
+              this.locationList = unshiftAllOptions(Array.from(res.data));
+            })
+            .catch(err => console.log(err));
+        }
       } else {
         this.locationList = [];
         this.categoryList = [];
         this.dinnersList = [];
+        
       }
     },
     getDinnersList(canteen_id) {

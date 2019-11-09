@@ -50,9 +50,11 @@
                   ></el-option>
                 </el-select>
               </el-form-item>
-              <el-button type="primary" @click="queryList(1)" :disabled="isDisabled">查询</el-button>
-              <el-button type="primary">导出</el-button>
             </el-form>
+          </div>
+          <div class="btn-area">
+            <el-button type="primary" @click="queryList(1)" :disabled="isDisabled">查询</el-button>
+            <el-button type="primary">导出</el-button>
           </div>
         </div>
         <div class="main-content">
@@ -107,7 +109,11 @@ export default {
     };
   },
   created() {
-    this.getCompanies();
+    if(this.companiesVisible){
+      this.getCompanies();
+    }else{
+      this.getLocationList();
+    }
   },
   computed: {
     companiesVisible() {
@@ -148,13 +154,16 @@ export default {
         .catch(err => console.log(err));
     },
     async getLocationList(company_id) {
+      let res;
       if (company_id) {
-        const res = await $axios.get(
-          `/v1/company/consumptionLocation?company_id=${company_id}`
+        res = await $axios.get(
+          `/v1/canteens?company_id=${company_id}`
         );
-        if (res.msg === "ok") {
-          this.canteenOptions = unshiftAllOptions(Array.from(res.data.canteen));
-        }
+      }else{
+        res = await $axios.get("/v1/managerCanteens");
+      }
+      if (res.msg === "ok") {
+        this.canteenOptions = unshiftAllOptions(Array.from(res.data));
       }
     },
     async queryList(page) {

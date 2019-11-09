@@ -23,7 +23,7 @@
                   type="datetime"
                 ></el-date-picker>
               </el-form-item>
-              <el-form-item label="公司">
+              <el-form-item label="公司" v-if="companiesVisible">
                 <el-select v-model="formdata.company_ids" @change="getOptions" placeholder="请选择公司">
                   <el-option
                     v-for="item in companyOptions"
@@ -58,7 +58,7 @@
                   ></el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="部门" prop="department_id">
+              <el-form-item label="部门" prop="department_id"  v-if="companiesVisible">
                 <el-select v-model="formdata.department_id" placeholder="请选择部门">
                   <el-option
                     v-for="item in departmentOptions"
@@ -116,10 +116,12 @@
 import $axios from "@/api/index";
 import Pagination from "@/components/Pagination";
 import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
+import store from '@/store';
 export default {
   components: { Pagination },
   data() {
     return {
+      grade: store.getters.grade,
       formdata: {
         company_ids: null,
         canteen_id: null,
@@ -143,7 +145,11 @@ export default {
     };
   },
   created() {
-    this.getCompanyOptions();
+    if(this.companiesVisible){
+      this.getCompanyOptions();
+    }else{
+      this.getCanteenOptions();
+    }
   },
   methods: {
     getOptions(company_ids) {
@@ -164,11 +170,16 @@ export default {
       }
     },
     async getCanteenOptions(company_ids) {
-      const res = await $axios.get(
-        `/v1/company/consumptionLocation?company_id=${company_ids}`
-      );
+      let res;
+      if(company_ids){
+        res = await $axios.get(
+          `/v1/canteens?company_id=${company_ids}`
+        );
+      }else{
+        res = await $axios.get("/v1/managerCanteens");
+      }
       if (res.msg === "ok") {
-        this.canteenOptions = unshiftAllOptions(Array.from(res.data.canteen)); //给数组添加一个全部option
+        this.canteenOptions = unshiftAllOptions(Array.from(res.data)); //给数组添加一个全部option
       }
     },
     async getDepartmentOptions(company_ids) {
@@ -208,6 +219,9 @@ export default {
         !!this.formdata.time_begin &&
         !!this.formdata.company_ids
       );
+    },
+    companiesVisible(){
+      return this.grade !== 3;
     }
   },
   watch: {

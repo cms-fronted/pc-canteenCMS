@@ -104,7 +104,7 @@
                 @click="_editMachine(scoped.row)"
                 >编辑</el-button
               >
-              <!-- <el-button size="small" type="text" @click="_deleteMachine(scoped.row)">删除</el-button> -->
+              <el-button size="small" type="text" @click="_deleteMachine(scoped.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -276,6 +276,30 @@ export default {
           if (res.msg === "ok") this.$message.success("修改成功");
         })
         .catch(err => console.log(err));
+    },
+    async _deleteMachine(row) {
+      let id = row.id;
+      this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(async () => {
+          const res = await $axios.post("/v1/canteen/deleteMachine", { id });
+          if (res.msg === "ok") {
+            this.$message({
+              type: "success",
+              message: "删除成功!"
+            });
+            await this.getCompanyMachine(this.company_id);
+          }
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
     }
   }
 };

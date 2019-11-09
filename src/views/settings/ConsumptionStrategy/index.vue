@@ -5,7 +5,7 @@
     <div class="main">
       <div class="main-header">
         <el-form :model="queryForm" :inline="true" label-width="60px">
-          <el-form-item label="公司">
+          <el-form-item label="公司"  v-if="companiesVisible">
             <el-select v-model="queryForm.company_id" @change="getCanteenList">
               <el-option
                 v-for="item in companiesList"
@@ -14,21 +14,21 @@
                 :key="item.id"
               ></el-option>
             </el-select>
-            <el-form-item label="饭堂">
-              <el-select v-model="queryForm.c_id">
-                <el-option
-                  v-for="item in canteenList"
-                  :label="item.name"
-                  :key="item.id"
-                  :value="item.id"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-            <el-button @click="queryList" :disabled="!!!queryForm.c_id"
-              >查询</el-button
-            >
-            <el-button @click="settingDialogVisible = true">新增</el-button>
           </el-form-item>
+          <el-form-item label="饭堂">
+            <el-select v-model="queryForm.c_id">
+              <el-option
+                v-for="item in canteenList"
+                :label="item.name"
+                :key="item.id"
+                :value="item.id"
+              ></el-option>
+            </el-select>
+          </el-form-item>
+          <el-button @click="queryList" :disabled="!!!queryForm.c_id"
+            >查询</el-button
+          >
+          <el-button @click="settingDialogVisible = true">新增</el-button>
         </el-form>
       </div>
     </div>
@@ -310,9 +310,11 @@
 <script>
 import { flatten, getAllOptions } from "@/utils/flatternArr";
 import $axios from "@/api/index";
+import store from "@/store";
 export default {
   data() {
     return {
+      grade: store.getters.grade,
       settingDialogVisible: false,
       changeSettingVisible: false,
       addCountVisible: false,
@@ -370,6 +372,18 @@ export default {
       }
     }
   },
+  computed: {
+    companiesVisible() {
+      return this.grade !== 3;
+    },
+  },
+  created() {
+    if(this.companiesVisible){
+      this.getCompanies();
+    }else{
+      this.getCanteenList();
+    }
+  },
   methods: {
     async getCompanies() {
       await $axios
@@ -383,12 +397,21 @@ export default {
         .catch(err => console.log(err));
     },
     async getCanteenList(company_id) {
-      await $axios
-        .get(`/v1/company/consumptionLocation?company_id=${company_id}`)
-        .then(res => {
-          this.canteenList = Array.from(res.data.canteen);
-        })
-        .catch(err => console.log(err));
+      if(company_id){
+        await $axios
+          .get(`/v1/canteens?company_id=${company_id}`)
+          .then(res => {
+            this.canteenList = Array.from(res.data);
+          })
+          .catch(err => console.log(err));
+      }else{
+        await $axios
+          .get("/v1/managerCanteens")
+          .then(res => {
+            this.canteenList = Array.from(res.data);
+          })
+          .catch(err => console.log(err));
+      }
     },
     async getDialogCanteenList(company_id) {
       this.newSettingForm.c_id = "";

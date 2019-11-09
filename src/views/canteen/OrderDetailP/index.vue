@@ -13,23 +13,23 @@
               <el-form-item label="手机号码：">
                 <el-input placeholder="请输入手机号码" v-model="queryform.phone" style="width:217px"></el-input>
               </el-form-item>
-              <el-form-item label="所属企业：">
+              <el-form-item label="所属企业："  v-if="companiesVisible">
                 <el-select v-model="queryform.company_id" placeholder="请选择企业">
                   <el-option
-                    v-for="item in queryform.companyList"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
+                    v-for="item in companyList"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
                   ></el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="部门：">
+              <el-form-item label="部门："  v-if="companiesVisible">
                 <el-select v-model="queryform.department_id" placeholder="请选择部门">
                   <el-option
-                    v-for="item in queryform.departmentList"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
+                    v-for="item in departmentList"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
                   ></el-option>
                 </el-select>
               </el-form-item>
@@ -115,18 +115,22 @@
 // l列表的信息
 // 序号 下单时间 结束时间 姓名 手机号 类型 商品名称 状态
 // 单位 unit  商品数量 stock 商品金额 price  地址 address 打印 print  备注 remark
+import $axios from "@/api/index";
+import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
+import store from "@/store";
 export default {
   data() {
     return {
+      grade: store.getters.grade,
+      companyList: [],
+      departmentList: [],
       queryform: {
         name: "",
         phone: "",
         type: "",
         categoryList: [],
         department_id: "",
-        departmentList: ["部门1", "部门2", "部门3"],
         company_id: "",
-        companyList: ["公司1", "公司2", "公司3"],
         begin_time: "",
         end_time: "",
         goodsState: "",
@@ -176,7 +180,40 @@ export default {
       ]
     };
   },
+  computed: {
+    companiesVisible() {
+      return this.grade !== 3;
+    },
+  },
+  created() {
+    if(this.companiesVisible){
+      this.getCompanies();
+    }
+  },
   methods: {
+    getCompanies(){
+      $axios
+        .get("/v1/admin/companies")
+        .then(res => {
+          let arr = res.data;
+          let allCompanies = [];
+          let companiesList = getAllOptions(flatten(arr));
+          this.companyList = companiesList;
+        })
+        .catch(err => console.log(err));
+    },
+    getDepartmentList(company_id) {
+      if (company_id) {
+        $axios
+          .get(`v1/departments?c_id=${company_id}`)
+          .then(res => {
+            let arr = res.data;
+            let departmentList = unshiftAllOptions(flatten(arr));
+            this.departmentList = departmentList;
+          })
+          .catch(err => console.log(err));
+      }
+    },
     handleEdit(index, row) {
       console.log(row);
       console.log("打印按钮被你点击啦！");
