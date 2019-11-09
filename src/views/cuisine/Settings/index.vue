@@ -292,6 +292,7 @@ export default {
       const res = await $axios.post("/v1/menu/save", this.menuForm);
       if (res.msg === "ok") {
         this.$message.success("操作成功");
+        this.detail = [];
         this.fetchTableList();
         this.closeNewMenu();
       }
