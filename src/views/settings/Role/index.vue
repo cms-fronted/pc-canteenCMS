@@ -87,10 +87,7 @@
       width="60%"
       center
       title="新增角色"
-<<<<<<< HEAD
-=======
       @close="closeNewRoleDialog"
->>>>>>> 19050d27428eae8af4cccf736b7978304f854b29
     >
       <el-row :gutter="20">
         <el-col :span="6">
