@@ -4,28 +4,19 @@
     <el-divider></el-divider>
     <div class="main">
       <div class="main-header">
-        <span class="content-header"  v-if="companiesVisible">公司：</span>
-        <el-select v-model="company_id" placeholder="请选择" style="width:150px" 
-          @change="fetchCanteenList(company_id)"  v-if="companiesVisible">
-          <el-option
-            v-for="item in companyList"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id"
-          ></el-option>
-        </el-select>
-        <span class="content-header">消费地点：</span>
+        <span class="content-header" v-if="companiesVisible">公司：</span>
         <el-select
-          v-model="canteen_id"
+          v-model="company_id"
           placeholder="请选择"
           style="width:150px"
+          @change="fetchCanteenList(company_id)"
+          v-if="companiesVisible"
         >
-          <el-option
-            v-for="item in canteenList"
-            :key="item.id"
-            :label="item.name"
-            :value="item.id"
-          ></el-option>
+          <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        </el-select>
+        <span class="content-header">消费地点：</span>
+        <el-select v-model="canteen_id" placeholder="请选择" style="width:150px">
+          <el-option v-for="item in canteenList" :key="item.id" :label="item.name" :value="item.id"></el-option>
         </el-select>
         <el-input
           placeholder="请输入内容"
@@ -34,13 +25,7 @@
           v-model="keyword"
           style="width:180px;margin: 0 15px;"
         ></el-input>
-        <el-button
-          type="primary"
-          plain
-          style="margin-left:0"
-          @click="fetchTableList"
-          >查询</el-button
-        >
+        <el-button type="primary" plain style="margin-left:0" @click="fetchTableList">查询</el-button>
         <el-button type="primary" @click="deriveData">导出</el-button>
         <el-upload
           class="upload-excel"
@@ -48,7 +33,7 @@
           :limit="limit"
           :headers="header"
           :show-file-list="false"
-          accept=".xls,.xlsx"
+          accept=".xls, .xlsx"
           action="/v1/material/upload"
           :on-success="handleSuccess"
           :data="{ c_id: canteen_id }"
@@ -56,50 +41,30 @@
         >
           <el-button type="primary">批量导入</el-button>
         </el-upload>
-        <el-button
-          type="primary"
-          @click="handleClick({ c_id: canteen_id }, '_add', '新增材料')"
-          >添加</el-button
-        >
+        <el-button type="primary" @click="handleClick({ c_id: canteen_id }, '_add', '新增材料')">添加</el-button>
       </div>
       <!-- 共有{{total}}条记录 -->
       <div class="total" v-show="total > 0">
-        <span
-          >共有 <strong>{{ total }}</strong> 条记录</span
-        >
+        <span>
+          共有
+          <strong>{{ total }}</strong> 条记录
+        </span>
       </div>
       <div class="main-content">
         <el-table style="width:100%; font-size:14px" :data="tableData" border>
-          <el-table-column
-            prop="id"
-            label="序号"
-            width="200px"
-          ></el-table-column>
+          <el-table-column prop="id" label="序号" width="200px"></el-table-column>
           <el-table-column prop="name" label="材料名称"></el-table-column>
           <el-table-column label="单价/元">
-            <template slot-scope="scope"
-              >{{ scope.row.price }}元/kg</template
-            >
+            <template slot-scope="scope">{{ scope.row.price }}元/kg</template>
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <el-button
-                size="mini"
-                @click="handleClick(scope.row, '_edit', '编辑材料')"
-                >编辑</el-button
-              >
-              <el-button size="mini" type="danger" @click="_delete(scope.row)"
-                >Delete</el-button
-              >
+              <el-button size="mini" @click="handleClick(scope.row, '_edit', '编辑材料')">编辑</el-button>
+              <el-button size="mini" type="danger" @click="_delete(scope.row)">Delete</el-button>
             </template>
           </el-table-column>
         </el-table>
-        <pagination
-          v-show="total > 10"
-          :total="total"
-          :page.sync="page"
-          @pagination="getList"
-        ></pagination>
+        <pagination v-show="total > 10" :total="total" :page.sync="page" @pagination="getList"></pagination>
       </div>
     </div>
     <handle-dialog
@@ -146,7 +111,7 @@ export default {
     this.fetchCompanyList();
   },
   computed: {
-    companiesVisible(){
+    companiesVisible() {
       return this.grade !== 3;
     }
   },
@@ -189,21 +154,21 @@ export default {
         })
         .catch(error => console.log(err));
     },
-    fetchCanteenList(id){
-      this.canteen_id = '';
+    fetchCanteenList(id) {
+      this.canteen_id = "";
       this.canteenList = [];
-      if(this.companiesVisible){
-        if(typeof id === 'string' && id.indexOf(',')){
-          this.canteenList.unshift({id:'',name:'全部'})
-        }else{
+      if (this.companiesVisible) {
+        if (typeof id === "string" && id.indexOf(",")) {
+          this.canteenList.unshift({ id: "", name: "全部" });
+        } else {
           $axios
-          .get(`/v1/canteens?company_id=${id}`)
-          .then(res => {
-            this.canteenList = Array.from(res.data);
-          })
-          .catch(err => console.log(err));
+            .get(`/v1/canteens?company_id=${id}`)
+            .then(res => {
+              this.canteenList = Array.from(res.data);
+            })
+            .catch(err => console.log(err));
         }
-      }else{
+      } else {
         $axios
           .get("/v1/managerCanteens")
           .then(res => {
@@ -215,9 +180,7 @@ export default {
     fetchTableList() {
       $axios
         .get(
-          `/v1/materials?page=${this.page}&size=10&key=${
-            this.keyword
-          }&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
+          `/v1/materials?page=${this.page}&size=10&key=${this.keyword}&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
         )
         .then(res => {
           this.tableData = res.data.data;
@@ -269,9 +232,7 @@ export default {
     deriveData() {
       $axios
         .get(
-          `/v1/material/export?key=${this.keyword}&canteen_ids=${
-            this.canteen_id
-          }&company_ids=${this.company_id}`
+          `/v1/material/export?key=${this.keyword}&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
         )
         .then(res => {
           if (this.tableData.length > 0) {

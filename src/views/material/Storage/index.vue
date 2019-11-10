@@ -42,7 +42,6 @@
             ></el-date-picker>
           </el-form-item>
           <el-button @click="queryList(1)">查询</el-button>
-          <el-button>作废</el-button>
         </el-form>
       </div>
       <div class="main-content">
@@ -123,18 +122,7 @@ export default {
       companyOptions: [],
       canteenOptions: [],
       queryForm: {},
-      tableData: [
-        {
-          id: 4,
-          canteen_id: 6,
-          title: "2019-11-01~2019-11-07材料报表",
-          create_time: "2019-11-08 00:10:34",
-          canteen: {
-            id: 6,
-            name: "饭堂1"
-          }
-        }
-      ],
+      tableData: [],
       detailData: [],
       detailForm: {},
       current_page: 1,

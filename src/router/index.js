@@ -257,14 +257,14 @@ export const currencyRoutes = [
     },
     component: Layout,
     children: [
-      {
-        path: "details",
-        name: "Material-details",
-        component: () => import("@/views/material/Details"),
-        meta: {
-          title: "菜品材料明细"
-        }
-      },
+      // {
+      //   path: "details",
+      //   name: "Material-details",
+      //   component: () => import("@/views/material/Details"),
+      //   meta: {
+      //     title: "菜品材料明细"
+      //   }
+      // },
       {
         path: "storage",
         name: "Material-storage",
@@ -274,11 +274,19 @@ export const currencyRoutes = [
         }
       },
       {
+        path: "order-material",
+        name: "Material-Order",
+        component: () => import("@/views/material/OrderMaterial"),
+        meta: {
+          title: "材料下单报表"
+        }
+      },
+      {
         path: "parice-details",
         name: "Material-pricedetails",
         component: () => import("@/views/material/PriceDetails"),
         meta: {
-          title: "材料价格管理"
+          title: "材料价格明细"
         }
       }
     ]
