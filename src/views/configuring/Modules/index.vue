@@ -4,12 +4,14 @@
     <el-divider></el-divider>
     <div class="main">
       <div class="main-header">
-        <el-button type="primary" @click="changeDefault">{{
+        <el-button type="primary" @click="changeDefault">
+          {{
           changeDefaultStatus ? "完成默认设置" : "更改默认设置"
-        }}</el-button>
+          }}
+        </el-button>
         <el-button type="primary" @click="openModuleDialog">增加模块</el-button>
-        <el-button type="primary">删除模块</el-button>
-        <el-button type="primary">编辑模块</el-button>
+        <el-button type="primary">模块设置</el-button>
+        <!-- <el-button type="primary">删除模块</el-button> -->
       </div>
       <div class="main-content">
         <el-card class="box-card">
@@ -34,32 +36,57 @@
                     default-expand-all
                   >
                     <span class="modules-tree-node" slot-scope="{ node, data }">
-                      <span
-                        >{{ data.type === 1 ? "PC端" : "移动端" }}——{{
-                          node.label
-                        }}</span
-                      >
+                      <span>
+                        {{ data.type === 1 ? "PC端" : "移动端" }}——{{
+                        node.label
+                        }}
+                      </span>
                       <span class="btns-text">
                         <el-button
                           type="text"
                           size="mini"
                           @click="() => openEditModuleDialog(data, 2)"
-                          >编辑</el-button
-                        >
+                        >编辑</el-button>
                         <el-button
                           type="text"
                           size="mini"
                           @click="() => openModuleDialog(node, data)"
                           v-if="data.type === 1"
-                          >新增</el-button
-                        >
+                        >新增</el-button>
                       </span>
                     </span>
                   </el-tree>
                 </div>
               </div>
             </el-col>
-            <el-col :span="14"></el-col>
+            <el-col :span="16">
+              <el-table :data="modulesData" border>
+                <el-table-column label="模块名称" prop="name"></el-table-column>
+                <el-table-column label="模块类型">
+                  <template slot-scope="scoped">
+                    <span>{{scoped.row.type === 1 ? "PC端" :"移动端"}}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column label="是否默认">
+                  <template slot-scope="scoped">
+                    <span>{{scoped.row.default === 1 ? "默认" :'非默认'}}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column label="状态">
+                  <template slot-scope="scoped">
+                    <span>{{scoped.row.state === 1 ? "启用" : "停用"}}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column label="操作">
+                  <template slot-scope="scoped">
+                    <el-button
+                      size="small"
+                      @click="changeModulesState(scoped.row)"
+                    >{{scoped.row.state === 1 ? "停用":"启用"}}</el-button>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </el-col>
           </el-row>
         </el-card>
       </div>
@@ -71,12 +98,7 @@
       width="30%"
       @close="closeModuleDialog"
     >
-      <el-form
-        :model="modulesForm"
-        ref="modulesForm"
-        label-width="80px"
-        label-position="right"
-      >
+      <el-form :model="modulesForm" ref="modulesForm" label-width="80px" label-position="right">
         <el-form-item label="功能类型" prop="system" v-if="false">
           <el-radio-group v-model="systemType">
             <el-radio :label="1">系统功能</el-radio>
@@ -126,9 +148,7 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="closeEditModuleDialog">取 消</el-button>
-        <el-button type="primary" @click="submitEditModulesForm"
-          >确定</el-button
-        >
+        <el-button type="primary" @click="submitEditModulesForm">确定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -136,7 +156,7 @@
 
 <script>
 import $axios from "@/api/index";
-import { flatten } from "@/utils/flatternArr";
+import { flatten, treeToArr } from "@/utils/flatternArr";
 export default {
   data() {
     return {
@@ -162,6 +182,7 @@ export default {
       s_modules: [],
       canteenModules: [],
       c_modules: [],
+      modulesData: [],
       shopModules: [],
       p_modules: [],
       defaultProps: {
@@ -182,7 +203,6 @@ export default {
   methods: {
     openModuleDialog(node, data, type) {
       let dataForm = data || {};
-      console.log(dataForm);
       if (dataForm.id) {
         this.modulesForm.parent_id = data.id;
         this.modulesForm.type = dataForm.type;
@@ -233,27 +253,19 @@ export default {
         if (!obj.items) {
           this.timer = setTimeout(() => {
             this.$message.success("修改成功");
-          }, 500);
+          }, 300);
         }
       }
     },
     changeDefault() {
       this.changeDefaultStatus = !this.changeDefaultStatus;
+      if (!this.changeDefaultStatus) {
+        this.renderModules();
+      }
     },
     async submitModulesForm() {
       let type = this.systemType;
       const url = "/v1/module/system/canteen/save";
-      // switch (type) {
-      //   case 1:
-      //     url = "/v1/module/system/save";
-      //     break;
-      //   case 2:
-      //     url = "/v1/module/system/canteen/save";
-      //     break;
-      //   case 3:
-      //     url = "/v1/module/system/shop/save";
-      //     break;
-      // }
       let res = await $axios.post(url, this.modulesForm);
       if (res.msg === "ok") {
         this.closeModuleDialog();
@@ -269,54 +281,48 @@ export default {
         this.renderModules();
       }
     },
-    // getModules() {
-    //   let systemModules = this.$axios.get("/v1/modules?type=1");
-    //   let canteenModules = this.$axios.get("/v1/modules?type=2");
-    //   let shopModules = this.$axios.get("/v1/modules?type=3");
-    //   let reqList = [];
-    //   reqList.push(systemModules, canteenModules, shopModules);
-    //   return this.$axios.all(reqList).then(
-    //     this.$axios.spread(function(...resList) {
-    //       return resList;
-    //     })
-    //   );
-    // },
     async renderModules() {
       try {
         const res = await $axios.get("/v1/modules?type=2");
         if (res.msg === "ok") {
           console.log(res);
           this.canteenModules = Array.from(res.data);
+          this.modulesData = treeToArr(res.data);
           this.c_modules = flatten(res.data);
           this.handleModuleData(this.c_modules, "canteenTree");
         }
-        // let resq = await this.getModules();
-        // let system = resq[0].data.data;
-        // let canteen = resq[1].data.data;
-        // let shop = resq[2].data.data;
-        // this.systemModules = Array.from(system);
-        // this.canteenModules = Array.from(canteen);
-        // this.shopModules = Array.from(shop);
-        // this.s_modules = flatten(system);
-        // this.c_modules = flatten(canteen);
-        // this.p_modules = flatten(shop);
-        // this.handleModuleData(this.c_modules, "canteenTree");
-        // this.handleModuleData(this.p_modules, "shopTree");
       } catch (error) {
         console.log(error);
       }
     },
     handleModuleData(data, treeRef) {
       let checkKey = [];
+      let index = "";
       data.forEach(item => {
-        if (item.default === 1) {
+        if (item.default == 1 && item.p_id === 0) {
           checkKey.push(item.id);
         }
-        if (item.default === 2 && item.p_id) {
-          checkKey.splice(checkKey.indexOf(item.p_id), 1);
+        if (item.default == 1 && item.p_id !== 0) {
+          checkKey.push(item.id);
+        }
+        if (item.default === 2 && item.p_id !== 0) {
+          if (checkKey.indexOf(item.p_id) !== -1) {
+            checkKey.splice(checkKey.indexOf(item.p_id), 1);
+          }
         }
       });
       this.$refs[treeRef].setCheckedKeys(checkKey);
+    },
+    async changeModulesState(row) {
+      let data = {};
+      data.id = row.id;
+      data.state = row.state === 1 ? 2 : 1;
+      console.log(data);
+      const res = await $axios.post("/v1/module/system/handel", data);
+      if (res.msg === "ok") {
+        this.$$message.success("操作成功!");
+        this.renderModules();
+      }
     }
   }
 };
