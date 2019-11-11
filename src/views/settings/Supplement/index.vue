@@ -9,7 +9,7 @@
             <span class="content-header">人员信息</span>
             <el-input
               class="filter-input"
-              v-model="filterText"
+              v-model="key"
               placeholder="输入人员信息"
               style="width:200px"
             ></el-input>
@@ -34,7 +34,7 @@
           <el-table style="width:100%" :data="tableData" border @selection-change="handleSelectionChange">
             <el-table-column type="selection" width="55"> </el-table-column>
             <el-table-column label="公司" prop="company"></el-table-column>
-            <el-table-column label="归属饭堂" prop="canteen"></el-table-column>
+            <!-- <el-table-column label="归属饭堂" prop="canteen"></el-table-column> -->
             <el-table-column label="部门" prop="department"></el-table-column>
             <el-table-column label="姓名" prop="username"></el-table-column>
             <el-table-column label="员工编号" prop="code"></el-table-column>
@@ -132,14 +132,13 @@ export default {
   data() {
     return {
       grade: store.getters.grade,
-      filterText: "",
+      key: "",
       company_ids: "",
       companiesList: [],
       tableData: [
-        {
+        /* {
           id: 1,
           company: "A企业",
-          canteen: "大饭堂",
           department: "后勤部",
           username: "张三三",
           code: "aaaaaaaa",
@@ -148,21 +147,11 @@ export default {
         {
           id: 2,
           company: "B企业",
-          canteen: "中饭堂",
           department: "后勤部",
           username: "李四",
           code: "aaaaaaaa",
           card_num: "122324"
-        },
-        {
-          id: 3,
-          company: "C企业",
-          canteen: "小饭堂",
-          department: "后勤部",
-          username: "王五",
-          code: "aaaaaaaa",
-          card_num: "122324"
-        }
+        } */
       ],
       formdata: {
         canteen_id: "",
@@ -208,7 +197,12 @@ export default {
       }
     },
     queryList(){
-
+      $axios
+        .get(`/v1/department/staffs/recharge?page=1&size=10&department_id=0&key=${this.key}`)
+        .then(res => {
+          this.tableData = Array.from(res.data.data);
+        })
+        .catch(err => console.log(err));
     },
     getCompanies() {
       $axios
