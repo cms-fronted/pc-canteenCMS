@@ -13,7 +13,20 @@
           <span class="content-header">备注</span>
           <el-input v-model="remark" placeholder="请输入"  style="width:180px"></el-input>
           <el-button type="primary" @click="recharge">充值</el-button>
-          <el-button type="primary" @click="batchRecharge">批量充值</el-button>
+          <!-- <el-button type="primary" @click="batchRecharge">批量充值</el-button> -->
+          <el-upload
+            class="upload-excel upload"
+            ref="upload"
+            :limit="limit"
+            :headers="header"
+            accept=".xls,.xlsx"
+            action="/v1/wallet/recharge/upload"
+            :show-file-list="false"
+            :on-success='handleSuccess'
+            name="cash"
+            >
+            <el-button type="primary">批量充值</el-button>
+          </el-upload>
         </div>
         <div class="total" v-show="total > 0"><span>共有 <strong>{{total}}</strong> 条记录</span></div>
         <div class="main-content clearfix">
@@ -43,40 +56,11 @@
           </div>
         </div>
       </div>
-      <el-dialog title="批量充值" :visible.sync="dialogFormVisible" @close="handleClose">
-        <div class="dialog-header clearfix">
-          <span class="download">下载模板：<a style="color: blue;" href="http://canteen.tonglingok.com/static/excel/template/%E6%89%B9%E9%87%8F%E7%8E%B0%E9%87%91%E5%85%85%E5%80%BC%E6%A8%A1%E6%9D%BF.xlsx" download>团体充值模板.xls</a></span>
-          <el-upload
-            class="upload-excel upload"
-            ref="upload"
-            :limit="limit"
-            :headers="header"
-            accept=".xls,.xlsx"
-            action="/v1/wallet/recharge/upload"
-            
-            :on-success='handleSuccess'
-            :auto-upload="false"
-            :on-change="handleChange"
-            name="cash"
-            >
-            <el-button type="primary">选择上传文件</el-button>
-          </el-upload>
-          <!-- :show-file-list="false"  -->
-        </div>
-        <div slot="footer" class="dialog-footer">
-          <el-button @click="handleClose">取 消</el-button>
-          <el-button type="primary" @click="submitUpload">确 定</el-button>
-          <!-- @click="dialogFormVisible = false"   -->
-        </div>
-      </el-dialog>
     </div>
   </div>
 </template>
 
 <script>
-// 人员信息 充值金额 备注 充值 批量充值
-// http://canteen.tonglingok.com/api/v1/department/staffs/recharge?page=1&size=10&department_id=4&key=
-// page  size department_id key
 import $axios from "@/api/index";
 import Pagination from '@/components/Pagination';
 import store from '@/store'
@@ -180,28 +164,9 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    batchRecharge(){
-      this.dialogFormVisible = true;
-    },
     handleSuccess(res, file, fileList){
-      this.$refs.upload.clearFiles();
-      this.sendMessage(res.msg);
-    },
-    handleChange(file, fileList){
-      if(file.status === 'ready'){
-        this.$message({
-          type: 'info',
-          message: "已成功选择文件上传，请点击确定按钮确认"
-        });
-      }
-    },
-    submitUpload() {
-      this.$refs.upload.submit();
-      this.dialogFormVisible = false;
-    },
-    handleClose(){
-      this.dialogFormVisible = false;
       // this.$refs.upload.clearFiles();
+      this.sendMessage(res.msg);
     },
     getList(val){
       this.current_page = val;
@@ -228,6 +193,9 @@ export default {
   .main-header{
     .content-header{
       padding: 12px 10px;
+    }
+    .upload{
+      display: inline-block;
     }
   }
   .main-content{
