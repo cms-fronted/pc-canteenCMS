@@ -9,10 +9,14 @@ import "./plugins/element.js";
 import "@/assets/iconfont/iconfont.css";
 import "@/style/index.scss"; // glob scss
 
-Vue.filter("coverTime", function(data, str) {
+Vue.filter("coverTime", function (data, str) {
   return Moment(data).format(str);
 });
 
+Vue.prototype.showCellData = function (str) { //全局方法 处理表格中 的空数据
+  return !str ? `<span>/</span>` : `<span>${str}</span>`
+
+}
 Vue.prototype.$axios = Axios;
 Vue.use(animated);
 

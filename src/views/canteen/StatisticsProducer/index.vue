@@ -23,9 +23,9 @@
               ></el-date-picker>
             </el-form-item>
             <el-form-item label="商品类型">
-              <el-select v-model="formdata.good_type">
+              <el-select v-model="formdata.category_id">
                 <el-option
-                  v-for="item in goodsTypeOptions"
+                  v-for="item in categoryOptions"
                   :key="item.id"
                   :value="item.id"
                   :label="item.name"
@@ -33,17 +33,25 @@
               </el-select>
             </el-form-item>
             <el-form-item label="商品名称">
-              <el-select v-model="formdata.good_name">
+              <el-select
+                v-model="formdata.product_id"
+                remote
+                filterable
+                :remote-method="remoteMethod"
+                :loading="loading"
+                placeholder="请选择商品名称"
+                style="width:200px"
+              >
                 <el-option
-                  v-for="(item,index) in goodsOptions"
-                  :key="index"
+                  v-for="item in productOptions"
+                  :key="item.id"
                   :label="item.name"
-                  :value="item.name"
+                  :value="item.id"
                 ></el-option>
               </el-select>
             </el-form-item>
             <el-form-item label="状态">
-              <el-select v-model="formdata.state">
+              <el-select v-model="formdata.status">
                 <el-option
                   v-for="item in goodStateOptions"
                   :key="item.id"
@@ -53,10 +61,10 @@
               </el-select>
             </el-form-item>
             <el-form-item class="types-radio">
-              <el-radio-group v-model="formdata.sum_order" @change="queryList(current_page)">
-                <el-radio label="dept_name">按类型汇总</el-radio>
-                <el-radio label="usr_name">按商品汇总</el-radio>
-                <el-radio label="state">按状态汇总</el-radio>
+              <el-radio-group v-model="formdata.type" @change="queryList(current_page)">
+                <el-radio :label="1">按类型汇总</el-radio>
+                <el-radio :label="2">按商品汇总</el-radio>
+                <el-radio :label="3">按状态汇总</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-form>
@@ -68,18 +76,37 @@
       </div>
       <div class="main-content">
         <el-table border :data="tableData">
-          <el-table-column label="序号" prop="id"></el-table-column>
-          <el-table-column label="统计变量" prop="sum"></el-table-column>
-          <el-table-column label="下单时间" prop="time_begin"></el-table-column>
-          <el-table-column label="结束时间" prop="time_end"></el-table-column>
-          <el-table-column label="姓名" prop="username"></el-table-column>
-          <el-table-column label="部门" prop="department"></el-table-column>
-          <el-table-column label="类型" prop="good_type"></el-table-column>
-          <el-table-column label="商品名称" prop="good_name"></el-table-column>
-          <el-table-column label="单位" prop="unit"></el-table-column>
-          <el-table-column label="数量" prop="count"></el-table-column>
-          <el-table-column label="商品总金额" prop="price"></el-table-column>
-          <el-table-column label="备注" prop="remark"></el-table-column>
+          <el-table-column label="序号" type="index" width="50px"></el-table-column>
+          <el-table-column label="统计变量">
+            <div slot-scope="scoped" v-html="showCellData(scoped.row.statistic)"></div>
+          </el-table-column>
+          <el-table-column label="下单时间">
+            <div slot-scope="scoped" v-html="showCellData(scoped.row.create_time)"></div>
+          </el-table-column>
+          <el-table-column label="结束时间">
+            <div slot-scope="scoped" v-html="showCellData(scoped.row.used_time)"></div>
+          </el-table-column>
+          <el-table-column label="姓名">
+            <div slot-scope="scoped" v-html="showCellData(scoped.row.username)"></div>
+          </el-table-column>
+          <el-table-column label="部门">
+            <div slot-scope="scoped" v-html="showCellData(scoped.row.department)"></div>
+          </el-table-column>
+          <el-table-column label="类型">
+            <div slot-scope="scoped" v-html="showCellData(scoped.row.category)"></div>
+          </el-table-column>
+          <el-table-column label="商品名称">
+            <div slot-scope="scoped" v-html="showCellData(scoped.row.product)"></div>
+          </el-table-column>
+          <el-table-column label="单位">
+            <div slot-scope="scoped" v-html="showCellData(scoped.row.unit)"></div>
+          </el-table-column>
+          <el-table-column label="数量">
+            <div slot-scope="scoped" v-html="showCellData(scoped.row.order_count)"></div>
+          </el-table-column>
+          <el-table-column label="报表总销售额">
+            <div slot-scope="scoped" v-html="showCellData(scoped.row.order_money)"></div>
+          </el-table-column>
         </el-table>
         <pagination
           :total="total"
@@ -94,8 +121,11 @@
 
 <script>
 import $axios from "@/api/index";
+import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
+import store from "@/store";
 import Pagination from "@/components/Pagination";
 const good_state = [
+  { id: 0, name: "全部" },
   { id: 1, name: "已完成" },
   { id: 2, name: "未完成" },
   { id: 3, name: "待取货" },
@@ -105,13 +135,41 @@ export default {
   components: { Pagination },
   data() {
     return {
+      loading: false,
       company_id: "",
       canteen_id: "",
-      formdata: {},
-      goodsTypeOptions: [],
-      goodsOptions: [],
+      formdata: {
+        type: 1
+      },
+      categoryOptions: [],
+      productOptions: [],
       goodStateOptions: good_state,
-      tableData: [],
+      tableData: [
+        {
+          statistic: "商品12",
+          create_time: "2019-10-28 23:49:27",
+          used_time: null,
+          username: "",
+          department: "",
+          category: "商品12",
+          unit: "kg",
+          product: "",
+          order_count: "7",
+          order_money: "119.00"
+        },
+        {
+          statistic: "公司餐",
+          create_time: "2019-10-29 10:20:17",
+          used_time: null,
+          username: "",
+          department: "",
+          category: "公司餐",
+          unit: "元/500g",
+          product: "",
+          order_count: "6",
+          order_money: "48.00"
+        }
+      ],
       isDisabled: true,
       current_page: 1,
       size: 10,
@@ -120,11 +178,7 @@ export default {
   },
   computed: {
     isAble() {
-      return (
-        !!this.formdata.time_end &&
-        !!this.formdata.time_begin &&
-        !!this.formdata.company_ids
-      );
+      return !!this.formdata.time_end && !!this.formdata.time_begin;
     }
   },
   watch: {
@@ -132,10 +186,48 @@ export default {
       this.isDisabled = !val;
     }
   },
+  created() {
+    this.getCategoryOptions();
+    this.getProductsId();
+  },
   methods: {
+    async getCategoryOptions() {
+      const res = await $axios.get("/v1/company/categories");
+      if (res.msg === "ok") {
+        this.categoryOptions = unshiftAllOptions(Array.from(res.data));
+      }
+    },
+    async getProductsId(id) {
+      const res = await this.$axios({
+        url: `/v1/shop/supplierProducts/search`,
+        methods: "get",
+        headers: { token: store.getters.token }
+      });
+      if (res.data.msg === "ok") {
+        console.log(res.data.data);
+        this.productOptions = unshiftAllOptions(Array.from(res.data.data));
+      }
+    },
+    async remoteMethod(query) {
+      if (query != "") {
+        this.loading = true;
+        const res = await this.$axios({
+          url: `/v1/shop/supplierProducts/search?product=${query}`,
+          methods: "get",
+          headers: { token: store.getters.token }
+        });
+        if (res.data.msg === "ok") {
+          console.log(res.data.data);
+          this.productOptions = Array.from(res.data.data);
+        }
+        this.loading = false;
+      } else {
+        await this.getProductsId();
+      }
+    },
     async queryList(page) {
       page = page || 1;
-      const res = await $axios.get("/v1/shop/cms/products", this.formdata); //待对接
+      const res = await $axios.get("/v1/shop/orderConsumption", this.formdata); //待对接
       if (res.msg === "ok") {
         this.tableData = Array.from(res.data.data);
         this.total = res.data.total;
@@ -154,10 +246,10 @@ export default {
     display: flex;
     flex-wrap: wrap;
     .el-input {
-      width: 220px;
+      width: 250px;
     }
     .el-select {
-      width: 220px;
+      width: 250px;
     }
     .types-radio {
       display: flex;

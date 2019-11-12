@@ -32,7 +32,7 @@
                     :value="item.id"
                   ></el-option>
                 </el-select>
-              </el-form-item> -->
+              </el-form-item>-->
               <el-form-item label="姓名">
                 <el-input placeholder="请输入姓名" v-model="formdata.username"></el-input>
               </el-form-item>
@@ -64,20 +64,26 @@
           </div>
         </div>
         <div class="total" v-show="total > 0">
-          <span
-            >共有 <strong>{{ total }}</strong> 条记录</span
-          >
+          <span>
+            共有
+            <strong>{{ total }}</strong> 条记录
+          </span>
         </div>
         <div class="main-content">
           <el-table style="width:100%" :data="tableData" border>
-             <el-table-column label="创建时间" prop="create_time"></el-table-column>
-             <el-table-column label="姓名" prop="username"></el-table-column>
-             <el-table-column label="充值金额" prop="money"></el-table-column>
-             <el-table-column label="充值途径" prop="type"></el-table-column>
-             <el-table-column label="充值人员" prop="admin"></el-table-column>
-             <el-table-column label="备注" prop="remark"></el-table-column>
+            <el-table-column label="创建时间" prop="create_time"></el-table-column>
+            <el-table-column label="姓名" prop="username"></el-table-column>
+            <el-table-column label="充值金额" prop="money"></el-table-column>
+            <el-table-column label="充值途径" prop="type"></el-table-column>
+            <el-table-column label="充值人员" prop="admin"></el-table-column>
+            <el-table-column label="备注" prop="remark"></el-table-column>
           </el-table>
-          <pagination v-show="total > 10" :total="total" :page.sync="current_page" @pagination="getList"></pagination>
+          <pagination
+            v-show="total > 10"
+            :total="total"
+            :page.sync="current_page"
+            @pagination="getList"
+          ></pagination>
         </div>
       </div>
     </div>
@@ -88,7 +94,7 @@
 import $axios from "@/api/index";
 import Pagination from "@/components/Pagination";
 import { flatten } from "@/utils/flatternArr";
-import store from '@/store';
+import store from "@/store";
 export default {
   data() {
     return {
@@ -97,10 +103,10 @@ export default {
         time_begin: "",
         time_end: "",
         admin_id: "",
-        type: "",  
+        type: "",
         username: "",
         page: 1,
-        size: 10,
+        size: 10
       },
       companiesList: [],
       adminList: [
@@ -109,10 +115,10 @@ export default {
         {id: 3,"role": "饭堂管理员3"} */
       ],
       recharge_wayList: [
-        {id: '0',name: '全部',type: "all"},
-        {id: '1',name: '现金',type: "cash"},
-        {id: '2',name: '微信',type: "weixin"},
-        {id: '3',name: '农行',type: "nonghang"}
+        { id: "0", name: "全部", type: "all" },
+        { id: "1", name: "现金", type: "cash" },
+        { id: "2", name: "微信", type: "weixin" },
+        { id: "3", name: "农行", type: "nonghang" }
       ],
       tableData: [
         /* {
@@ -134,19 +140,19 @@ export default {
       ],
       total: 0,
       current_page: 1
-    }
+    };
   },
-  created(){
+  created() {
     this.fetchAdminList();
     // this.getCompanies();
   },
   computed: {
-    companiesVisible(){
+    companiesVisible() {
       return this.grade !== 3;
     }
   },
-  components:{Pagination},
-  methods:{
+  components: { Pagination },
+  methods: {
     getCompanies() {
       $axios
         .get("/v1/admin/companies")
@@ -158,7 +164,7 @@ export default {
             let id = element.id;
             allCompanies.push(id);
           });
-          if(allCompanies.length > 1){
+          if (allCompanies.length > 1) {
             allCompanies = allCompanies.join(",");
             companiesList.unshift({
               name: "全部",
@@ -169,26 +175,26 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    fetchAdminList(){
+    fetchAdminList() {
       // module_id 暂时固定为14
       $axios
         .get("/v1/wallet/recharge/admins?module_id=14")
         .then(res => {
-          console.log(res)
+          console.log(res);
           this.adminList = res.data;
-          if(this.adminList.length > 1){
+          if (this.adminList.length > 1) {
             this.adminList.unshift({
               id: 0,
               role: "全部"
-            })
+            });
           }
         })
         .catch(err => console.log(err));
     },
-    fetchTableList(){
+    fetchTableList() {
       this.formdata.page = this.current_page;
       $axios
-        .get("/v1/wallet/recharges",this.formdata)
+        .get("/v1/wallet/recharges", this.formdata)
         .then(res => {
           // console.log(res)
           this.tableData = Array.from(res.data.data);
@@ -197,7 +203,7 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    getList(val){
+    getList(val) {
       this.current_page = val;
       this.fetchTableList();
     }
@@ -206,7 +212,7 @@ export default {
 </script>
 
 <style lang="scss" scpoed>
-.clearfix::after{
+.clearfix::after {
   content: "";
   display: block;
   clear: both;
