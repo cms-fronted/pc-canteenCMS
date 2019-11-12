@@ -40,12 +40,13 @@
             <el-table-column label="员工编号" prop="code"></el-table-column>
             <el-table-column label="卡号" prop="card_num"></el-table-column>
           </el-table>
+          <pagination v-show="total > 10" :total="total" :page.sync="current_page" @pagination="getList"></pagination>
           <div class="supply-form">
             <el-form :inline="true" :model="formdata" label-width="80px">
               <el-form-item label="公司"  v-if="companiesVisible">
                 <el-select
                   v-model="company_ids"
-                  @change="getList"
+                  @change="getCanteenList"
                   style="width:200px"
                   placeholder="请选择公司"
                 >
@@ -132,26 +133,13 @@ export default {
   data() {
     return {
       grade: store.getters.grade,
+      grade: 3,
       key: "",
       company_ids: "",
       companiesList: [],
       tableData: [
-        /* {
-          id: 1,
-          company: "A企业",
-          department: "后勤部",
-          username: "张三三",
-          code: "aaaaaaaa",
-          card_num: "122324"
-        },
-        {
-          id: 2,
-          company: "B企业",
-          department: "后勤部",
-          username: "李四",
-          code: "aaaaaaaa",
-          card_num: "122324"
-        } */
+        /* { id: 1, company: "A企业", department: "后勤部", username: "张三三", code: "aaaaaaaa", card_num: "122324"},
+        { id: 2, company: "B企业", department: "后勤部", username: "李四", code: "aaaaaaaa", card_num: "122324" }, */
       ],
       formdata: {
         canteen_id: "",
@@ -167,7 +155,10 @@ export default {
       limit: 1,
       header: {
         token: store.getters.token
-      }
+      },
+      total: 0,
+      current_page: 1,
+
     };
   },
   created() {
@@ -182,6 +173,7 @@ export default {
       return this.grade !== 3;
     }
   },
+  components:{Pagination},
   methods: {
     sendMessage(msg) {
       if (msg === "ok") {
@@ -197,8 +189,9 @@ export default {
       }
     },
     queryList(){
+      console.log(this.current_page)
       $axios
-        .get(`/v1/department/staffs/recharge?page=1&size=10&department_id=0&key=${this.key}`)
+        .get(`/v1/department/staffs/recharge?page=${this.current_page}&size=10&department_id=0&key=${this.key}`)
         .then(res => {
           this.tableData = Array.from(res.data.data);
         })
@@ -215,7 +208,7 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    getList(val) {
+    getCanteenList(val) {
       this.fetchCanteenList(val);
       this.formdata.dinner_id = "";
       this.formdata.canteen_id = "";
@@ -263,6 +256,10 @@ export default {
           this.sendMessage(res.msg);
         })
         .catch(err => console.log(err));
+    },
+    getList(val){
+      this.current_page = val;
+      this.queryList();
     },
     handleSuccess(res){
       // console.log(res)
