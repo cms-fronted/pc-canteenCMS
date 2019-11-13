@@ -26,6 +26,12 @@ export const currencyRoutes = [
     redirect: "/order"
   },
   {
+    path: "/print",
+    name: "Print",
+    component: () => import("@/views/print"),
+    hidden: true
+  },
+  {
     path: "/login",
     name: "Login",
     component: () => import("@/views/login"),

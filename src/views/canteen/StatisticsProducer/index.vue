@@ -61,7 +61,10 @@
               </el-select>
             </el-form-item>
             <el-form-item class="types-radio">
-              <el-radio-group v-model="formdata.type" @change="queryList(current_page)">
+              <el-radio-group
+                v-model="formdata.type"
+                @change="queryList(current_page)"
+              >
                 <el-radio :label="1">按类型汇总</el-radio>
                 <el-radio :label="2">按商品汇总</el-radio>
                 <el-radio :label="3">按状态汇总</el-radio>
@@ -70,42 +73,78 @@
           </el-form>
         </div>
         <div class="btn-area">
-          <el-button type="primary" @click="queryList" :disabled="isDisabled">查询</el-button>
+          <el-button type="primary" @click="queryList" :disabled="isDisabled"
+            >查询</el-button
+          >
           <el-button type="primary">导出</el-button>
         </div>
       </div>
       <div class="main-content">
         <el-table border :data="tableData">
-          <el-table-column label="序号" type="index" width="50px"></el-table-column>
+          <el-table-column
+            label="序号"
+            type="index"
+            width="50px"
+          ></el-table-column>
           <el-table-column label="统计变量">
-            <div slot-scope="scoped" v-html="showCellData(scoped.row.statistic)"></div>
+            <div
+              slot-scope="scoped"
+              v-html="showCellData(scoped.row.statistic)"
+            ></div>
           </el-table-column>
           <el-table-column label="下单时间">
-            <div slot-scope="scoped" v-html="showCellData(scoped.row.create_time)"></div>
+            <div
+              slot-scope="scoped"
+              v-html="showCellData(scoped.row.create_time)"
+            ></div>
           </el-table-column>
           <el-table-column label="结束时间">
-            <div slot-scope="scoped" v-html="showCellData(scoped.row.used_time)"></div>
+            <div
+              slot-scope="scoped"
+              v-html="showCellData(scoped.row.used_time)"
+            ></div>
           </el-table-column>
           <el-table-column label="姓名">
-            <div slot-scope="scoped" v-html="showCellData(scoped.row.username)"></div>
+            <div
+              slot-scope="scoped"
+              v-html="showCellData(scoped.row.username)"
+            ></div>
           </el-table-column>
           <el-table-column label="部门">
-            <div slot-scope="scoped" v-html="showCellData(scoped.row.department)"></div>
+            <div
+              slot-scope="scoped"
+              v-html="showCellData(scoped.row.department)"
+            ></div>
           </el-table-column>
           <el-table-column label="类型">
-            <div slot-scope="scoped" v-html="showCellData(scoped.row.category)"></div>
+            <div
+              slot-scope="scoped"
+              v-html="showCellData(scoped.row.category)"
+            ></div>
           </el-table-column>
           <el-table-column label="商品名称">
-            <div slot-scope="scoped" v-html="showCellData(scoped.row.product)"></div>
+            <div
+              slot-scope="scoped"
+              v-html="showCellData(scoped.row.product)"
+            ></div>
           </el-table-column>
           <el-table-column label="单位">
-            <div slot-scope="scoped" v-html="showCellData(scoped.row.unit)"></div>
+            <div
+              slot-scope="scoped"
+              v-html="showCellData(scoped.row.unit)"
+            ></div>
           </el-table-column>
           <el-table-column label="数量">
-            <div slot-scope="scoped" v-html="showCellData(scoped.row.order_count)"></div>
+            <div
+              slot-scope="scoped"
+              v-html="showCellData(scoped.row.order_count)"
+            ></div>
           </el-table-column>
           <el-table-column label="报表总销售额">
-            <div slot-scope="scoped" v-html="showCellData(scoped.row.order_money)"></div>
+            <div
+              slot-scope="scoped"
+              v-html="showCellData(scoped.row.order_money)"
+            ></div>
           </el-table-column>
         </el-table>
         <pagination
@@ -144,32 +183,7 @@ export default {
       categoryOptions: [],
       productOptions: [],
       goodStateOptions: good_state,
-      tableData: [
-        {
-          statistic: "商品12",
-          create_time: "2019-10-28 23:49:27",
-          used_time: null,
-          username: "",
-          department: "",
-          category: "商品12",
-          unit: "kg",
-          product: "",
-          order_count: "7",
-          order_money: "119.00"
-        },
-        {
-          statistic: "公司餐",
-          create_time: "2019-10-29 10:20:17",
-          used_time: null,
-          username: "",
-          department: "",
-          category: "公司餐",
-          unit: "元/500g",
-          product: "",
-          order_count: "6",
-          order_money: "48.00"
-        }
-      ],
+      tableData: [],
       isDisabled: true,
       current_page: 1,
       size: 10,
@@ -227,7 +241,10 @@ export default {
     },
     async queryList(page) {
       page = page || 1;
-      const res = await $axios.get("/v1/shop/orderConsumption", this.formdata); //待对接
+      const res = await $axios.get(
+        `/v1/shop/orderConsumption?page=${page}&size=${this.size}`,
+        this.formdata
+      );
       if (res.msg === "ok") {
         this.tableData = Array.from(res.data.data);
         this.total = res.data.total;

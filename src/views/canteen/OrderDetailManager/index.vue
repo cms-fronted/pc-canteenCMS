@@ -6,15 +6,31 @@
       <div class="main clearfix">
         <div class="main-header">
           <div class="select-title">
-            <el-form :model="queryform" :inline="true">
-              <el-form-item label="姓名：">
-                <el-input placeholder="请输入姓名" v-model="queryform.name" style="width:217px"></el-input>
+            <el-form :model="formdata" :inline="true">
+              <el-form-item label="开始">
+                <el-date-picker
+                  value-format="yyyy-MM-dd HH:mm:ss"
+                  format="yyyy-MM-dd"
+                  v-model="formdata.time_begin"
+                  style="width:220px"
+                  type="datetime"
+                ></el-date-picker>
               </el-form-item>
-              <el-form-item label="手机号码：">
-                <el-input placeholder="请输入手机号码" v-model="queryform.phone" style="width:217px"></el-input>
+              <el-form-item label="结束">
+                <el-date-picker
+                  value-format="yyyy-MM-dd HH:mm:ss"
+                  format="yyyy-MM-dd"
+                  v-model="formdata.time_end"
+                  style="width:220px"
+                  type="datetime"
+                ></el-date-picker>
               </el-form-item>
-              <el-form-item label="所属企业：" v-if="companiesVisible">
-                <el-select v-model="queryform.company_id" placeholder="请选择企业">
+              <el-form-item label="公司" v-if="companiesVisible">
+                <el-select
+                  v-model="formdata.company_id"
+                  placeholder="请选择企业"
+                  @change="getDepartmentList"
+                >
                   <el-option
                     v-for="item in companyList"
                     :key="item.id"
@@ -23,8 +39,11 @@
                   ></el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="部门：" v-if="companiesVisible">
-                <el-select v-model="queryform.department_id" placeholder="请选择部门">
+              <el-form-item label="部门">
+                <el-select
+                  v-model="formdata.department_id"
+                  placeholder="请选择部门"
+                >
                   <el-option
                     v-for="item in departmentList"
                     :key="item.id"
@@ -33,79 +52,125 @@
                   ></el-option>
                 </el-select>
               </el-form-item>
-              <el-form-item label="开始时间：">
-                <el-date-picker v-model="queryform.begin_time" style="width:217px" type="datetime"></el-date-picker>
-              </el-form-item>
-              <el-form-item label="结束时间：">
-                <el-date-picker v-model="queryform.end_time" style="width:217px" type="datetime"></el-date-picker>
-              </el-form-item>
-              <el-form-item label="状态：">
-                <el-select v-model="queryform.goodsState" placeholder="请选择状态">
+
+              <el-form-item label="状态">
+                <el-select v-model="formdata.status" placeholder="请选择状态">
                   <el-option
-                    v-for="item in queryform.stateList"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  ></el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item label="商品类型：">
-                <el-select v-model="queryform.type" placeholder="请选择商品">
-                  <el-option
-                    v-for="item in queryform.categoryList"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
-                  ></el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item label="商品名称：">
-                <el-select v-model="queryform.goodsName" placeholder="请选择商品名称">
-                  <el-option
-                    v-for="item in queryform.goodList"
-                    :key="item.value"
-                    :label="item.label"
-                    :value="item.value"
+                    v-for="item in goodStateOptions"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
                   ></el-option>
                 </el-select>
               </el-form-item>
             </el-form>
           </div>
           <div class="btn-area">
+            <el-button type="primary" @click="fetchList" :disabled="isDisabled"
+              >查询</el-button
+            >
             <el-button type="primary" @click="deriveData">导出</el-button>
-            <el-button type="primary" @click="fetchTableList">查询</el-button>
           </div>
         </div>
         <div class="main-content">
           <el-table style="width:100%" :data="tableData" border>
-            <el-table-column label="序号" prop="ordinal"></el-table-column>
-            <el-table-column label="下单时间" prop="begin_time"></el-table-column>
-            <el-table-column label="结束时间" prop="end_time"></el-table-column>
-            <el-table-column label="姓名" prop="name"></el-table-column>
-            <el-table-column label="手机号码" prop="phone"></el-table-column>
-            <el-table-column label="类型" prop="goodsType"></el-table-column>
-            <el-table-column label="商品名称" prop="goodsName"></el-table-column>
-            <el-table-column label="单位" prop="goodsUnit"></el-table-column>
-            <el-table-column label="商品数量" prop="goodsStock"></el-table-column>
-            <el-table-column label="商品金额(元)" prop="goodsPrice"></el-table-column>
-            <el-table-column label="状态" prop="goodsState"></el-table-column>
-            <el-table-column label="地址" prop="address"></el-table-column>
-            <!-- 用户打印的话，发送请求到后台，后台返回一个地址，然后进行下载 -->
-            <el-table-column label="打印">
-              <template slot-scope="props">
-                <el-button
-                  size="mini"
-                  @click="handleEdit(props.$index, props.row)"
-                  v-if="props.row.print"
-                >打印</el-button>
-                <span v-else>/</span>
+            <el-table-column
+              label="序号"
+              type="index"
+              width="50px"
+            ></el-table-column>
+            <el-table-column label="下单时间">
+              <div
+                slot-scope="scoped"
+                v-html="showCellData(scoped.row.create_time)"
+              ></div
+            ></el-table-column>
+            <el-table-column label="结束时间">
+              <div
+                slot-scope="scoped"
+                v-html="showCellData(scoped.row.used_time)"
+              ></div
+            ></el-table-column>
+            <el-table-column label="姓名">
+              <div
+                slot-scope="scoped"
+                v-html="showCellData(scoped.row.username)"
+              ></div
+            ></el-table-column>
+            <el-table-column label="手机号码">
+              <div
+                slot-scope="scoped"
+                v-html="showCellData(scoped.row.phone)"
+              ></div
+            ></el-table-column>
+            <el-table-column label="商品数量">
+              <div
+                slot-scope="scoped"
+                v-html="showCellData(scoped.row.order_count)"
+              ></div>
+            </el-table-column>
+            <el-table-column label="商品金额(元)">
+              <div
+                slot-scope="scoped"
+                v-html="showCellData(scoped.row.money)"
+              ></div
+            ></el-table-column>
+            <el-table-column label="地址">
+              <template slot-scope="scoped">
+                <span>{{
+                  scoped.row.address ? scoped.row.address.address : "/"
+                }}</span>
               </template>
             </el-table-column>
-            <el-table-column label="备注" prop="remark"></el-table-column>
+            <el-table-column label="操作">
+              <template slot-scope="scoped">
+                <span
+                  ><el-button type="text" @click="checkDetail(scoped.row)"
+                    >明细</el-button
+                  ><el-button type="text" @click="print(scoped.row)"
+                    >打印</el-button
+                  ></span
+                >
+              </template>
+            </el-table-column>
           </el-table>
+          <pagination
+            :total="total"
+            :pageSize="size"
+            @pagination="fetchList"
+            :currentPage="current_page"
+          ></pagination>
         </div>
       </div>
     </div>
+    <el-dialog
+      ref="detail"
+      :visible.sync="detailDialogVisible"
+      width="375px"
+      @close="closeDetailDialog"
+      title="明细"
+      center
+    >
+      <!-- <ul>
+        <li>收货人：{{detailForm.address.name}}</li>
+        <li>手机号码：{{detailForm.address.phone}}</li>
+        <li>送货时间{{detailForm.address.name}}</li>
+        <li>送货地址{{detailForm.address.province+ detailForm.address.city+detailForm.address.area + detailForm.address.address}}</li>
+      </ul>-->
+      <!-- <p style="textAlign:center">订单明细</p> -->
+      <el-table size="mini" :data="detailForm.foods">
+        <el-table-column label="类型" prop="category"></el-table-column>
+        <el-table-column label="名称" prop="name"></el-table-column>
+        <el-table-column label="单位" prop="unit"></el-table-column>
+        <el-table-column label="数量" prop="count"></el-table-column>
+        <el-table-column label="金额" prop="price">
+          <div
+            slot-scope="scoped"
+            v-html="showCellData(scoped.row.price)"
+          ></div>
+        </el-table-column>
+      </el-table>
+    </el-dialog>
   </div>
 </template>
 
@@ -118,76 +183,65 @@
 import $axios from "@/api/index";
 import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
 import store from "@/store";
+import Pagination from "@/components/Pagination";
+const good_state = [
+  { id: 0, name: "全部" },
+  { id: 1, name: "已完成" },
+  { id: 2, name: "未完成" },
+  { id: 3, name: "待取货" },
+  { id: 4, name: "已取货" }
+];
 export default {
+  components: { Pagination },
   data() {
     return {
       grade: store.getters.grade,
+      detailDialogVisible: false,
       companyList: [],
       departmentList: [],
-      queryform: {
-        name: "",
-        phone: "",
-        type: "",
-        categoryList: [],
-        department_id: "",
-        company_id: "",
-        begin_time: "",
-        end_time: "",
-        goodsState: "",
-        stateList: [
-          { name: "全部", label: "全部" },
-          { name: "已完成", label: "已完成" },
-          { name: "已取消", label: "已取消" },
-          { name: "待取货", label: "待取货" },
-          { name: "待送货", label: "待送货" }
-        ],
-        goodsName: "",
-        goodList: []
-      },
+      goodStateOptions: good_state,
+      formdata: {},
       tableData: [
         {
-          ordinal: "1",
-          begin_time: "2019-05-25  8:30",
-          end_time: "2019-05-25  8:35",
-          name: "test1",
-          phone: "13547546780",
-          goodsType: "蔬菜、水果",
-          goodsName: "白菜、西洋菜",
-          goodsUnit: "斤",
-          goodsStock: "10",
-          goodsPrice: "5",
-          goodsState: "已取消",
-          address: "白石大道东11号",
-          print: true,
-          remark: "/"
-        },
-        {
-          ordinal: "2",
-          begin_time: "2019-06-25  8:30",
-          end_time: "2019-06-25  8:35",
-          name: "test2",
-          phone: "13547546580",
-          goodsType: "蔬菜",
-          goodsName: "西洋菜",
-          goodsUnit: "斤",
-          goodsStock: "10",
-          goodsPrice: "3",
-          goodsState: "待取货",
-          address: "/",
-          print: false,
-          remark: "xxx"
+          order_id: 6,
+          create_time: "2019-09-28 08:14:10",
+          used_time: null,
+          username: "LANGBIN",
+          phone: "15521323081",
+          order_count: 2,
+          money: 10,
+          address_id: 1,
+          address: {
+            id: 1,
+            address: "江门市白石大道东4号路3栋"
+          }
         }
-      ]
+      ],
+      detailForm: {},
+      isDisabled: true,
+      current_page: 1,
+      size: 10,
+      total: 0
     };
+  },
+  watch: {
+    isAble(val) {
+      this.isDisabled = !val;
+    }
   },
   computed: {
     companiesVisible() {
       return this.grade !== 3;
+    },
+    isAble() {
+      return !!this.formdata.time_end && !!this.formdata.time_begin;
     }
   },
   created() {
     if (this.companiesVisible) {
       this.getCompanies();
+    } else {
+      this.getDepartmentListWithoutCid();
     }
   },
   methods: {
@@ -197,30 +251,49 @@ export default {
         .then(res => {
           let arr = res.data;
           let allCompanies = [];
-          let companiesList = getAllOptions(flatten(arr));
+          let companiesList = flatten(arr);
           this.companyList = companiesList;
         })
         .catch(err => console.log(err));
     },
-    getDepartmentList(company_id) {
-      if (company_id) {
-        $axios
-          .get(`v1/departments?c_id=${company_id}`)
-          .then(res => {
-            let arr = res.data;
-            let departmentList = unshiftAllOptions(flatten(arr));
-            this.departmentList = departmentList;
-          })
-          .catch(err => console.log(err));
+    async getDepartmentList(company_id) {
+      const res = await $axios.get(`v1/departments?c_id=${company_id}`);
+      if (res.msg === "ok") {
+        this.departmentList = unshiftAllOptions(Array.from(flatten(res.data)));
       }
     },
-    handleEdit(index, row) {
-      console.log(row);
-      console.log("打印按钮被你点击啦！");
+    async getDepartmentListWithoutCid() {
+      const res = await $axios.get("/v1/admin/departments");
+      if (res.msg === "ok") {
+        this.departmentList = unshiftAllOptions(Aarray.from(res.data));
+      }
     },
-    fetchTableList() {
-      console.log("获取查询后的列表");
+    async fetchList(page) {
+      page = typeof page === Number ? page : 1;
+      // page = page || 1;
+      const res = await $axios.get(
+        `/v1/shop/order/statistic/manager?page=${page}&size=${this.size}`,
+        this.formdata
+      );
+      if (res.msg === "ok") {
+        this.tableData = Array.from(res.data.data);
+        this.total = res.data.total;
+        this.current_page = res.data.current_page;
+      }
     },
+    closeDetailDialog() {
+      this.detailDialogVisible = false;
+      this.detailForm = {};
+    },
+    async checkDetail(row) {
+      let id = row.order_id;
+      console.log(this.$refs.detail.$el.innerHTML);
+      let inner = this.$refs.detail.$el.innerHTML;
+      var newWeb = window.open('/print');
+      newWeb.document.write(inner);
+
+    },
+    print(row) {},
     deriveData() {
       console.log("点击导出表格");
     }
@@ -235,6 +308,9 @@ export default {
   clear: both;
 }
 .shop-order-detail-manager {
+  .el-select {
+    width: 220px;
+  }
   .main-header {
     .select-title {
       float: left;
@@ -247,6 +323,7 @@ export default {
       width: 10%;
       display: flex;
       flex-direction: column;
+      display: block;
       .el-button {
         margin-bottom: 20px;
       }

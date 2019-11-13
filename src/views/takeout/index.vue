@@ -115,6 +115,7 @@
       </div>
     </div>
     <el-dialog
+      ref="print"
       :visible.sync="detailDialogVisible"
       width="375px"
       @close="closeDetailDialog"
