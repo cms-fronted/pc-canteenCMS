@@ -221,7 +221,7 @@ export default {
           _add.push(id);
         }
       });
-      _cancel = Array.from(new Set(_cancel));
+      _cancel = Array.from(new Set(_cancel)); //去重
       return { _add, _cancel };
     },
     async _edit() {

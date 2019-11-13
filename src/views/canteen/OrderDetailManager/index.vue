@@ -1,164 +1,179 @@
 <template>
-  <div>
-    <div class="shop-order-detail-manager">
-      <div class="nav-title">订单明细查询</div>
-      <el-divider></el-divider>
-      <div class="main clearfix">
-        <div class="main-header">
-          <div class="select-title">
-            <el-form :model="formdata" :inline="true">
-              <el-form-item label="开始">
-                <el-date-picker
-                  value-format="yyyy-MM-dd HH:mm:ss"
-                  format="yyyy-MM-dd"
-                  v-model="formdata.time_begin"
-                  style="width:220px"
-                  type="datetime"
-                ></el-date-picker>
-              </el-form-item>
-              <el-form-item label="结束">
-                <el-date-picker
-                  value-format="yyyy-MM-dd HH:mm:ss"
-                  format="yyyy-MM-dd"
-                  v-model="formdata.time_end"
-                  style="width:220px"
-                  type="datetime"
-                ></el-date-picker>
-              </el-form-item>
-              <el-form-item label="公司" v-if="companiesVisible">
-                <el-select
-                  v-model="formdata.company_id"
-                  placeholder="请选择企业"
-                  @change="getDepartmentList"
-                >
-                  <el-option
-                    v-for="item in companyList"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id"
-                  ></el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item label="部门">
-                <el-select
-                  v-model="formdata.department_id"
-                  placeholder="请选择部门"
-                >
-                  <el-option
-                    v-for="item in departmentList"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id"
-                  ></el-option>
-                </el-select>
-              </el-form-item>
+  <div class="shop-order-detail-manager">
+    <div class="nav-title">订单明细查询</div>
+    <el-divider></el-divider>
+    <div class="main">
+      <div class="main-header">
+        <div class="select-title">
+          <el-form :model="formdata" :inline="true">
+            <el-form-item label="开始">
+              <el-date-picker
+                value-format="yyyy-MM-dd HH:mm:ss"
+                format="yyyy-MM-dd"
+                v-model="formdata.time_begin"
+                style="width:220px"
+                type="datetime"
+              ></el-date-picker>
+            </el-form-item>
+            <el-form-item label="结束">
+              <el-date-picker
+                value-format="yyyy-MM-dd HH:mm:ss"
+                format="yyyy-MM-dd"
+                v-model="formdata.time_end"
+                style="width:220px"
+                type="datetime"
+              ></el-date-picker>
+            </el-form-item>
+            <el-form-item label="公司" v-if="companiesVisible">
+              <el-select
+                v-model="formdata.company_id"
+                placeholder="请选择企业"
+                @change="getDepartmentList"
+              >
+                <el-option
+                  v-for="item in companyList"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+            <el-form-item label="部门">
+              <el-select
+                v-model="formdata.department_id"
+                placeholder="请选择部门"
+              >
+                <el-option
+                  v-for="item in departmentList"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                ></el-option>
+              </el-select>
+            </el-form-item>
 
-              <el-form-item label="状态">
-                <el-select v-model="formdata.status" placeholder="请选择状态">
-                  <el-option
-                    v-for="item in goodStateOptions"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id"
-                  ></el-option>
-                </el-select>
-              </el-form-item>
-            </el-form>
-          </div>
-          <div class="btn-area">
-            <el-button type="primary" @click="fetchList" :disabled="isDisabled"
-              >查询</el-button
-            >
-            <el-button type="primary" @click="deriveData">导出</el-button>
-          </div>
+            <el-form-item label="状态">
+              <el-select v-model="formdata.status" placeholder="请选择状态">
+                <el-option
+                  v-for="item in goodStateOptions"
+                  :key="item.id"
+                  :label="item.name"
+                  :value="item.id"
+                ></el-option>
+              </el-select>
+            </el-form-item>
+          </el-form>
         </div>
-        <div class="main-content">
-          <el-table style="width:100%" :data="tableData" border>
-            <el-table-column
-              label="序号"
-              type="index"
-              width="50px"
-            ></el-table-column>
-            <el-table-column label="下单时间">
-              <div
-                slot-scope="scoped"
-                v-html="showCellData(scoped.row.create_time)"
-              ></div
-            ></el-table-column>
-            <el-table-column label="结束时间">
-              <div
-                slot-scope="scoped"
-                v-html="showCellData(scoped.row.used_time)"
-              ></div
-            ></el-table-column>
-            <el-table-column label="姓名">
-              <div
-                slot-scope="scoped"
-                v-html="showCellData(scoped.row.username)"
-              ></div
-            ></el-table-column>
-            <el-table-column label="手机号码">
-              <div
-                slot-scope="scoped"
-                v-html="showCellData(scoped.row.phone)"
-              ></div
-            ></el-table-column>
-            <el-table-column label="商品数量">
-              <div
-                slot-scope="scoped"
-                v-html="showCellData(scoped.row.order_count)"
-              ></div>
-            </el-table-column>
-            <el-table-column label="商品金额(元)">
-              <div
-                slot-scope="scoped"
-                v-html="showCellData(scoped.row.money)"
-              ></div
-            ></el-table-column>
-            <el-table-column label="地址">
-              <template slot-scope="scoped">
-                <span>{{
-                  scoped.row.address ? scoped.row.address.address : "/"
-                }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column label="操作">
-              <template slot-scope="scoped">
-                <span
-                  ><el-button type="text" @click="checkDetail(scoped.row)"
-                    >明细</el-button
-                  ><el-button type="text" @click="print(scoped.row)"
-                    >打印</el-button
-                  ></span
-                >
-              </template>
-            </el-table-column>
-          </el-table>
-          <pagination
-            :total="total"
-            :pageSize="size"
-            @pagination="fetchList"
-            :currentPage="current_page"
-          ></pagination>
+        <div class="btn-area">
+          <el-button type="primary" @click="fetchList" :disabled="isDisabled"
+            >查询</el-button
+          >
+          <el-button type="primary" @click="deriveData">导出</el-button>
         </div>
+      </div>
+      <div class="main-content">
+        <el-table style="width:100%" :data="tableData" border>
+          <el-table-column
+            label="序号"
+            type="index"
+            width="50px"
+          ></el-table-column>
+          <el-table-column label="下单时间">
+            <div
+              slot-scope="scoped"
+              v-html="showCellData(scoped.row.create_time)"
+            ></div
+          ></el-table-column>
+          <el-table-column label="结束时间">
+            <div
+              slot-scope="scoped"
+              v-html="showCellData(scoped.row.used_time)"
+            ></div
+          ></el-table-column>
+          <el-table-column label="姓名">
+            <div
+              slot-scope="scoped"
+              v-html="showCellData(scoped.row.username)"
+            ></div
+          ></el-table-column>
+          <el-table-column label="手机号码">
+            <div
+              slot-scope="scoped"
+              v-html="showCellData(scoped.row.phone)"
+            ></div
+          ></el-table-column>
+          <el-table-column label="商品数量">
+            <div
+              slot-scope="scoped"
+              v-html="showCellData(scoped.row.order_count)"
+            ></div>
+          </el-table-column>
+          <el-table-column label="商品金额(元)">
+            <div
+              slot-scope="scoped"
+              v-html="showCellData(scoped.row.money)"
+            ></div
+          ></el-table-column>
+          <el-table-column label="地址">
+            <template slot-scope="scoped">
+              <span>{{
+                scoped.row.address ? scoped.row.address.address : "/"
+              }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作">
+            <template slot-scope="scoped">
+              <span
+                ><el-button type="text" @click="checkDetail(scoped.row)"
+                  >明细</el-button
+                ><el-button
+                  type="text"
+                  @click="print(scoped.row)"
+                  v-loading.fullscreen.lock="fullscreenLoading"
+                  >打印</el-button
+                ></span
+              >
+            </template>
+          </el-table-column>
+        </el-table>
+        <pagination
+          :total="total"
+          :pageSize="size"
+          @pagination="fetchList"
+          :currentPage="current_page"
+        ></pagination>
       </div>
     </div>
     <el-dialog
       ref="detail"
       :visible.sync="detailDialogVisible"
-      width="375px"
+      width="520px"
       @close="closeDetailDialog"
-      title="明细"
+      :title="dialogTitle"
       center
+      :show-close="false"
+      top="5vh"
     >
-      <!-- <ul>
-        <li>收货人：{{detailForm.address.name}}</li>
-        <li>手机号码：{{detailForm.address.phone}}</li>
-        <li>送货时间{{detailForm.address.name}}</li>
-        <li>送货地址{{detailForm.address.province+ detailForm.address.city+detailForm.address.area + detailForm.address.address}}</li>
-      </ul>-->
-      <!-- <p style="textAlign:center">订单明细</p> -->
-      <el-table size="mini" :data="detailForm.foods">
+      <ul>
+        <li v-if="isPrint">收货人：{{ detailForm.address.name }}</li>
+        <li v-if="isPrint">手机号码：{{ detailForm.address.phone }}</li>
+        <!-- <li v-if="isPrint">送货时间{{ detailForm.address.name }}</li> -->
+        <li v-if="isPrint">
+          送货地址：{{
+            detailForm.address.province +
+              detailForm.address.city +
+              detailForm.address.area +
+              detailForm.address.address
+          }}
+        </li>
+      </ul>
+      <p v-if="isPrint" style="textAlign:center">订单明细</p>
+      <el-table
+        size="mini"
+        :data="detailForm.products"
+        :cell-class-name="tableRowClassName"
+        :header-cell-class-name="tableRowClassName"
+      >
         <el-table-column label="类型" prop="category"></el-table-column>
         <el-table-column label="名称" prop="name"></el-table-column>
         <el-table-column label="单位" prop="unit"></el-table-column>
@@ -195,7 +210,9 @@ export default {
   components: { Pagination },
   data() {
     return {
+      fullscreenLoading: false,
       grade: store.getters.grade,
+      isPrint: false,
       detailDialogVisible: false,
       companyList: [],
       departmentList: [],
@@ -217,7 +234,17 @@ export default {
           }
         }
       ],
-      detailForm: {},
+      detailForm: {
+        products: [
+          {
+            category: "111",
+            name: "11111",
+            price: "1111",
+            unit: "11111",
+            count: "111"
+          }
+        ]
+      },
       isDisabled: true,
       current_page: 1,
       size: 10,
@@ -235,6 +262,9 @@ export default {
     },
     isAble() {
       return !!this.formdata.time_end && !!this.formdata.time_begin;
+    },
+    dialogTitle() {
+      return !this.isPrint ? "订单明细" : "小票";
     }
   },
   created() {
@@ -243,8 +273,12 @@ export default {
     } else {
       this.getDepartmentListWithoutCid();
     }
+    $axios.get("/v1/order/detail?id=8&type=1").then(res => console.log(res));
   },
   methods: {
+    tableRowClassName({ row, column, rowIndex, columnIndex }) {
+      return "table-border";
+    },
     getCompanies() {
       $axios
         .get("/v1/admin/companies")
@@ -283,17 +317,32 @@ export default {
     },
     closeDetailDialog() {
       this.detailDialogVisible = false;
+      this.isPrint = false;
       this.detailForm = {};
     },
     async checkDetail(row) {
       let id = row.order_id;
-      console.log(this.$refs.detail.$el.innerHTML);
-      let inner = this.$refs.detail.$el.innerHTML;
-      var newWeb = window.open('/print');
-      newWeb.document.write(inner);
-
+      const res = await $axios.get(`/v1/shop/order/products?order_id=${id}`);
+      if (res.msg === "ok") {
+        this.detailForm = Object.assign({}, res.data);
+        this.detailDialogVisible = true;
+      }
+      // console.log(this.$refs.detail.$el.innerHTML);
     },
-    print(row) {},
+    async print(row) {
+      this.isPrint = true;
+      let id = row.order_id;
+      const res = await $axios.get(`/v1/shop/order/products?order_id=${id}`);
+      if (res.msg === "ok") {
+        this.detailForm = Object.assign({}, res.data);
+        this.detailDialogVisible = true;
+      }
+      this.fullscreenLoading = true;
+      setTimeout(() => {
+        this.fullscreenLoading = false;
+        this.$print(this.$refs.detail, { noPrint: ".el-button" });
+      }, 1000);
+    },
     deriveData() {
       console.log("点击导出表格");
     }
@@ -302,6 +351,12 @@ export default {
 </script>
 
 <style lang="scss" scpoed>
+.el-table .table-border {
+  border: 1px solid #111;
+}
+.el-table::before {
+  height: 0;
+}
 .clearfix::after {
   content: "";
   display: block;

@@ -46,7 +46,8 @@ import {
   Radio,
   RadioGroup,
   Checkbox,
-  CheckboxGroup
+  CheckboxGroup,
+  Loading
 } from "element-ui";
 Message.install = () => {
   Vue.prototype.$message = Message;
@@ -59,6 +60,7 @@ Notification.install = () => {
 };
 
 Vue.use(InputNumber);
+Vue.use(Loading);
 Vue.use(TimeSelect);
 Vue.use(Checkbox);
 Vue.use(CheckboxGroup);
