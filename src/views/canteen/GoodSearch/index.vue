@@ -111,6 +111,4 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.good-search {
-}
 </style>
