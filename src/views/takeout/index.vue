@@ -59,13 +59,8 @@
               <el-option label="未打印" :value="2"></el-option>
             </el-select>
           </el-form-item>
-          <el-button type="primary" @click="queryList" :disabled="isDisabled"
-            >查询</el-button
-          >
+          <el-button type="primary" @click="queryList" :disabled="isDisabled">查询</el-button>
           <el-button type="primary">导出</el-button>
-          <el-button type="success" @click="openDetailDialog"
-            >打印小票</el-button
-          >
         </el-form>
       </div>
       <div class="main-content">
@@ -82,36 +77,41 @@
                 <el-button
                   type="text"
                   @click="openDetailDialog(scoped.row.dinner)"
-                  >{{ scoped.row.dinner }}</el-button
-                >
+                >{{ scoped.row.dinner }}</el-button>
               </span>
             </template>
           </el-table-column>
           <el-table-column label="金额" prop="money"></el-table-column>
           <el-table-column label="送货地点" show-overflow-tooltip>
             <template slot-scope="scoped">
-              <span>{{
+              <span>
+                {{
                 scoped.row.province +
-                  scoped.row.area +
-                  scoped.row.city +
-                  scoped.row.address
-              }}</span>
+                scoped.row.area +
+                scoped.row.city +
+                scoped.row.address
+                }}
+              </span>
             </template>
           </el-table-column>
           <el-table-column label="状态">
             <template slot-scope="scoped">
-              <el-tag :type="scoped.row.used === 1 ? 'success' : 'warning'">{{
+              <el-tag :type="scoped.row.used === 1 ? 'success' : 'warning'">
+                {{
                 scoped.row.used === 1 ? "已派单" : "未派单"
-              }}</el-tag>
+                }}
+              </el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作">
+            <template slot-scope="scoped">
+              <span>
+                <el-button type="success" @click="openDetailDialog(scoped.row)">打印小票</el-button>
+              </span>
             </template>
           </el-table-column>
         </el-table>
-        <pagination
-          v-if="!tableData"
-          :total="total"
-          :page="current_page"
-          @pagination="queryList"
-        ></pagination>
+        <pagination v-if="!tableData" :total="total" :page="current_page" @pagination="queryList"></pagination>
       </div>
     </div>
     <el-dialog
@@ -121,21 +121,25 @@
       @close="closeDetailDialog"
       title="小票"
       center
+      :show-close="false"
+      top="5vh"
     >
-      <!-- <ul>
+      <ul>
         <li>收货人：{{detailForm.address.name}}</li>
         <li>手机号码：{{detailForm.address.phone}}</li>
-        <li>送货时间{{detailForm.address.name}}</li>
-        <li>送货地址{{detailForm.address.province+ detailForm.address.city+detailForm.address.area + detailForm.address.address}}</li>
-      </ul>-->
-      <p style="textAlign:center">订单明细</p>
+        <li>送货时间：{{detailForm.address.name}}</li>
+        <li>送货地址：{{detailForm.address.province+ detailForm.address.city+detailForm.address.area + detailForm.address.address}}</li>
+      </ul>
+      <p style="textAlign:center; fontSize:18px">订单明细</p>
       <el-table size="mini" :data="detailForm.foods">
         <el-table-column label="菜品" prop="name"></el-table-column>
         <el-table-column label="数量" prop="count"></el-table-column>
         <el-table-column label="金额" prop="price">
-          <template slot-scope="scoped">{{
+          <template slot-scope="scoped">
+            {{
             scoped.row.price ? scoped.row.price : "/"
-          }}</template>
+            }}
+          </template>
         </el-table-column>
       </el-table>
     </el-dialog>
@@ -179,6 +183,12 @@ export default {
       companyOptions: [],
       dinnersOptions: [],
       detailForm: {
+        id: 8,
+        address_id: 1,
+        d_id: 6,
+        type: 2,
+        create_time: "2019-09-09 16:34:15",
+        hidden: 2,
         foods: [
           {
             detail_id: 5,
@@ -193,9 +203,20 @@ export default {
             o_id: 8,
             food_id: 3,
             count: 1,
-            name: "菜品2"
+            name: "菜品2",
+            price: "5.0"
           }
-        ]
+        ],
+        address: {
+          id: 1,
+          province: "广东省",
+          city: "江门市",
+          area: "蓬江区",
+          address: "江门市白石大道东4号路3栋",
+          name: "张三",
+          phone: "18956225230",
+          sex: 1
+        }
       },
       total: 0,
       size: 10,
@@ -209,7 +230,7 @@ export default {
     },
     companiesVisible() {
       return this.grade !== 3;
-    },
+    }
   },
   watch: {
     isAble(val) {
@@ -217,9 +238,9 @@ export default {
     }
   },
   created() {
-    if(this.companiesVisible){
+    if (this.companiesVisible) {
       this.getCompanyOptions();
-    }else{
+    } else {
       this.getCanteenOptions();
     }
   },
@@ -238,10 +259,8 @@ export default {
       let res;
       if (company_ids) {
         if (!Number(company_ids)) return;
-        res = await $axios.get(
-          `/v1/canteens?company_id=${company_ids}`
-        );
-      }else{
+        res = await $axios.get(`/v1/canteens?company_id=${company_ids}`);
+      } else {
         res = await $axios.get("/v1/managerCanteens");
       }
       if (res.msg === "ok") {
@@ -264,9 +283,7 @@ export default {
       queryForm.canteen_id = queryForm.canteen_id ? queryForm.canteen_id : 0;
       queryForm.dinner_id = queryForm.dinner_id ? queryForm.dinner_id : 0;
       const res = await $axios.get(
-        `/v1/order/takeoutStatistic?page=${this.current_page}&size=${
-          this.size
-        }`,
+        `/v1/order/takeoutStatistic?page=${this.current_page}&size=${this.size}`,
         queryForm
       );
       if (res.msg === "ok") {
@@ -276,8 +293,15 @@ export default {
       }
     },
     async openDetailDialog(row) {
-      this.detailDialogVisible = true;
-      console.log(row);
+      let id = row.order_id;
+      const res = await $axios.get(`/v1/order/info/print?order_id=${id}`);
+      if (res.msg === "ok") {
+        this.detailForm = res.data;
+        this.detailDialogVisible = true;
+        setTimeout(() => {
+          this.$print(this.$refs.print);
+        }, 1000);
+      }
     },
     async closeDetailDialog() {
       this.detailDialogVisible = false;
