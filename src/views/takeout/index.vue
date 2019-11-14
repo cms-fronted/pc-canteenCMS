@@ -105,7 +105,7 @@
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scoped">
-              <span>
+              <span v-if="scoped.row.used===2">
                 <el-button type="success" @click="openDetailDialog(scoped.row)">打印小票</el-button>
               </span>
             </template>
