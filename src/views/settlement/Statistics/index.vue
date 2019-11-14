@@ -8,6 +8,7 @@
           <el-form :inline="true" :model="formdata" label-width="80px">
             <el-form-item label="开始">
               <el-date-picker
+                placeholder="请选择时间"
                 v-model="formdata.time_begin"
                 value-format="yyyy-MM-dd HH:mm:ss"
                 format="yyyy-MM-dd"
@@ -16,6 +17,7 @@
             </el-form-item>
             <el-form-item label="结束">
               <el-date-picker
+                placeholder="请选择时间"
                 v-model="formdata.time_end"
                 value-format="yyyy-MM-dd HH:mm:ss"
                 format="yyyy-MM-dd"
@@ -23,7 +25,11 @@
               ></el-date-picker>
             </el-form-item>
             <el-form-item label="公司" v-if="companiesVisible">
-              <el-select v-model="formdata.company_ids" @change="getList" placeholder="请选择公司">
+              <el-select
+                v-model="formdata.company_ids"
+                @change="getList"
+                placeholder="请选择公司"
+              >
                 <el-option
                   v-for="item in companiesList"
                   :key="item.id"
@@ -33,7 +39,11 @@
               </el-select>
             </el-form-item>
             <el-form-item label="消费地点">
-              <el-select v-model="formdata.canteen_id" @change="getDinnersList" placeholder="请选择饭堂">
+              <el-select
+                v-model="formdata.canteen_id"
+                @change="getDinnersList"
+                placeholder="请选择饭堂"
+              >
                 <el-option
                   v-for="item in locationList"
                   :key="item.id"
@@ -43,7 +53,10 @@
               </el-select>
             </el-form-item>
             <el-form-item label="部门" v-if="companiesVisible">
-              <el-select v-model="formdata.department_id" placeholder="请选择部门">
+              <el-select
+                v-model="formdata.department_id"
+                placeholder="请选择部门"
+              >
                 <el-option
                   v-for="item in departmentList"
                   :key="item.id"
@@ -52,18 +65,14 @@
                 ></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="餐次">
-              <el-select v-model="formdata.dinner_id" placeholder="请选择餐次">
-                <el-option
-                  v-for="item in dinnersList"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                ></el-option>
-              </el-select>
+            <el-form-item label="姓名">
+              <el-input
+                v-model="formdata.username"
+                placeholder="请输入姓名"
+              ></el-input>
             </el-form-item>
             <el-form-item label="消费类型">
-              <el-select v-model="formdata.consumption_type">
+              <el-select v-model="formdata.status">
                 <el-option
                   v-for="item in consumptionOptions"
                   :key="item.id"
@@ -73,7 +82,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="人员类型">
-              <el-select v-model="formdata.role">
+              <el-select v-model="formdata.staff_type_id">
                 <el-option
                   v-for="item in roleOptions"
                   :key="item.id"
@@ -83,40 +92,80 @@
               </el-select>
             </el-form-item>
             <el-form-item class="types-radio">
-              <el-radio-group v-model="formdata.sum_order" @change="queryList(current_page)">
-                <el-radio label="dept_name">按部门汇总</el-radio>
-                <el-radio label="usr_name">按姓名汇总</el-radio>
-                <el-radio label="goods_type">按人员类型汇总</el-radio>
-                <el-radio label="goods_name">按消费地点汇总</el-radio>
-                <el-radio label="state">按消费类型汇总</el-radio>
+              <el-radio-group
+                v-model="formdata.type"
+                @change="queryList(current_page)"
+              >
+                <el-radio :label="1">按部门汇总</el-radio>
+                <el-radio :label="2">按姓名汇总</el-radio>
+                <el-radio :label="3">按人员类型汇总</el-radio>
+                <el-radio :label="4">按消费地点汇总</el-radio>
+                <el-radio :label="5">按消费类型汇总</el-radio>
               </el-radio-group>
             </el-form-item>
           </el-form>
         </div>
         <div class="btn-area">
-          <el-button type="primary" @click="queryList" :disabled="isDisabled">查询</el-button>
+          <el-button type="primary" @click="queryList" :disabled="isDisabled"
+            >查询</el-button
+          >
           <el-button type="primary">导出</el-button>
         </div>
       </div>
       <div class="main-content">
         <el-table :data="tableData" border>
-          <el-table-column label="统计变量" prop></el-table-column>
-          <el-table-column label="开始时间" prop></el-table-column>
-          <el-table-column label="结束时间" prop></el-table-column>
-          <el-table-column label="姓名" prop></el-table-column>
-          <el-table-column label="部门" prop></el-table-column>
-          <el-table-column label="消费类型" prop></el-table-column>
-          <el-table-column label="消费地点" prop></el-table-column>
-          <el-table-column label="人员类型" prop></el-table-column>
-          <el-table-column label="早餐数量" prop></el-table-column>
-          <el-table-column label="早餐金额" prop></el-table-column>
-          <el-table-column label="午餐数量" prop></el-table-column>
-          <el-table-column label="午餐金额" prop></el-table-column>
-          <el-table-column label="晚餐数量" prop></el-table-column>
-          <el-table-column label="晚餐金额" prop></el-table-column>
-          <el-table-column label="宵夜数量" prop></el-table-column>
-          <el-table-column label="宵夜金额" prop></el-table-column>
-          <el-table-column label="总金额" prop></el-table-column>
+          <el-table-column type="expand" v-if="formdata.type === 2">
+            <el-table size="mini" :data="tableData.dinner_statstic">
+              <el-table-column label="餐次信息">
+                <div
+                  slot-scope="scoped"
+                  v-html="showCellData(scoped.row.dinner)"
+                ></div>
+              </el-table-column>
+              <el-table-column label="订餐数量">
+                <div
+                  slot-scope="scoped"
+                  v-html="showCellData(scoped.row.order_count)"
+                ></div
+              ></el-table-column>
+              <el-table-column label="金额">
+                <div
+                  slot-scope="scoped"
+                  v-html="showCellData(scoped.row.order_money)"
+                ></div
+              ></el-table-column>
+            </el-table>
+          </el-table-column>
+          <el-table-column label="统计变量">
+            <div
+              slot-scope="scoped"
+              v-html="showCellData(scoped.row.statistic)"
+            ></div
+          ></el-table-column>
+          <el-table-column label="开始时间">
+            <div
+              slot-scope="scoped"
+              v-html="showCellData(scoped.row.time_begin)"
+            ></div
+          ></el-table-column>
+          <el-table-column label="结束时间">
+            <div
+              slot-scope="scoped"
+              v-html="showCellData(scoped.row.time_end)"
+            ></div
+          ></el-table-column>
+          <el-table-column label="姓名">
+            <div
+              slot-scope="scoped"
+              v-html="showCellData(scoped.row.username)"
+            ></div
+          ></el-table-column>
+          <el-table-column label="部门">
+            <div
+              slot-scope="scoped"
+              v-html="showCellData(scoped.row.department)"
+            ></div
+          ></el-table-column>
         </el-table>
         <pagination
           :total="total"
@@ -133,13 +182,13 @@
 import $axios from "@/api/index";
 import Pagination from "@/components/Pagination";
 import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
-import store from '@/store';
+import store from "@/store";
 const consumption_options = [
   { id: 0, name: "全部" },
   { id: 1, name: "订餐就餐" },
   { id: 2, name: "订餐未就餐" },
   { id: 3, name: "未订餐就餐" },
-  { id: 4, name: "补录" }
+  { id: 4, name: "补录操作" }
 ];
 export default {
   components: { Pagination },
@@ -148,13 +197,42 @@ export default {
       grade: store.getters.grade,
       company_id: "",
       canteen_id: "",
-      formdata: {},
+      formdata: {
+        type: 1
+      },
       departmentList: [],
       dinnersList: [],
       locationList: [],
       companiesList: [],
       roleOptions: [],
-      tableData: [],
+      tableData: [
+        {
+          statistic: "股东",
+          time_begin: "2019-10-11",
+          time_end: "2019-11-30",
+          department: "股东",
+          dinnerStatistic: [
+            {
+              dinner_id: 6,
+              dinner: "中餐",
+              order_count: "8",
+              order_money: 28
+            },
+            {
+              dinner_id: 5,
+              dinner: "早餐",
+              order_count: "2",
+              order_money: 4
+            },
+            {
+              dinner_id: 7,
+              dinner: "晚餐",
+              order_count: "5",
+              order_money: 3
+            }
+          ]
+        }
+      ],
       consumptionOptions: consumption_options,
       isDisabled: true,
       current_page: 1,
@@ -164,13 +242,9 @@ export default {
   },
   computed: {
     isAble() {
-      return (
-        !!this.formdata.time_end &&
-        !!this.formdata.time_begin &&
-        !!this.formdata.company_ids
-      );
+      return !!this.formdata.time_end && !!this.formdata.time_begin;
     },
-    companiesVisible(){
+    companiesVisible() {
       return this.grade !== 3;
     }
   },
@@ -180,12 +254,12 @@ export default {
     }
   },
   created() {
-    if(this.companiesVisible){
+    if (this.companiesVisible) {
       this.getCompanies();
-    }else{
+    } else {
       this.getLocationList();
+      this.getDepartmentListWithoutCid();
     }
-    // this.getCompanies();
     this.getRoleType();
   },
   methods: {
@@ -226,8 +300,14 @@ export default {
         this.dinnersList = [{ name: "全部" }];
       }
     },
+    async getDepartmentListWithoutCid() {
+      const res = await $axios.get("/v1/admin/departments");
+      if (res.msg === "ok") {
+        this.departmentList = unshiftAllOptions(Aarray.from(res.data));
+      }
+    },
     getDepartmentList(company_id) {
-      if (company_id) {
+      if (company_id && Number(company_id)) {
         $axios
           .get(`v1/departments?c_id=${company_id}`)
           .then(res => {
@@ -239,14 +319,14 @@ export default {
       }
     },
     getLocationList(company_id) {
-      if (company_id) {
+      if (company_id && Number(company_id)) {
         $axios
           .get(`/v1/canteens?company_id=${company_id}`)
           .then(res => {
             this.locationList = unshiftAllOptions(Array.from(res.data));
           })
           .catch(err => console.log(err));
-      }else{
+      } else {
         $axios
           .get("/v1/managerCanteens")
           .then(res => {
@@ -263,15 +343,25 @@ export default {
     },
     async queryList(page) {
       page = page || 1;
+      const type = this.formdata.type;
       const res = await $axios.get(
-        `/v1/order/orderSettlement?page=${page}&size=${this.size}`,
+        `/v1/order/consumptionStatistic?page=${page}&size=${this.size}`,
         this.formdata
       );
       if (res.msg === "ok") {
-        this.tableData = Array.from(res.data.data);
-        this.current_page = res.data.current_page;
-        this.total = res.data.total;
+        if (type === 2) {
+          this.tableData = Array.from(res.data.statistic.data);
+          this.current_page = res.data.statistic.current_page;
+          this.total = res.data.statistic.total;
+        } else {
+          this.tableData = Array.from(res.data.data);
+          this.current_page = res.data.current_page;
+          this.total = res.data.total;
+        }
       }
+    },
+    test(scoped) {
+      console.log(scoped);
     }
   }
 };
