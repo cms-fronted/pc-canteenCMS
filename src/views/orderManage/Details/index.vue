@@ -22,7 +22,7 @@
                 type="datetime"
               ></el-date-picker>
             </el-form-item>
-            <el-form-item label="公司"  v-if="companiesVisible">
+            <el-form-item label="公司" v-if="companiesVisible">
               <el-select
                 v-model="formdata.company_ids"
                 @change="getList"
@@ -119,7 +119,8 @@
 import $axios from "@/api/index";
 import Pagination from "@/components/Pagination";
 import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
-import store from '@/store';
+import store from "@/store";
+import { type } from 'os';
 export default {
   data() {
     return {
@@ -148,9 +149,9 @@ export default {
     };
   },
   created() {
-    if(this.companiesVisible){
+    if (this.companiesVisible) {
       this.getCompanies();
-    }else{
+    } else {
       this.getLocationList();
     }
   },
@@ -162,7 +163,7 @@ export default {
         !!this.formdata.company_ids
       );
     },
-    companiesVisible(){
+    companiesVisible() {
       return this.grade !== 3;
     }
   },
@@ -224,7 +225,7 @@ export default {
             this.locationList = unshiftAllOptions(Array.from(res.data));
           })
           .catch(err => console.log(err));
-      }else{
+      } else {
         $axios
           .get("/v1/managerCanteens")
           .then(res => {
@@ -233,8 +234,10 @@ export default {
           .catch(err => console.log(err));
       }
     },
-    queryList() {
-      let { page, pageSize, sum } = this;
+    queryList(page) {
+      console.log(page,typeof page);
+      page = typeof page == "number" ? page : 1;
+      let { pageSize, sum } = this;
       let {
         name,
         company_ids,
@@ -246,7 +249,7 @@ export default {
         department_id
       } = this.formdata;
       $axios
-        .get("/v1/order/orderStatistic/detail", {
+        .get(`v1/order/orderStatistic/detail?page=${page}&size=${pageSize}`, {
           name: name,
           company_ids: company_ids,
           time_end: time_end,

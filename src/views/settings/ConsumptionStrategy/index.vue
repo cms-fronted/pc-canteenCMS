@@ -5,7 +5,7 @@
     <div class="main">
       <div class="main-header">
         <el-form :model="queryForm" :inline="true" label-width="60px">
-          <el-form-item label="公司"  v-if="companiesVisible">
+          <el-form-item label="公司" v-if="companiesVisible">
             <el-select v-model="queryForm.company_id" @change="getCanteenList">
               <el-option
                 v-for="item in companiesList"
@@ -375,12 +375,12 @@ export default {
   computed: {
     companiesVisible() {
       return this.grade !== 3;
-    },
+    }
   },
   created() {
-    if(this.companiesVisible){
+    if (this.companiesVisible) {
       this.getCompanies();
-    }else{
+    } else {
       this.getCanteenList();
     }
   },
@@ -397,14 +397,14 @@ export default {
         .catch(err => console.log(err));
     },
     async getCanteenList(company_id) {
-      if(company_id){
+      if (company_id) {
         await $axios
           .get(`/v1/canteens?company_id=${company_id}`)
           .then(res => {
             this.canteenList = Array.from(res.data);
           })
           .catch(err => console.log(err));
-      }else{
+      } else {
         await $axios
           .get("/v1/managerCanteens")
           .then(res => {
@@ -540,6 +540,7 @@ export default {
     },
     //提交消费策略设置修改请求
     async changeSetting() {
+      this.editSettingForm.consumption_count = this.detail.length;
       this.editSettingForm.detail = JSON.stringify(this.detail);
       await $axios
         .post("/v1/canteen/consumptionStrategy/update", this.editSettingForm)
