@@ -6,8 +6,15 @@
       <div class="main">
         <div class="main-header">
           <el-form :inline="true" label-width="80px" :model="queryForm">
-            <el-form-item label="公司" prop="company_ids"  v-if="companiesVisible">
-              <el-select v-model="queryForm.company_id" @change="getLocationList">
+            <el-form-item
+              label="公司"
+              prop="company_ids"
+              v-if="companiesVisible"
+            >
+              <el-select
+                v-model="queryForm.company_id"
+                @change="getLocationList"
+              >
                 <el-option
                   v-for="item in companyList"
                   :label="item.name"
@@ -17,7 +24,10 @@
               </el-select>
             </el-form-item>
             <el-form-item label="消费地点" prop="canteen_id">
-              <el-select v-model="queryForm.canteen_id" @change="getDinnersList">
+              <el-select
+                v-model="queryForm.canteen_id"
+                @change="getDinnersList"
+              >
                 <el-option
                   v-for="item in locationList"
                   :label="item.name"
@@ -27,7 +37,10 @@
               </el-select>
             </el-form-item>
             <el-form-item label="餐次" prop="dinner_id">
-              <el-select v-model="queryForm.dinner_id" @change="getCategoryList">
+              <el-select
+                v-model="queryForm.dinner_id"
+                @change="getCategoryList"
+              >
                 <el-option
                   v-for="item in dinnersList"
                   :label="item.name"
@@ -47,7 +60,9 @@
               </el-select>
             </el-form-item>
             <el-button type="primary" @click="fetchList">查询</el-button>
-            <el-button @click="addCuisine" :disabled="locationList.length === 0">新增</el-button>
+            <el-button @click="addCuisine" :disabled="locationList.length === 0"
+              >新增</el-button
+            >
           </el-form>
         </div>
         <div class="main-content">
@@ -69,7 +84,9 @@
                 <li class="list">主厨:{{ item.chef }}</li>
               </ul>
               <div class="btns">
-                <el-button type="danger" plain @click="handleDelete(item)">删除</el-button>
+                <el-button type="danger" plain @click="handleDelete(item)"
+                  >删除</el-button
+                >
                 <el-button type="primary" @click="_edit(item)">编辑</el-button>
               </div>
             </div>
@@ -206,16 +223,16 @@ export default {
   },
   components: { CuisineDialog, Pagination },
   created() {
-    if(this.companiesVisible){
+    if (this.companiesVisible) {
       this.getCompanies();
-    }else{
-      this.getLocationList('');
+    } else {
+      this.getLocationList(0);
     }
   },
   computed: {
     companiesVisible() {
       return this.grade !== 3;
-    },
+    }
   },
   methods: {
     fetchList(page) {
@@ -257,7 +274,7 @@ export default {
       this.queryForm.dinner_id = null;
       this.queryForm.m_id = null;
       if (!isNaN(company_id)) {
-        if(company_id){
+        if (company_id) {
           $axios
             .get(`/v1/canteens?company_id=${company_id}`)
             .then(res => {
@@ -265,7 +282,8 @@ export default {
               this.locationList = getAllOptions(Array.from(res.data));
             })
             .catch(err => console.log(err));
-        }else{
+        } else {
+          //两种都可以
           $axios
             .get("/v1/managerCanteens")
             .then(res => {
@@ -273,6 +291,13 @@ export default {
               this.locationList = getAllOptions(Array.from(res.data));
             })
             .catch(err => console.log(err));
+          /*   $axios
+            .get(`/v1/canteens?company_id=0`)
+            .then(res => {
+              this.diaLocationList = Array.from(res.data);
+              this.locationList = getAllOptions(Array.from(res.data));
+            })
+            .catch(err => console.log(err)); */
         }
       } else {
         this.locationList = [];

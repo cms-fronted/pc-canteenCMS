@@ -6,7 +6,10 @@
       <div class="main-header">
         <el-form :inline="true" :model="queryForm">
           <el-form-item label="公司" v-if="companiesVisible" prop="company_id">
-            <el-select @change="getCanteenOptions" v-model="queryForm.company_id">
+            <el-select
+              @change="getCanteenOptions"
+              v-model="queryForm.company_id"
+            >
               <el-option
                 v-for="item in companyOptions"
                 :key="item.id"
@@ -50,16 +53,23 @@
           <el-table-column label="序号" type="index"></el-table-column>
           <el-table-column label="消费地点">
             <template slot-scope="scoped">
-              <span>{{scoped.row.canteen.name}}</span>
+              <span>{{ scoped.row.canteen.name }}</span>
             </template>
           </el-table-column>
           <el-table-column label="报表名称" prop="title"></el-table-column>
-          <el-table-column label="生成时间" prop="create_time"></el-table-column>
+          <el-table-column
+            label="生成时间"
+            prop="create_time"
+          ></el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scoped">
               <span>
-                <el-button type="text" @click="showDetail(scoped.row)">查询</el-button>
-                <el-button type="text" @click="deleteDetail(scoped.row)">作废</el-button>
+                <el-button type="text" @click="showDetail(scoped.row)"
+                  >查询</el-button
+                >
+                <el-button type="text" @click="deleteDetail(scoped.row)"
+                  >作废</el-button
+                >
               </span>
             </template>
           </el-table-column>
@@ -81,7 +91,7 @@
     >
       <el-card>
         <div slot="header" class="clearfix">
-          <span>{{detailForm.title}}</span>
+          <span>{{ detailForm.title }}</span>
         </div>
         <el-table :data="detailData">
           <el-table-column type="index" width="50px"></el-table-column>
@@ -89,12 +99,20 @@
           <el-table-column label="餐次" prop="dinner"></el-table-column>
           <el-table-column label="材料名称" prop="material"></el-table-column>
           <!-- <el-table-column label="单位" prop=""></el-table-column> -->
-          <el-table-column label="材料数量" prop="order_count"></el-table-column>
-          <el-table-column label="订货数量" prop="material_count"></el-table-column>
+          <el-table-column
+            label="材料数量"
+            prop="order_count"
+          ></el-table-column>
+          <el-table-column
+            label="订货数量"
+            prop="material_count"
+          ></el-table-column>
           <el-table-column label="单价" prop="material_price"></el-table-column>
           <el-table-column label="总价">
             <template slot-scope="scoped">
-              <span>{{scoped.row.material_count * scoped.row.material_price}}</span>
+              <span>{{
+                scoped.row.material_count * scoped.row.material_price
+              }}</span>
             </template>
           </el-table-column>
         </el-table>
@@ -145,7 +163,11 @@ export default {
     }
   },
   created() {
-    this.getCompanies();
+    if (this.companiesVisible) {
+      this.getCompanies();
+    } else {
+      this.getCanteenOptions(0);
+    }
   },
   methods: {
     async getCompanies() {

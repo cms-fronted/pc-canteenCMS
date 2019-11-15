@@ -108,7 +108,12 @@ export default {
     };
   },
   created() {
-    this.fetchCompanyList();
+      if(this.companiesVisible){
+      this.fetchCompanyList();
+    } else{
+      this.fetchCanteenList(0)
+    }
+    
   },
   computed: {
     companiesVisible() {

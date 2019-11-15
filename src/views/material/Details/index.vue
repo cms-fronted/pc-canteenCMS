@@ -80,7 +80,11 @@ export default {
     };
   },
   created() {
-    this.getCompanies();
+    if(this.companiesVisible){
+      this.getCompanies();
+    } else{
+      this.getCanteenOptions(0)
+    }
   },
   methods: {
     async getCompanies() {

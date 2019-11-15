@@ -221,7 +221,7 @@ export default {
     if(this.companiesVisible){
       this.getCompanies();
     }else{
-      this.getLocationList('');
+      this.getLocationList(0);
     }
   },
   computed: {

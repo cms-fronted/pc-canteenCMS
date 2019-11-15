@@ -4,9 +4,14 @@
       <div class="nav-title">订餐统计</div>
       <el-divider></el-divider>
       <div class="main">
-        <div class="main-header" :class="{ 'active': !companiesVisible}">
+        <div class="main-header" :class="{ active: !companiesVisible }">
           <div class="select-title">
-            <el-form :inline="true" :model="formdata" label-width="40px" label-position="left">
+            <el-form
+              :inline="true"
+              :model="formdata"
+              label-width="40px"
+              label-position="left"
+            >
               <el-form-item label="开始">
                 <el-date-picker
                   v-model="formdata.time_begin"
@@ -41,7 +46,11 @@
                 </el-select>
               </el-form-item>
               <el-form-item label="消费地点" label-width="80px">
-                <el-select v-model="formdata.canteen_id" placeholder="请选择消费地点" style="width:200px">
+                <el-select
+                  v-model="formdata.canteen_id"
+                  placeholder="请选择消费地点"
+                  style="width:200px"
+                >
                   <el-option
                     v-for="item in canteenOptions"
                     :key="item.id"
@@ -53,13 +62,21 @@
             </el-form>
           </div>
           <div class="btn-area">
-            <el-button type="primary" @click="queryList(1)" :disabled="isDisabled">查询</el-button>
+            <el-button
+              type="primary"
+              @click="queryList(1)"
+              :disabled="isDisabled"
+              >查询</el-button
+            >
             <el-button type="primary">导出</el-button>
           </div>
         </div>
         <div class="main-content">
           <el-table style="width:100%" :data="tableData" border>
-            <el-table-column label="日期" prop="ordering_date"></el-table-column>
+            <el-table-column
+              label="日期"
+              prop="ordering_date"
+            ></el-table-column>
             <el-table-column label="公司" prop="company"></el-table-column>
             <el-table-column label="消费地点" prop="canteen"></el-table-column>
             <el-table-column label="餐次" prop="dinner"></el-table-column>
@@ -109,9 +126,9 @@ export default {
     };
   },
   created() {
-    if(this.companiesVisible){
+    if (this.companiesVisible) {
       this.getCompanies();
-    }else{
+    } else {
       this.getLocationList();
     }
   },
@@ -120,11 +137,7 @@ export default {
       return this.grade !== 3;
     },
     isAble() {
-      return (
-        !!this.formdata.time_end &&
-        !!this.formdata.time_begin &&
-        !!this.formdata.company_ids
-      );
+      return !!this.formdata.time_end && !!this.formdata.time_begin;
     }
   },
   watch: {
@@ -156,10 +169,8 @@ export default {
     async getLocationList(company_id) {
       let res;
       if (company_id) {
-        res = await $axios.get(
-          `/v1/canteens?company_id=${company_id}`
-        );
-      }else{
+        res = await $axios.get(`/v1/canteens?company_id=${company_id}`);
+      } else {
         res = await $axios.get("/v1/managerCanteens");
       }
       if (res.msg === "ok") {

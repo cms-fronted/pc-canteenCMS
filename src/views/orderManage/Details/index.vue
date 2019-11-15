@@ -120,7 +120,7 @@ import $axios from "@/api/index";
 import Pagination from "@/components/Pagination";
 import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
 import store from "@/store";
-import { type } from 'os';
+import { type } from "os";
 export default {
   data() {
     return {
@@ -157,11 +157,7 @@ export default {
   },
   computed: {
     isAble() {
-      return (
-        !!this.formdata.time_end &&
-        !!this.formdata.time_begin &&
-        !!this.formdata.company_ids
-      );
+      return !!this.formdata.time_end && !!this.formdata.time_begin;
     },
     companiesVisible() {
       return this.grade !== 3;
@@ -235,7 +231,7 @@ export default {
       }
     },
     queryList(page) {
-      console.log(page,typeof page);
+      console.log(page, typeof page);
       page = typeof page == "number" ? page : 1;
       let { pageSize, sum } = this;
       let {

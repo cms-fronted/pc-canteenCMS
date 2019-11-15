@@ -11,7 +11,7 @@
             label-position="left"
             :model="queryForm"
           >
-            <el-form-item label="企业名称" prop="name" label-width="80px" v-if="companiesVisible">
+            <el-form-item label="公司" prop="name" label-width="80px" v-if="companiesVisible">
               <el-select v-model="queryForm.name">
                 <el-option
                   v-for="item in companyOptions"
