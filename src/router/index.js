@@ -26,10 +26,19 @@ export const currencyRoutes = [
     redirect: "/order"
   },
   {
-    path: "/print",
-    name: "Print",
-    component: () => import("@/views/print"),
-    hidden: true
+    path: "/home",
+    name: "Home",
+    redirect: "/home/index",
+    component: Layout,
+    children: [{
+      path: "index",
+      name: "Home",
+      component: () => import("@/views/home"),
+      meta: {
+        title: "首页",
+        icon: "el-icon-document"
+      },
+    }],
   },
   {
     path: "/login",

@@ -12,3 +12,7 @@ export function getInfo() {
   const url = "/getInfo";
   return $axios.get(url);
 }
+export function getUserModules() {
+  const url = '/v1/modules/admin';
+  return $axios.get(url);
+}

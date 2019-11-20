@@ -1,4 +1,4 @@
-import { login, getInfo, producerLogin } from "@/api/login";
+import { login, getInfo, producerLogin, getUserModules } from "@/api/login";
 import { Message } from "element-ui";
 import router, { resetRouter } from "@/router";
 
@@ -90,6 +90,16 @@ const actions = {
         redirect: router.currentRoute.fullPath
       }
     });
+  },
+  _getUserModules({ commit }){
+    return new Promise((resolve,reject) => {
+      getUserModules()
+        .then(res => {
+          if(res.msg === 'ok'){
+            console.log(res);
+          }
+        })
+    })
   },
   _getInfo({ commit }) {
     return new Promise((resolve, reject) => {
