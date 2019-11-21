@@ -5,8 +5,8 @@ const getters = {
   role: state => state.user.role,
   grade: state => state.user.grade,
   introduce: state => state.user.introduce,
-  // routes: state => state.permission.routes,
-  // addRoutes: state => state.permission.addRoutes,
+  routes: state => state.permission.routes,
+  addRoutes: state => state.permission.addRoutes,
   opened: state => {
     if (state.app.opened === 'false') {
       return false

@@ -1,7 +1,7 @@
 import { login, getInfo, producerLogin, getUserModules } from "@/api/login";
 import { Message } from "element-ui";
 import router, { resetRouter } from "@/router";
-
+import { treeToArr } from "@/utils/flatternArr"
 const state = {
   token: localStorage.getItem("token") ? localStorage.getItem("token") : "", // 认证凭证'
   userName: "",
@@ -91,13 +91,20 @@ const actions = {
       }
     });
   },
-  _getUserModules({ commit }){
-    return new Promise((resolve,reject) => {
+  _getUserModules({ commit }) {
+    let roles = null;
+    return new Promise((resolve, reject) => {
       getUserModules()
         .then(res => {
-          if(res.msg === 'ok'){
-            console.log(res);
+          if (res.msg === 'ok') {
+            let data = treeToArr(res.data);
+            roles = data.map(item => item.url);
+            commit("SET_ROLES", roles);
           }
+          resolve({ roles });
+        })
+        .catch(error => {
+          reject(error)
         })
     })
   },

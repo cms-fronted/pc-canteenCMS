@@ -27,12 +27,12 @@ export const currencyRoutes = [
     meta: { title: '登录页' },
     hidden: true
   },
-  /*   {
-      path:'/404',
-      name: '404',
-      componet:() => import('error-page/404.vue'),
-      hidden:true
-    }, */
+  {
+    path: '/404',
+    name: '404',
+    componet: () => import('error-page/404.vue'),
+    hidden: true
+  },
   {
     path: '/',
     name: 'Home',
@@ -47,6 +47,12 @@ export const currencyRoutes = [
       }
     ]
   },
+  {
+    path: '*',
+    name: '*404',
+    redirect: '/404',
+    hidden: true
+  }
 
 ];
 export const asyncRoutes = [{

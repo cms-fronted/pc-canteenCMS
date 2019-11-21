@@ -26,13 +26,19 @@ export const currencyRoutes = [
     redirect: "/order"
   },
   {
+    path: '/404',
+    name: '404',
+    component: () => import('@/views/error'),
+    hidden: true
+  },
+  {
     path: "/home",
     name: "Home",
     redirect: "/home/index",
     component: Layout,
     children: [{
       path: "index",
-      name: "Home",
+      name: "HomeIndex",
       component: () => import("@/views/home"),
       meta: {
         title: "首页",
@@ -130,7 +136,7 @@ export const currencyRoutes = [
       }
     ]
   },
-  {
+  /* {
     path: "/recharge",
     name: "Recharge",
     redirect: "/recharge/cash",
@@ -165,7 +171,7 @@ export const currencyRoutes = [
         }
       }
     ]
-  },
+  }, */
   {
     path: "/cuisine",
     name: "Cuisine",
@@ -452,9 +458,43 @@ export const currencyRoutes = [
         }
       }
     ]
+  },
+  {
+    path: '*',
+    name: '*404',
+    redirect: '/404',
+    hidden: true
   }
 ];
-export const asyncRoutes = [];
+export const asyncRoutes = [
+  {
+    path: '/recharge',
+    name: 'chargeManage',
+    component: Layout,
+    redirect: '/recharge/cash',
+    meta: { title: '充值管理', icon: 'el-icon-bank-card' },
+    children: [
+      {
+        path: 'cash',
+        name: 'cashCharge',
+        component: () => import('@/views/recharge/cash'),
+        meta: { title: '现金充值' }
+      },
+      {
+        path: 'record',
+        name: 'chargingStatistics',
+        component: () => import('@/views/recharge/record'),
+        meta: { title: '充值记录明细' }
+      },
+      {
+        path: 'card-balance',
+        name: 'reamain',
+        component: () => import('@/views/recharge/cardBalance'),
+        meta: { title: '饭卡余额查询' }
+      }
+    ]
+  }
+];
 
 const creatRouter = () => {
   return new Router({
@@ -473,40 +513,57 @@ export function resetRouter() {
   router.matcher = reset.matcher;
 }
 
-// router.beforeEach(async (to, from, next) => {
-//   document.title = getTitle(to.meta.title)
-//   if (to.path === '/login') {
-//     next()
-//   } else {
-//     if (store.getters.token) {
-//       const hasRoles = store.getters.roles.length > 0
-//       if (hasRoles) {
-//         next()
-//       } else {
-//         try {
-//           const { roles } = await store.dispatch('user/_getInfo')
-//           const addRoutes = await store.dispatch(
-//             'permission/getAsyncRoutes',
-//             roles
-//           )
-//           router.addRoutes(addRoutes)
+router.beforeEach(async (to, from, next) => {
+  document.title = getTitle(to.meta.title);
+  if (to.path === '/login') {
+    next()
+  } else {
+    // let res = await store.dispatch('user/_getUserModules')
+    if (store.getters.token) {
+      const hasRoles = store.getters.roles.length > 0
+      if (hasRoles) {
+        next()
+      } else {
+        try {
+          let data = await store.dispatch('user/_getUserModules')
+          let roles = data.roles;
+          const addRoutes = await store.dispatch(
+            'permission/getAsyncRoutes',
+            roles
+          )
+          router.addRoutes(addRoutes)
+          next({ ...to, replace: true })
+        } catch (error) {
 
-//           // hack method to ensure that addRoutes is complete
-//           // set the replace: true, so the navigation will not leave a history record
-//           next({ ...to, replace: true })
-//         } catch (error) {
-//           Message.error(error)
-//         }
-//       }
-//     } else {
-//       next({
-//         path: '/login',
-//         query: {
-//           redirect: to.fullPath
-//         }
-//       })
-//     }
-//   }
-// })
+        }
+      }
+      // if (hasRoles) {
+      //   next()
+      // } else {
+      //   try {
+      //     const { roles } = await store.dispatch('user/_getUserModules)')
+      // const addRoutes = await store.dispatch(
+      //   'permission/getAsyncRoutes',
+      //   roles
+      // )
+      // router.addRoutes(addRoutes)
+
+      //     // hack method to ensure that addRoutes is complete
+      //     // set the replace: true, so the navigation will not leave a history record
+      //     next({ ...to, replace: true })
+      //   } catch (error) {
+      //     Message.error(error)
+      //   }
+      // }
+    } else {
+      next({
+        path: '/login',
+        query: {
+          redirect: to.fullPath
+        }
+      })
+    }
+  }
+})
 
 export default router;

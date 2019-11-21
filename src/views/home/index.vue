@@ -11,7 +11,9 @@
 export default {
   name: "Home",
   mounted() {
-    this.$store.dispatch("user/_getUserModules").then(res => console.log(res));
+    this.$store.dispatch("user/_getUserModules").then(res => {
+      console.log(res);
+    });
   }
 };
 </script>
