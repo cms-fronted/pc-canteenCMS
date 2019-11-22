@@ -5,6 +5,7 @@ const getters = {
   role: state => state.user.role,
   grade: state => state.user.grade,
   introduce: state => state.user.introduce,
+  isProducer: state => state.user.isProducer,
   routes: state => state.permission.routes,
   addRoutes: state => state.permission.addRoutes,
   opened: state => {

@@ -1,4 +1,4 @@
-import { asyncRoutes, currencyRoutes } from '@/router'
+import { asyncRoutes, currencyRoutes, producerRoutes } from '@/router'
 
 const state = {
   routes: [],
@@ -28,8 +28,8 @@ const actions = {
   getAsyncRoutes({ commit, rootGetters }, roles) {
     return new Promise(resolve => {
       let routes = []
-      if (rootGetters.userName === 'admin') {
-        routes = asyncRoutes || ''
+      if (rootGetters.isProducer) {
+        routes = producerRoutes || ''
       } else {
         routes = forSearchArr(asyncRoutes, roles)
       }

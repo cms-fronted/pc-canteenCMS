@@ -2,13 +2,15 @@ import { login, getInfo, producerLogin, getUserModules } from "@/api/login";
 import { Message } from "element-ui";
 import router, { resetRouter } from "@/router";
 import { treeToArr } from "@/utils/flatternArr"
+import { stat } from "fs";
 const state = {
   token: localStorage.getItem("token") ? localStorage.getItem("token") : "", // 认证凭证'
   userName: "",
   grade: "",
   role: "",
   roles: [],
-  introduce: ""
+  introduce: "",
+  isProducer: ""
 };
 const mutations = {
   SET_TOKEN(state, val) {
@@ -40,7 +42,14 @@ const mutations = {
   },
   SET_INTRODUCE(state, payload) {
     state.introduce = payload;
+  },
+  SET_PRODUCER(state, val) {
+    state.isProducer = val;
+  },
+  DEL_PRODUCER(state) {
+    state.isProducer = ""
   }
+
 };
 const actions = {
   // user login
@@ -71,6 +80,7 @@ const actions = {
             commit("SET_ROLE", res.data.role);
             commit("SET_GRADE", res.data.grade);
             commit("SET_NAME", res.data.userName);
+            commit("SET_PRODUCER", 1);
             resolve(res);
           }
         })
@@ -79,17 +89,27 @@ const actions = {
         });
     });
   },
-  loginOut({ commit }) {
+  loginOut({ commit, state }) {
     commit("DEL_TOKEN");
     commit("DEL_ROLE");
     commit("DEL_GRADE");
+    commit("DEL_PRODUCER");
     // resetRouter();
-    router.push({
-      path: "/login",
-      query: {
-        redirect: router.currentRoute.fullPath
-      }
-    });
+    if (state.isProducer) {
+      router.push({
+        path: "/producerLogin",
+        query: {
+          redirect: router.currentRoute.fullPath
+        }
+      });
+    } else {
+      router.push({
+        path: "/login",
+        query: {
+          redirect: router.currentRoute.fullPath
+        }
+      });
+    }
   },
   _getUserModules({ commit }) {
     let roles = null;

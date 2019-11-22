@@ -19,7 +19,7 @@
       </transition>
     </div>
     <div class="loginBox">
-      <h2 class="loginH2"><strong>Vue</strong> 后台管理系统</h2>
+      <h2 class="loginH2"><strong>Vue</strong> 云饭堂后台管理系统</h2>
       <div class="loginCon">
         <div class="titleDiv">
           <h3>Sign up now</h3>
@@ -93,7 +93,7 @@ export default {
     loginYz(form) {
       this.$refs[form].validate(valid => {
         if (valid) {
-          this.showSlide = true;
+          this._login();
         } else {
           return;
         }
@@ -122,8 +122,7 @@ export default {
     shopTip() {
       this.notifyObj = this.$notify({
         title: "提示",
-        message:
-          "目前有两个登陆角色，管理员和普通用户，账号分别为：admin、user,密码都为：123456",
+        message: "当前登录界面为企业人员登录界面",
         duration: 0,
         iconClass: "el-icon-s-opportunity"
       });
@@ -138,7 +137,7 @@ export default {
 .login {
   height: 100%;
   width: 100%;
-  background: url(../../assets/pageBg/loginBg.jpg) no-repeat center center;
+  background: url(../../assets/pageBg/lgbg.jpg) no-repeat center center;
   background-size: 100% 100%;
   overflow: hidden;
 }

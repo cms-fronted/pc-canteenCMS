@@ -136,7 +136,7 @@ export const currencyRoutes = [
       }
     ]
   },
-  /* {
+  {
     path: "/recharge",
     name: "Recharge",
     redirect: "/recharge/cash",
@@ -171,7 +171,7 @@ export const currencyRoutes = [
         }
       }
     ]
-  }, */
+  },
   {
     path: "/cuisine",
     name: "Cuisine",
@@ -294,14 +294,6 @@ export const currencyRoutes = [
     },
     component: Layout,
     children: [
-      // {
-      //   path: "details",
-      //   name: "Material-details",
-      //   component: () => import("@/views/material/Details"),
-      //   meta: {
-      //     title: "菜品材料明细"
-      //   }
-      // },
       {
         path: "storage",
         name: "Material-storage",
@@ -466,34 +458,80 @@ export const currencyRoutes = [
     hidden: true
   }
 ];
-export const asyncRoutes = [
+export const producerRoutes = [
   {
-    path: '/recharge',
-    name: 'chargeManage',
+    path: "/canteen",
+    name: "Canteen",
+    redirect: "/canteen/manage",
     component: Layout,
-    redirect: '/recharge/cash',
-    meta: { title: '充值管理', icon: 'el-icon-bank-card' },
+    meta: {
+      title: "小卖部管理",
+      icon: "el-icon-coffee"
+    },
     children: [
       {
-        path: 'cash',
-        name: 'cashCharge',
-        component: () => import('@/views/recharge/cash'),
-        meta: { title: '现金充值' }
+        path: "manage",
+        name: "Canteen-manage",
+        component: () => import("@/views/canteen/Manage"),
+        meta: {
+          title: "商品管理(供)"
+        }
       },
       {
-        path: 'record',
-        name: 'chargingStatistics',
-        component: () => import('@/views/recharge/record'),
-        meta: { title: '充值记录明细' }
+        path: "statistics-producer",
+        name: "Canteen-statistics-producer",
+        component: () => import("@/views/canteen/StatisticsProducer"),
+        meta: {
+          title: "消费订单汇总查询(供)"
+        }
       },
       {
-        path: 'card-balance',
-        name: 'reamain',
-        component: () => import('@/views/recharge/cardBalance'),
-        meta: { title: '饭卡余额查询' }
+        path: "order-detail-producer",
+        name: "Canteen-order-producer",
+        component: () => import("@/views/canteen/OrderDetailProducer"),
+        meta: {
+          title: "订单明细查询(供)"
+        }
+      },
+      {
+        path: 'invoicing-report-producer',
+        name: 'Canteen-invocing-report-producer',
+        component: () => import('@/views/canteen/InvoicingReportProducer'),
+        meta: {
+          title: '进销统计报表(供)'
+        }
       }
     ]
   }
+]
+export const asyncRoutes = [
+  // {
+  //   path: '/recharge',
+  //   name: 'chargeManage',
+  //   component: Layout,
+  //   redirect: '/recharge/cash',
+  //   meta: { title: '充值管理', icon: 'el-icon-bank-card' },
+  //   children: [
+  //     {
+  //       path: 'cash',
+  //       name: 'cashCharge',
+  //       component: () => import('@/views/recharge/cash'),
+  //       meta: { title: '现金充值' }
+  //     },
+  //     {
+  //       path: 'record',
+  //       name: 'chargingStatistics',
+  //       component: () => import('@/views/recharge/record'),
+  //       meta: { title: '充值记录明细' }
+  //     },
+  //     {
+  //       path: 'card-balance',
+  //       name: 'reamain',
+  //       component: () => import('@/views/recharge/cardBalance'),
+  //       meta: { title: '饭卡余额查询' }
+  //     }
+  //   ]
+  // }
 ];
 
 const creatRouter = () => {
