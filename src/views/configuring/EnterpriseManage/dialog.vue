@@ -373,7 +373,7 @@ export default {
     },
     addCanteen() {
       $axios
-        .post("/v1/canteen/save", {
+        .post("http://canteen.tonglingok.com/api/v1/canteen/save", {
           canteens: this.canteens,
           c_id: this.company_id
         })
@@ -399,8 +399,8 @@ export default {
         data.c_id = this.canteen_id;
       }
       const url = !this.isEdit
-        ? "/v1/canteen/configuration/save"
-        : "/v1/canteen/configuration/update";
+        ? "http://canteen.tonglingok.com/api/v1/canteen/configuration/save"
+        : "http://canteen.tonglingok.com/api/v1/canteen/configuration/update";
       $axios
         .post(url, data)
         .then(res => {
@@ -436,7 +436,7 @@ export default {
         type: "warning"
       })
         .then(async () => {
-          const res = await $axios.post("/v1/canteen/deleteMachine", { id });
+          const res = await $axios.post("http://canteen.tonglingok.com/api/v1/canteen/deleteMachine", { id });
           if (res.msg === "ok") {
             this.$message({
               type: "success",
@@ -478,7 +478,7 @@ export default {
           .catch(err => console.log(err));
       } else {
         $axios
-          .post("/v1/canteen/updateMachine", this.machineForm)
+          .post("http://canteen.tonglingok.com/api/v1/canteen/updateMachine", this.machineForm)
           .then(res => {
             this.$emit(
               "updateMachineTable",

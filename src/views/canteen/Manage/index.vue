@@ -204,7 +204,7 @@ export default {
     },
     // 封装方法 changeState 处理商品状态
     changeState(id, state) {
-      this.sendPostRequest("/v1/shop/product/handel", {
+      this.sendPostRequest("http://canteen.tonglingok.com/api/v1/shop/product/handel", {
         id: id,
         state: state
       });
@@ -213,7 +213,7 @@ export default {
     getSupplierList() {
       this.supplier_id = "";
       $axios
-        .get("/v1/company/suppliers")
+        .get("http://canteen.tonglingok.com/api/v1/company/suppliers")
         .then(res => {
           this.supplierList = res.data;
           this.supplierList.unshift({
@@ -226,7 +226,7 @@ export default {
     getCategoryList() {
       this.category_id = "";
       $axios
-        .get("/v1/company/categories?&page=1&size=10")
+        .get("http://canteen.tonglingok.com/api/v1/company/categories?&page=1&size=10")
         .then(res => {
           this.categoryList = res.data;
           this.categoryList.unshift({
@@ -240,7 +240,7 @@ export default {
     fetchTableList() {
       $axios
         .get(
-          `/v1/shop/cms/products?supplier_id=${this.supplier_id}&category_id=${
+          `http://canteen.tonglingok.com/api/v1/shop/cms/products?supplier_id=${this.supplier_id}&category_id=${
             this.category_id
           }&page=1&size=10`
         )
@@ -282,7 +282,7 @@ export default {
     },
     confirmRevise(val) {
       this.reviseVisible = false;
-      this.sendPostRequest("/v1/shop/product/update", val);
+      this.sendPostRequest("http://canteen.tonglingok.com/api/v1/shop/product/update", val);
     },
     // 处理添加商品弹窗
     closeAddDialog(val) {
@@ -298,7 +298,7 @@ export default {
         },
         formData
       );
-      this.sendPostRequest("/v1/shop/product/save", addForm);
+      this.sendPostRequest("http://canteen.tonglingok.com/api/v1/shop/product/save", addForm);
       this.addVisible = false;
     },
     // 入库处理
@@ -312,7 +312,7 @@ export default {
     },
     confirmStorage() {
       this.storageFormVisible = false;
-      this.sendPostRequest("/v1/shop/stock/save", {
+      this.sendPostRequest("http://canteen.tonglingok.com/api/v1/shop/stock/save", {
         product_id: this.currentProductId,
         count: this.storageCount
       });

@@ -234,7 +234,7 @@ export default {
           .catch(err => console.log(err));
       } else {
         $axios
-          .post("/v1/canteen/updateMachine", this.machineForm)
+          .post("http://canteen.tonglingok.com/api/v1/canteen/updateMachine", this.machineForm)
           .then(res => {
             this.$emit(
               "updateMachineTable",
@@ -250,7 +250,7 @@ export default {
     //发起添加新小卖部请求
     addShop() {
       $axios
-        .post("/v1/shop/save", {
+        .post("http://canteen.tonglingok.com/api/v1/shop/save", {
           c_id: this.company_id,
           name: this.shop_name,
           taking_mode: this.taking_mode
@@ -267,7 +267,7 @@ export default {
     },
     editShop() {
       $axios
-        .post("/v1/shop/update", {
+        .post("http://canteen.tonglingok.com/api/v1/shop/update", {
           id: this.formdata.id,
           name: this.shop_name,
           taking_mode: this.taking_mode
@@ -285,7 +285,7 @@ export default {
         type: "warning"
       })
         .then(async () => {
-          const res = await $axios.post("/v1/canteen/deleteMachine", { id });
+          const res = await $axios.post("http://canteen.tonglingok.com/api/v1/canteen/deleteMachine", { id });
           if (res.msg === "ok") {
             this.$message({
               type: "success",

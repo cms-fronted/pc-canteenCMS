@@ -88,7 +88,7 @@ export default {
   },
   methods: {
     async getCompanies() {
-      const res = await $axios.get("/v1/admin/companies");
+      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/admin/companies");
       if (res.msg === "ok") {
         this.companyOptions = getAllOptions(flatten(res.data));
       }
@@ -98,7 +98,7 @@ export default {
       this.canteenOptions = [];
       this.queryForm.canteen_ids = "";
       if (Number(company_id)) {
-        const res = await $axios.get(`/v1/canteens?company_id=${company_id}`);
+        const res = await $axios.get(`http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`);
         if (res.msg === "ok") {
           this.canteenOptions = getAllOptions(Array.from(res.data));
         }
@@ -107,7 +107,7 @@ export default {
     },
     async getDinnerOptions(canteen_id) {
       const res = await $axios.get(
-        `/v1/canteen/dinners?canteen_id=${canteen_id}`
+        `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
       );
       if (res.msg === "ok") {
         this.dinnerOptions = getAllOptions(Array.from(res.data));
@@ -123,7 +123,7 @@ export default {
         delete form.canteen_ids;
       }
       const res = await $axios.get(
-        `/v1/materials?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/materials?page=${page}&size=${this.size}`,
         form
       );
       if (res.msg === "ok") {

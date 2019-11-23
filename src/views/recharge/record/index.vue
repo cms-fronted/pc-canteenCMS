@@ -155,7 +155,7 @@ export default {
   methods: {
     getCompanies() {
       $axios
-        .get("/v1/admin/companies")
+        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
         .then(res => {
           let arr = res.data;
           let allCompanies = [];
@@ -178,7 +178,7 @@ export default {
     fetchAdminList() {
       // module_id 暂时固定为14
       $axios
-        .get("/v1/wallet/recharge/admins?module_id=14")
+        .get("http://canteen.tonglingok.com/api/v1/wallet/recharge/admins?module_id=14")
         .then(res => {
           console.log(res);
           this.adminList = res.data;
@@ -194,7 +194,7 @@ export default {
     fetchTableList() {
       this.formdata.page = this.current_page;
       $axios
-        .get("/v1/wallet/recharges", this.formdata)
+        .get("http://canteen.tonglingok.com/api/v1/wallet/recharges", this.formdata)
         .then(res => {
           // console.log(res)
           this.tableData = Array.from(res.data.data);

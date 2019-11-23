@@ -97,7 +97,7 @@ export default {
     async queryList(page) {
       page = typeof page == Number ? page : 1;
       const res = await $axios.get(
-        `/v1/shop/salesReport/supplier?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/shop/salesReport/supplier?page=${page}&size=${this.size}`,
         this.formdata
       );
       if (res.msg === "ok") {

@@ -21,7 +21,7 @@
               :headers="header"
               :show-file-list="false"
               accept=".xls,.xlsx"
-              action="http://canteen.tonglingok.com/api/v1/wallet/supplement/upload"
+              action="http://canteen.tonglingok.comhttp://canteen.tonglingok.com/api/v1/wallet/supplement/upload"
               :on-success="handleSuccess"
               :on-error="handleError"
               name="supplement"
@@ -191,7 +191,7 @@ export default {
     queryList(){
       console.log(this.current_page)
       $axios
-        .get(`/v1/department/staffs/recharge?page=${this.current_page}&size=10&department_id=0&key=${this.key}`)
+        .get(`http://canteen.tonglingok.com/api/v1/department/staffs/recharge?page=${this.current_page}&size=10&department_id=0&key=${this.key}`)
         .then(res => {
           this.tableData = Array.from(res.data.data);
         })
@@ -199,7 +199,7 @@ export default {
     },
     getCompanies() {
       $axios
-        .get("/v1/admin/companies")
+        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
         .then(res => {
           let arr = res.data;
           let allCompanies = [];
@@ -216,14 +216,14 @@ export default {
     fetchCanteenList(company_id) {
       if (company_id) {
         $axios
-          .get(`/v1/canteens?company_id=${company_id}`)
+          .get(`http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`)
           .then(res => {
             this.canteenList = Array.from(res.data);
           })
           .catch(err => console.log(err));
       }else{
         $axios
-          .get("/v1/managerCanteens")
+          .get("http://canteen.tonglingok.com/api/v1/managerCanteens")
           .then(res => {
             this.canteenList = Array.from(res.data);
           })
@@ -234,7 +234,7 @@ export default {
       this.formdata.dinner_id = "";
       if (canteen_id) {
         $axios
-          .get(`/v1/canteen/dinners?canteen_id=${canteen_id}`)
+          .get(`http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`)
           .then(res => {
             this.dinnersList = Array.from(res.data);
           })
@@ -250,7 +250,7 @@ export default {
     },
     confirmSupplement(){
       $axios
-        .post("/v1/wallet/supplement",this.formdata)
+        .post("http://canteen.tonglingok.com/api/v1/wallet/supplement",this.formdata)
         .then(res => {
           // console.log(res)
           this.sendMessage(res.msg);

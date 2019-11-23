@@ -34,7 +34,7 @@
           :headers="header"
           :show-file-list="false"
           accept=".xls, .xlsx"
-          action="/v1/material/upload"
+          action="http://canteen.tonglingok.com/api/v1/material/upload"
           :on-success="handleSuccess"
           :data="{ c_id: canteen_id }"
           name="materials"
@@ -145,7 +145,7 @@ export default {
     },
     fetchCompanyList() {
       $axios
-        .get("/v1/admin/companies")
+        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
         .then(res => {
           this.flatten(res.data);
           let temp = "";
@@ -167,7 +167,7 @@ export default {
           this.canteenList.unshift({ id: "", name: "全部" });
         } else {
           $axios
-            .get(`/v1/canteens?company_id=${id}`)
+            .get(`http://canteen.tonglingok.com/api/v1/canteens?company_id=${id}`)
             .then(res => {
               this.canteenList = Array.from(res.data);
             })
@@ -175,7 +175,7 @@ export default {
         }
       } else {
         $axios
-          .get("/v1/managerCanteens")
+          .get("http://canteen.tonglingok.com/api/v1/managerCanteens")
           .then(res => {
             this.canteenList = Array.from(res.data);
           })
@@ -185,7 +185,7 @@ export default {
     fetchTableList() {
       $axios
         .get(
-          `/v1/materials?page=${this.page}&size=10&key=${this.keyword}&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
+          `http://canteen.tonglingok.com/api/v1/materials?page=${this.page}&size=10&key=${this.keyword}&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
         )
         .then(res => {
           this.tableData = res.data.data;
@@ -206,7 +206,7 @@ export default {
         type: "warning"
       }).then(() => {
         this.$axios
-          .post("/v1/material/handel", {
+          .post("http://canteen.tonglingok.com/api/v1/material/handel", {
             id: row.id
           })
           .then(res => {
@@ -237,7 +237,7 @@ export default {
     deriveData() {
       $axios
         .get(
-          `/v1/material/export?key=${this.keyword}&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
+          `http://canteen.tonglingok.com/api/v1/material/export?key=${this.keyword}&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
         )
         .then(res => {
           if (this.tableData.length > 0) {

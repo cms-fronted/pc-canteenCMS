@@ -216,7 +216,7 @@ export default {
   },
   methods: {
     async getCompanies() {
-      const res = await $axios.get("/v1/admin/companies", this.queryForm);
+      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/admin/companies", this.queryForm);
       if (res.msg === "ok") {
         this.companyOptions = flatten(res.data);
       }
@@ -224,7 +224,7 @@ export default {
     async fetchList(page) {
       page = page || 1;
       const res = await $axios.get(
-        "/v1/roles?page=" + page + "&size=" + this.size,
+        "http://canteen.tonglingok.com/api/v1/roles?page=" + page + "&size=" + this.size,
         this.queryForm
       );
       if (res.msg === "ok") {
@@ -236,7 +236,7 @@ export default {
     async getCanteenList(c_id) {
       let company_id = c_id || "";
       const res = await $axios.get(
-        `/v1/company/consumptionLocation?company_id=${company_id}`
+        `http://canteen.tonglingok.com/api/v1/company/consumptionLocation?company_id=${company_id}`
       );
       if (res.msg === "ok") {
         this.canteenGroup = Array.from(res.data.canteen);
@@ -245,7 +245,7 @@ export default {
     },
     async getCanteenModuls(company_id) {
       const res = await $axios.get(
-        `/v1/modules/canteen/withoutSystem?company_id=${company_id}`
+        `http://canteen.tonglingok.com/api/v1/modules/canteen/withoutSystem?company_id=${company_id}`
       );
       if (res.msg === "ok") {
         this.modules = Array.from(res.data);
@@ -287,9 +287,9 @@ export default {
       return;
       if (this.isEdit) {
         this.roleForm.canteen = []; //没有字段不传
-        const res = await $axios.post("/v1/role/update", this.roleForm);
+        const res = await $axios.post("http://canteen.tonglingok.com/api/v1/role/update", this.roleForm);
       } else {
-        const res = await $axios.post("/v1/role/save", this.roleForm);
+        const res = await $axios.post("http://canteen.tonglingok.com/api/v1/role/save", this.roleForm);
         if (res.msg === "ok") {
           this.$message.success("新增角色成功");
           await this.fetchList();
@@ -314,7 +314,7 @@ export default {
       } else {
         state = 1;
       }
-      const res = await $axios.post("/v1/role/handel", {
+      const res = await $axios.post("http://canteen.tonglingok.com/api/v1/role/handel", {
         id: row.id,
         state: state
       });
@@ -358,7 +358,7 @@ export default {
       this.roleForm.rules = rules;
     },
     async getEditRole(id) {
-      const res = await $axios.get(`/v1/role?id=${id}`);
+      const res = await $axios.get(`http://canteen.tonglingok.com/api/v1/role?id=${id}`);
       return res;
     }
   }

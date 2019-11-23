@@ -247,7 +247,7 @@ export default {
   methods: {
     getCompanies() {
       $axios
-        .get("/v1/admin/companies")
+        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
         .then(res => {
           let arr = res.data;
           let allCompanies = [];
@@ -263,20 +263,20 @@ export default {
       }
     },
     async getDepartmentListWithoutCid() {
-      const res = await $axios.get("/v1/admin/departments");
+      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/admin/departments");
       if (res.msg === "ok") {
         this.departmentList = unshiftAllOptions(Aarray.from(res.data));
       }
     },
     async getCategoryOptions() {
-      const res = await $axios.get("/v1/company/categories");
+      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/company/categories");
       if (res.msg === "ok") {
         this.categoryOptions = unshiftAllOptions(Array.from(res.data));
       }
     },
     async getProductsId(id) {
       const res = await this.$axios({
-        url: `/v1/shop/supplierProducts/search`,
+        url: `http://canteen.tonglingok.com/api/v1/shop/supplierProducts/search`,
         methods: "get",
         headers: { token: store.getters.token }
       });
@@ -289,7 +289,7 @@ export default {
       if (query != "") {
         this.loading = true;
         const res = await this.$axios({
-          url: `/v1/shop/supplierProducts/search?product=${query}`,
+          url: `http://canteen.tonglingok.com/api/v1/shop/supplierProducts/search?product=${query}`,
           methods: "get",
           headers: { token: store.getters.token }
         });
@@ -305,7 +305,7 @@ export default {
     async queryList(page) {
       page = typeof page == Number ? page : 1;
       const res = await $axios.get(
-        `/v1/shop/orderConsumption?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/shop/orderConsumption?page=${page}&size=${this.size}`,
         this.formdata
       );
       if (res.msg === "ok") {

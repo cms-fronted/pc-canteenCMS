@@ -193,7 +193,7 @@ export default {
   methods: {
     getCompanies() {
       $axios
-        .get("/v1/admin/companies")
+        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
         .then(res => {
           let arr = res.data;
           let allCompanies = [];
@@ -219,14 +219,14 @@ export default {
       if (!isNaN(company_id)) {
         if(company_id){
           $axios
-            .get(`/v1/canteens?company_id=${company_id}`)
+            .get(`http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`)
             .then(res => {
               this.locationList = unshiftAllOptions(Array.from(res.data));
             })
             .catch(err => console.log(err));
         }else{
           $axios
-            .get("/v1/managerCanteens")
+            .get("http://canteen.tonglingok.com/api/v1/managerCanteens")
             .then(res => {
               this.locationList = unshiftAllOptions(Array.from(res.data));
             })
@@ -241,7 +241,7 @@ export default {
     },
     getDinnersList(canteen_id) {
       $axios
-        .get(`/v1/canteen/dinners?canteen_id=${canteen_id}`)
+        .get(`http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`)
         .then(res => {
           this.dinnerList = Array.from(res.data);
         })
@@ -289,7 +289,7 @@ export default {
     },
     async addNewMenu() {
       console.log(this.menuForm);
-      const res = await $axios.post("/v1/menu/save", this.menuForm);
+      const res = await $axios.post("http://canteen.tonglingok.com/api/v1/menu/save", this.menuForm);
       if (res.msg === "ok") {
         this.$message.success("操作成功");
         this.detail = [];
@@ -305,7 +305,7 @@ export default {
       page = page || 1;
       $axios
         .get(
-          `/v1/menus/company?company_id=${this.company_id}&canteen_id=${this.canteen_id}&size=${this.size}&page=${page}`
+          `http://canteen.tonglingok.com/api/v1/menus/company?company_id=${this.company_id}&canteen_id=${this.canteen_id}&size=${this.size}&page=${page}`
         )
         .then(res => {
           let _data = Array.from(res.data.data);
@@ -363,7 +363,7 @@ export default {
     },
     getCanteenDetail(canteen_id) {
       $axios
-        .get(`/v1/menus/canteen?canteen_id=${canteen_id}`)
+        .get(`http://canteen.tonglingok.com/api/v1/menus/canteen?canteen_id=${canteen_id}`)
         .then(res => (this.canteen_detail = Array.from(res.data)))
         .catch(err => console.log(err));
     },
@@ -387,7 +387,7 @@ export default {
       ];
       detail = JSON.stringify(detail);
       let formdata = { c_id: canteen_id, d_id: dinner_id, detail: detail };
-      const res = await $axios.post("/v1/menu/save", formdata);
+      const res = await $axios.post("http://canteen.tonglingok.com/api/v1/menu/save", formdata);
       if (res.msg === "ok") {
         this.$message.success("操作成功!");
         this.fetchTableList();

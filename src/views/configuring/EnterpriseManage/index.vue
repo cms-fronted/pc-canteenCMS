@@ -248,7 +248,7 @@ export default {
     getComsumptionLoc(id) {
       this.shopLocData = [];
       $axios
-        .get(`/v1/company/consumptionLocation?company_id=${id}`)
+        .get(`http://canteen.tonglingok.com/api/v1/company/consumptionLocation?company_id=${id}`)
         .then(res => {
           this.canteensLocData = Array.from(res.data.canteen);
           if (res.data.shop) {
@@ -259,7 +259,7 @@ export default {
     },
     fetchCompanyList() {
       $axios
-        .get("/v1/admin/companies")
+        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
         .then(res => {
           this.companyList = Array.from(res.data);
         })
@@ -305,7 +305,7 @@ export default {
     },
     _addEnterprise() {
       $axios
-        .post("/v1/company/save", {
+        .post("http://canteen.tonglingok.com/api/v1/company/save", {
           parent_id: this.parent.id || 0,
           name: this.enterpriseForm.name
         })
@@ -322,7 +322,7 @@ export default {
     async getCanteenConfig(id) {
       let data = null;
       await $axios
-        .get(`/v1/canteen/configuration?c_id=${id}`)
+        .get(`http://canteen.tonglingok.com/api/v1/canteen/configuration?c_id=${id}`)
         .then(res => {
           data = res.data;
         })
@@ -330,7 +330,7 @@ export default {
       return data;
     },
     async getSystemModules(id) {
-      const res = $axios.get("/v1/modules/canteen/withSystem", {
+      const res = $axios.get("http://canteen.tonglingok.com/api/v1/modules/canteen/withSystem", {
         c_id: id
       });
       return res;
@@ -359,7 +359,7 @@ export default {
     async getMachineList(val, type) {
       let data;
       await $axios
-        .get("/v1/machines", {
+        .get("http://canteen.tonglingok.com/api/v1/machines", {
           belong_id: val.id,
           machine_type: type,
           page: 1,

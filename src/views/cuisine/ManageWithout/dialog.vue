@@ -85,7 +85,7 @@
       <el-form-item label="图片" prop="img_url">
         <div class="imgs">
           <el-upload
-            action="/v1/image/upload"
+            action="http://canteen.tonglingok.com/api/v1/image/upload"
             list-type="picture-card"
             ref="addUpload"
             name="image"

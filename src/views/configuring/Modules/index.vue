@@ -248,7 +248,7 @@ export default {
         }
       );
       form.modules = JSON.stringify(form.modules);
-      let res = await $axios.post("/v1/module/default/handel", form);
+      let res = await $axios.post("http://canteen.tonglingok.com/api/v1/module/default/handel", form);
       if (res.msg === "ok") {
         if (!obj.items) {
           this.timer = setTimeout(() => {
@@ -265,7 +265,7 @@ export default {
     },
     async submitModulesForm() {
       let type = this.systemType;
-      const url = "/v1/module/system/canteen/save";
+      const url = "http://canteen.tonglingok.com/api/v1/module/system/canteen/save";
       let res = await $axios.post(url, this.modulesForm);
       if (res.msg === "ok") {
         this.closeModuleDialog();
@@ -274,7 +274,7 @@ export default {
       }
     },
     async submitEditModulesForm() {
-      let res = await $axios.post("/v1/module/update", this.editModuleForm);
+      let res = await $axios.post("http://canteen.tonglingok.com/api/v1/module/update", this.editModuleForm);
       if (res.msg === "ok") {
         this.closeEditModuleDialog();
         this.$message.success("修改成功");
@@ -283,7 +283,7 @@ export default {
     },
     async renderModules() {
       try {
-        const res = await $axios.get("/v1/modules?type=2");
+        const res = await $axios.get("http://canteen.tonglingok.com/api/v1/modules?type=2");
         if (res.msg === "ok") {
           console.log(res);
           this.canteenModules = Array.from(res.data);
@@ -318,7 +318,7 @@ export default {
       data.id = row.id;
       data.state = row.state === 1 ? 2 : 1;
       console.log(data);
-      const res = await $axios.post("/v1/module/system/handel", data);
+      const res = await $axios.post("http://canteen.tonglingok.com/api/v1/module/system/handel", data);
       if (res.msg === "ok") {
         this.$$message.success("操作成功!");
         this.renderModules();

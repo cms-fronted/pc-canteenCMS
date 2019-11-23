@@ -11,7 +11,7 @@
         :headers="params.header"
         :show-file-list="false"
         accept=".xls,.xlsx"
-        action="http://canteen.tonglingok.com/api/v1/wallet/supplement/upload"
+        action="http://canteen.tonglingok.comhttp://canteen.tonglingok.com/api/v1/wallet/supplement/upload"
         :on-success="handleSuccess"
         name="supplement"
       >

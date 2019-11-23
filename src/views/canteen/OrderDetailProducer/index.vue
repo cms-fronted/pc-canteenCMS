@@ -111,21 +111,21 @@ export default {
   },
   methods: {
     async getCategoryOptions() {
-      const res = await $axios.get("/v1/company/categories");
+      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/company/categories");
       if (res.msg === "ok") {
         this.categoryOptions = unshiftAllOptions(Array.from(res.data));
       }
     },
     async getProductsId(id) {
       const res = await $axios.get(
-        `/v1/shop/supplier/products?category_id=${id}&page=1&size=1000`
+        `http://canteen.tonglingok.com/api/v1/shop/supplier/products?category_id=${id}&page=1&size=1000`
       );
       console.log(res);
     },
     async fetchList(page) {
       page = page || 1;
       const res = await $axios.get(
-        `/v1/shop/order/statistic/supplier?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/shop/order/statistic/supplier?page=${page}&size=${this.size}`,
         this.queryform
       );
       if (res.msg === "ok") {
@@ -142,7 +142,7 @@ export default {
       console.log("点击导出表格");
     },
     async getProductsId() {
-      const res = await $axios.get("/v1/shop/supplierProducts/search");
+      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/shop/supplierProducts/search");
       if (res.msg === "ok") {
         this.productOptions = unshiftAllOptions(Array.from(res.data));
       }
@@ -151,7 +151,7 @@ export default {
       if (query != "") {
         this.loading = true;
         const res = await this.$axios({
-          url: `/v1/shop/supplierProducts/search?product=${query}`,
+          url: `http://canteen.tonglingok.com/api/v1/shop/supplierProducts/search?product=${query}`,
           methods: "get",
           headers: { token: store.getters.token }
         });

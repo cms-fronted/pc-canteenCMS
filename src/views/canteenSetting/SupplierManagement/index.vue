@@ -99,7 +99,7 @@ export default {
   methods:{
     fetchCompanyList(){
       $axios
-        .get("/v1/companies")
+        .get("http://canteen.tonglingok.com/api/v1/companies")
         .then(res => {
           this.companyList = Array.from(res.data.data);
         })
@@ -108,7 +108,7 @@ export default {
     fetchSupplierList(){
       if(this.companiesVisible){
         $axios
-          .get(`/v1/suppliers?c_id=${this.company_id}&page=${this.page}&size=10`)
+          .get(`http://canteen.tonglingok.com/api/v1/suppliers?c_id=${this.company_id}&page=${this.page}&size=10`)
           .then(res => {
             this.supplierList = Array.from(res.data.data);
             this.total = res.data.total;
@@ -116,7 +116,7 @@ export default {
           .catch(err => console.log(err));
       }else{
         $axios
-          .get(`/v1/suppliers?page=${this.page}&size=10`)
+          .get(`http://canteen.tonglingok.com/api/v1/suppliers?page=${this.page}&size=10`)
           .then(res => {
             this.supplierList = Array.from(res.data.data);
             this.total = res.data.total;
@@ -141,7 +141,7 @@ export default {
       })
         .then(() => {
           $axios
-            .post("/v1/supplier/delete", {
+            .post("http://canteen.tonglingok.com/api/v1/supplier/delete", {
               id: this.currentSupplierId
             })
             .then(res => {
@@ -186,7 +186,7 @@ export default {
     confirmReset(){
       this.reviseSupplierForm.pwd = this.pwd;
       $axios
-        .post("/v1/supplier/update",this.reviseSupplierForm)
+        .post("http://canteen.tonglingok.com/api/v1/supplier/update",this.reviseSupplierForm)
         .then(res => {
           this.resetpwdVisible = false;
           this.pwd = "";

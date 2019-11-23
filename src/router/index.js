@@ -459,50 +459,50 @@ export const currencyRoutes = [
   }
 ];
 export const producerRoutes = [
-  {
-    path: "/canteen",
-    name: "Canteen",
-    redirect: "/canteen/manage",
-    component: Layout,
-    meta: {
-      title: "小卖部管理",
-      icon: "el-icon-coffee"
-    },
-    children: [
-      {
-        path: "manage",
-        name: "Canteen-manage",
-        component: () => import("@/views/canteen/Manage"),
-        meta: {
-          title: "商品管理(供)"
-        }
-      },
-      {
-        path: "statistics-producer",
-        name: "Canteen-statistics-producer",
-        component: () => import("@/views/canteen/StatisticsProducer"),
-        meta: {
-          title: "消费订单汇总查询(供)"
-        }
-      },
-      {
-        path: "order-detail-producer",
-        name: "Canteen-order-producer",
-        component: () => import("@/views/canteen/OrderDetailProducer"),
-        meta: {
-          title: "订单明细查询(供)"
-        }
-      },
-      {
-        path: 'invoicing-report-producer',
-        name: 'Canteen-invocing-report-producer',
-        component: () => import('@/views/canteen/InvoicingReportProducer'),
-        meta: {
-          title: '进销统计报表(供)'
-        }
-      }
-    ]
-  }
+  // {
+  //   path: "/canteen",
+  //   name: "Canteen",
+  //   redirect: "/canteen/manage",
+  //   component: Layout,
+  //   meta: {
+  //     title: "小卖部管理",
+  //     icon: "el-icon-coffee"
+  //   },
+  //   children: [
+  //     {
+  //       path: "manage",
+  //       name: "Canteen-manage",
+  //       component: () => import("@/views/canteen/Manage"),
+  //       meta: {
+  //         title: "商品管理(供)"
+  //       }
+  //     },
+  //     {
+  //       path: "statistics-producer",
+  //       name: "Canteen-statistics-producer",
+  //       component: () => import("@/views/canteen/StatisticsProducer"),
+  //       meta: {
+  //         title: "消费订单汇总查询(供)"
+  //       }
+  //     },
+  //     {
+  //       path: "order-detail-producer",
+  //       name: "Canteen-order-producer",
+  //       component: () => import("@/views/canteen/OrderDetailProducer"),
+  //       meta: {
+  //         title: "订单明细查询(供)"
+  //       }
+  //     },
+  //     {
+  //       path: 'invoicing-report-producer',
+  //       name: 'Canteen-invocing-report-producer',
+  //       component: () => import('@/views/canteen/InvoicingReportProducer'),
+  //       meta: {
+  //         title: '进销统计报表(供)'
+  //       }
+  //     }
+  //   ]
+  // }
 ]
 export const asyncRoutes = [
   // {

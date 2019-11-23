@@ -55,7 +55,7 @@ export default {
   methods: {
     fetchCompanyList() {
       $axios
-        .get("/v1/companies")
+        .get("http://canteen.tonglingok.com/api/v1/companies")
         .then(res => {
           this.companyList = Array.from(res.data.data);
         })
@@ -67,7 +67,7 @@ export default {
     },
     handleConfirm() {
       $axios
-        .post("/v1/category/save", this.goodsForm)
+        .post("http://canteen.tonglingok.com/api/v1/category/save", this.goodsForm)
         .then(res => {
           this.$emit("closeDialog1", false, res.msg);
         })

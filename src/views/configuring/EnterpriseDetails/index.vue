@@ -209,7 +209,7 @@ export default {
     async fetchList(page) {
       page = page || 1;
       const res = await $axios.get(
-        `/v1/companies?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/companies?page=${page}&size=${this.size}`,
         this.queryForm
       );
       if (res.msg === "ok") {
@@ -217,7 +217,7 @@ export default {
       }
     },
     async getCompaniesList() {
-      const res = await $axios.get("/v1/admin/companies");
+      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/admin/companies");
       this.companyOptions = Array.from(flatten(res.data));
     },
     async openDetailDialog(row) {
@@ -235,7 +235,7 @@ export default {
     },
     async getCompanyDetail(company_id) {
       const res = await $axios.get(
-        `/v1/canteens/company?company_id=${company_id}`
+        `http://canteen.tonglingok.com/api/v1/canteens/company?company_id=${company_id}`
       );
       if (res.msg === "ok") {
         this.staffs = res.data.staffs;
@@ -243,7 +243,7 @@ export default {
       return res;
     },
     async getModules(company_id) {
-      const res = await $axios.get("/v1/modules/canteen/withSystem", {
+      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/modules/canteen/withSystem", {
         c_id: company_id
       });
       if (res.msg === "ok") {
@@ -252,7 +252,7 @@ export default {
       return res;
     },
     async getCompanyMachine(page) {
-      const res = await $axios.get("/v1/machines/company", {
+      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/machines/company", {
         company_id: this.company_id,
         page: page || 1,
         size: this.machine_size
@@ -271,7 +271,7 @@ export default {
         type: "warning"
       })
         .then(async () => {
-          const res = await $axios.post("/v1/canteen/deleteMachine", { id });
+          const res = await $axios.post("http://canteen.tonglingok.com/api/v1/canteen/deleteMachine", { id });
           if (res.msg === "ok") {
             this.$message({
               type: "success",

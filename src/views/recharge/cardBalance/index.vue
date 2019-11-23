@@ -95,9 +95,9 @@ export default {
   },
   methods: {
     fetchDepartmentList(){
-      // 正确接口，没数据：/v1/departments/recharge 测试接口：/v1/departments?c_id=2
+      // 正确接口，没数据：http://canteen.tonglingok.com/api/v1/departments/recharge 测试接口：http://canteen.tonglingok.com/api/v1/departments?c_id=2
       $axios
-        .get("/v1/departments/recharge")
+        .get("http://canteen.tonglingok.com/api/v1/departments/recharge")
         .then(res => {
           console.log(res)
           this.departmentList = res.data;
@@ -109,7 +109,7 @@ export default {
     },
     handleClear(){
       $axios
-        .post("/v1/wallet/clearBalance")
+        .post("http://canteen.tonglingok.com/api/v1/wallet/clearBalance")
         .then(res => {
           this.fetchTableList();
         })
@@ -120,7 +120,7 @@ export default {
       // 返回的数据 res.data.data username code card_num phone department balance
       let {user,phone,department_id} = this.formdata;
       $axios
-        .get("/v1/wallet/users/balance",{
+        .get("http://canteen.tonglingok.com/api/v1/wallet/users/balance",{
           "page": this.current_page,
           "size": 10,
           user,phone,department_id

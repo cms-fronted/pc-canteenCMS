@@ -164,7 +164,7 @@ export default {
       this.getDepartmentOptions(company_ids);
     },
     async getCompanyOptions() {
-      const res = await $axios.get("/v1/admin/companies");
+      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/admin/companies");
       if (res.msg === "ok") {
         this.companyOptions = getAllOptions(flatten(res.data));
       }
@@ -173,10 +173,10 @@ export default {
       let res;
       if(company_ids){
         res = await $axios.get(
-          `/v1/canteens?company_id=${company_ids}`
+          `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_ids}`
         );
       }else{
-        res = await $axios.get("/v1/managerCanteens");
+        res = await $axios.get("http://canteen.tonglingok.com/api/v1/managerCanteens");
       }
       if (res.msg === "ok") {
         this.canteenOptions = unshiftAllOptions(Array.from(res.data)); //给数组添加一个全部option
@@ -192,7 +192,7 @@ export default {
       //饭堂不为全部时， 0 为全部
       if (canteen_id) {
         const res = await $axios.get(
-          `/v1/canteen/dinners?canteen_id=${canteen_id}`
+          `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
         );
         if (res.msg === "ok") {
           this.dinnersOptions = unshiftAllOptions(Array.from(res.data));
@@ -202,7 +202,7 @@ export default {
     async queryList(page) {
       page = page || 1;
       const res = await $axios.get(
-        `/v1/order/orderSettlement?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/order/orderSettlement?page=${page}&size=${this.size}`,
         this.formdata
       );
       if (res.msg === "ok") {

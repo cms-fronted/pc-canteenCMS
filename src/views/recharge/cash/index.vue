@@ -20,7 +20,7 @@
             :limit="limit"
             :headers="header"
             accept=".xls,.xlsx"
-            action="/v1/wallet/recharge/upload"
+            action="http://canteen.tonglingok.com/api/v1/wallet/recharge/upload"
             :show-file-list="false"
             :on-success='handleSuccess'
             name="cash"
@@ -110,10 +110,10 @@ export default {
       }
     },
     fetchDepartmentList(){
-      // 先默认获取 c_id为2的公司的部门列表 到时需要修改成 /v1/departments/recharge
-      // get("/v1/departments?c_id=2") /v1/departments/recharge
+      // 先默认获取 c_id为2的公司的部门列表 到时需要修改成 http://canteen.tonglingok.com/api/v1/departments/recharge
+      // get("http://canteen.tonglingok.com/api/v1/departments?c_id=2") http://canteen.tonglingok.com/api/v1/departments/recharge
       $axios
-        .get("/v1/departments/recharge")
+        .get("http://canteen.tonglingok.com/api/v1/departments/recharge")
         .then(res => {
           // console.log(res)
           this.departmentList = res.data;
@@ -135,7 +135,7 @@ export default {
     },
     fetchPersonnelList(){
       $axios
-        .get("/v1/department/staffs/recharge",{
+        .get("http://canteen.tonglingok.com/api/v1/department/staffs/recharge",{
           "page": 1,
           "size": 10,
           "department_id": this.department_id,
@@ -154,7 +154,7 @@ export default {
     },
     recharge(){
       $axios
-        .post("/v1/wallet/recharge/cash",{
+        .post("http://canteen.tonglingok.com/api/v1/wallet/recharge/cash",{
           "money": this.money,
           "remark": this.remark,
           "detail": JSON.stringify(this.detail)

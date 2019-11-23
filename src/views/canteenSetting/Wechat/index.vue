@@ -82,7 +82,7 @@ export default {
   methods: {
     fetchCompanyList() {
       $axios
-        .get("/v1/companies")
+        .get("http://canteen.tonglingok.com/api/v1/companies")
         .then(res => {
           this.companyList = Array.from(res.data.data);
         })
@@ -91,7 +91,7 @@ export default {
     fetchTableList() {
       if(this.companiesVisible){
         $axios
-          .get(`/v1/categories?c_id=${this.company_id}&page=${this.page}&size=10`)
+          .get(`http://canteen.tonglingok.com/api/v1/categories?c_id=${this.company_id}&page=${this.page}&size=10`)
           .then(res => {
             this.tableList = Array.from(res.data.data);
             this.total = res.data.total;
@@ -99,7 +99,7 @@ export default {
           .catch(err => console.log(err));
       }else{
         $axios
-        .get(`/v1/categories?page=${this.page}&size=10`)
+        .get(`http://canteen.tonglingok.com/api/v1/categories?page=${this.page}&size=10`)
         .then(res => {
           console.log(res)
           this.tableList = Array.from(res.data.data);
@@ -117,7 +117,7 @@ export default {
       })
         .then(() => {
           $axios
-            .post("/v1/category/delete", {
+            .post("http://canteen.tonglingok.com/api/v1/category/delete", {
               id: this.currentGoodsId
             })
             .then(res => {

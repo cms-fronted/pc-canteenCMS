@@ -31,7 +31,7 @@
             :headers="header"
             :show-file-list="false"
             accept=".xls, .xlsx"
-            action="/v1/department/staff/upload"
+            action="http://canteen.tonglingok.com/api/v1/department/staff/upload"
             :on-success="handleSuccess"
             :data="{ c_id: c_id }"
             name="staffs"
@@ -551,26 +551,26 @@ export default {
       return data.name.indexOf(value) !== -1;
     },
     async getCompanies() {
-      const res = await $axios.get("/v1/admin/companies");
+      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/admin/companies");
       if (res.msg === "ok") {
         this.companyOptions = flatten(res.data);
       }
     },
     async getDepartmentListWithoutCid() {
-      const res = await $axios.get("/v1/admin/departments");
+      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/admin/departments");
       if (res.msg === "ok") {
         this.departmentList = unshiftAllOptions(Aarray.from(res.data));
       }
     },
     async getRoleType() {
-      const res = await $axios.get("/v1/role/types");
+      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/role/types");
       if (res.msg === "ok") {
         this.roleOptions = res.data.data;
       }
     },
     async fetchDepartmentTreeData(c_id) {
       c_id = c_id || this.queryForm.c_id || "";
-      const res = await $axios.get(`/v1/departments?c_id=${c_id}`);
+      const res = await $axios.get(`http://canteen.tonglingok.com/api/v1/departments?c_id=${c_id}`);
       if (res.msg === "ok") {
         this.treeData = Array.from(res.data);
         this.departmentOptions = flatten(res.data);
@@ -579,7 +579,7 @@ export default {
     async fetchList(page) {
       page = page || this.current_page;
       const res = await $axios.get(
-        `/v1/staffs?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/staffs?page=${page}&size=${this.size}`,
         {
           c_id: this.c_id, //company_id,
           d_id: this.d_id //d_id,
@@ -609,7 +609,7 @@ export default {
     async getCanteenOptions(c_id) {
       let company_id = c_id || "";
       const res = await $axios.get(
-        `/v1/company/consumptionLocation?company_id=${company_id}`
+        `http://canteen.tonglingok.com/api/v1/company/consumptionLocation?company_id=${company_id}`
       );
       if (res.msg === "ok") {
         this.canteenGroup = Array.from(res.data.canteen);
@@ -638,7 +638,7 @@ export default {
       if (!this.isEditDepartment) {
         //新增部门
         const res = await $axios.post(
-          "/v1/department/save",
+          "http://canteen.tonglingok.com/api/v1/department/save",
           this.departmentForm
         );
         if (res.msg === "ok") {
@@ -651,7 +651,7 @@ export default {
       } else {
         //编辑部门
         const res = await $axios.post(
-          "/v1/department/update",
+          "http://canteen.tonglingok.com/api/v1/department/update",
           this.departmentForm
         );
         if (res.msg === "ok") {
@@ -671,7 +671,7 @@ export default {
         type: "warning"
       })
         .then(async () => {
-          const res = await $axios.post("/v1/department/delete", {
+          const res = await $axios.post("http://canteen.tonglingok.com/api/v1/department/delete", {
             id: detail.id
           });
           if (res.msg === "ok") {
@@ -740,7 +740,7 @@ export default {
         });
         this.addFormData.canteens = JSON.stringify(_canteen);
         const res = await $axios.post(
-          "/v1/department/staff/save",
+          "http://canteen.tonglingok.com/api/v1/department/staff/save",
           this.addFormData
         );
         if (res.msg === "ok") {
@@ -774,7 +774,7 @@ export default {
         this.addFormData.cancel_canteens = JSON.stringify(cancel);
         this.addFormData.canteens = JSON.stringify(add);
         const res = await $axios.post(
-          "/v1/department/staff/update",
+          "http://canteen.tonglingok.com/api/v1/department/staff/update",
           this.addFormData
         );
         if (res.msg === "ok") {
@@ -786,7 +786,7 @@ export default {
     },
     async _deleteStaff(row) {
       let id = row.id;
-      const res = await $axios.post("/v1/department/staff/delete", { id });
+      const res = await $axios.post("http://canteen.tonglingok.com/api/v1/department/staff/delete", { id });
       if (res.msg === "ok") {
         this.$message.success("删除成功");
         await this.fetchList(this.current_page);
@@ -803,7 +803,7 @@ export default {
       this.QRForm = { minute: "", hour: "", day: "", month: "", year: "" };
     },
     async _comfirmSettingQR() {
-      const res = await $axios.post("/v1/staff/qrcode/save", this.QRForm);
+      const res = await $axios.post("http://canteen.tonglingok.com/api/v1/staff/qrcode/save", this.QRForm);
       console.log(res);
       if (res.msg === "ok") {
         this.$message.success("设置成功");
@@ -829,7 +829,7 @@ export default {
     async _comfirmMove() {
       let staff_id = this.cureentDepartment.id;
       let new_d_id = this.cureentDepartment.new_d_id;
-      const res = await $axios.post("/v1/department/staff/move", {
+      const res = await $axios.post("http://canteen.tonglingok.com/api/v1/department/staff/move", {
         id: staff_id,
         d_id: new_d_id
       });
@@ -855,7 +855,7 @@ export default {
       this.roleTypeDialogVisible = false;
     },
     async _addRoleType() {
-      const res = await $axios.post("/v1/role/type/save", this.roleTypeForm);
+      const res = await $axios.post("http://canteen.tonglingok.com/api/v1/role/type/save", this.roleTypeForm);
       if (res.msg === "ok") {
         this.$message.success("新增成功");
         await this.getRoleType();

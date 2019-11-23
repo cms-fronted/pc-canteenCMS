@@ -184,7 +184,7 @@ export default {
     },
     getCompanies() {
       $axios
-        .get("/v1/admin/companies")
+        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
         .then(res => {
           let arr = res.data;
           let allCompanies = [];
@@ -206,7 +206,7 @@ export default {
     getDinnersList(canteen_id) {
       if (canteen_id) {
         $axios
-          .get(`/v1/canteen/dinners?canteen_id=${canteen_id}`)
+          .get(`http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`)
           .then(res => {
             this.dinnersList = unshiftAllOptions(Array.from(res.data));
           })
@@ -216,14 +216,14 @@ export default {
     getLocationList(company_id) {
       if (company_id) {
         $axios
-          .get(`/v1/canteens?company_id=${company_id}`)
+          .get(`http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`)
           .then(res => {
             this.locationList = unshiftAllOptions(Array.from(res.data));
           })
           .catch(err => console.log(err));
       } else {
         $axios
-          .get("/v1/managerCanteens")
+          .get("http://canteen.tonglingok.com/api/v1/managerCanteens")
           .then(res => {
             this.locationList = unshiftAllOptions(Array.from(res.data));
           })
