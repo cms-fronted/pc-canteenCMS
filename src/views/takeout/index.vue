@@ -246,7 +246,7 @@ export default {
   },
   methods: {
     async getCompanyOptions() {
-      const res = await $axios.get("/apihttp://canteen.tonglingok.com/api/v1/admin/companies");
+      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/admin/companies");
       if (res.msg === "ok") {
         this.companyOptions = getAllOptions(flatten(res.data));
       }
@@ -259,9 +259,9 @@ export default {
       let res;
       if (company_ids) {
         if (!Number(company_ids)) return;
-        res = await $axios.get(`/apihttp://canteen.tonglingok.com/api/v1/canteens?company_id=${company_ids}`);
+        res = await $axios.get(`http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_ids}`);
       } else {
-        res = await $axios.get("/apihttp://canteen.tonglingok.com/api/v1/managerCanteens");
+        res = await $axios.get("http://canteen.tonglingok.com/api/v1/managerCanteens");
       }
       if (res.msg === "ok") {
         this.canteenOptions = unshiftAllOptions(Array.from(res.data));
@@ -271,7 +271,7 @@ export default {
       //饭堂不为全部时， 0 为全部
       if (canteen_id) {
         const res = await $axios.get(
-          `/apihttp://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
+          `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
         );
         if (res.msg === "ok") {
           this.dinnersOptions = unshiftAllOptions(Array.from(res.data));
@@ -283,7 +283,7 @@ export default {
       queryForm.canteen_id = queryForm.canteen_id ? queryForm.canteen_id : 0;
       queryForm.dinner_id = queryForm.dinner_id ? queryForm.dinner_id : 0;
       const res = await $axios.get(
-        `/apihttp://canteen.tonglingok.com/api/v1/order/takeoutStatistic?page=${this.current_page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/order/takeoutStatistic?page=${this.current_page}&size=${this.size}`,
         queryForm
       );
       if (res.msg === "ok") {
@@ -294,7 +294,7 @@ export default {
     },
     async openDetailDialog(row) {
       let id = row.order_id;
-      const res = await $axios.get(`/apihttp://canteen.tonglingok.com/api/v1/order/info/print?order_id=${id}`);
+      const res = await $axios.get(`http://canteen.tonglingok.com/api/v1/order/info/print?order_id=${id}`);
       if (res.msg === "ok") {
         this.detailForm = res.data;
         this.detailDialogVisible = true;
