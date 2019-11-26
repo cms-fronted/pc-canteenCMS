@@ -41,6 +41,9 @@ $axios.interceptors.response.use(
     }
     const code = response.status;
     if ((code >= 200 && code < 300) || code === 304) {
+      if (response.data.errorCode === 10001) {
+        store.dispatch('user/loginOut')
+      }
       return Promise.resolve(response.data);
     } else {
       return Promise.reject(response);

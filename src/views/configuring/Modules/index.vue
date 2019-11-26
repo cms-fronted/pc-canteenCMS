@@ -320,7 +320,7 @@ export default {
       console.log(data);
       const res = await $axios.post("http://canteen.tonglingok.com/api/v1/module/system/handel", data);
       if (res.msg === "ok") {
-        this.$$message.success("操作成功!");
+        this.$message.success("操作成功!");
         this.renderModules();
       }
     }

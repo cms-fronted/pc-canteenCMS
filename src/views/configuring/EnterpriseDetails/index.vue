@@ -11,7 +11,12 @@
             label-position="left"
             :model="queryForm"
           >
-            <el-form-item label="公司" prop="name" label-width="80px" v-if="companiesVisible">
+            <el-form-item
+              label="公司"
+              prop="name"
+              label-width="60px"
+              v-if="companiesVisible"
+            >
               <el-select v-model="queryForm.name">
                 <el-option
                   v-for="item in companyOptions"
@@ -203,7 +208,7 @@ export default {
   computed: {
     companiesVisible() {
       return this.grade !== 3;
-    },
+    }
   },
   methods: {
     async fetchList(page) {
@@ -214,10 +219,14 @@ export default {
       );
       if (res.msg === "ok") {
         this.companyList = Array.from(res.data.data);
+        this.total = res.data.total;
+        this.current_page = res.data.current_page;
       }
     },
     async getCompaniesList() {
-      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/admin/companies");
+      const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/admin/companies"
+      );
       this.companyOptions = Array.from(flatten(res.data));
     },
     async openDetailDialog(row) {
@@ -243,20 +252,26 @@ export default {
       return res;
     },
     async getModules(company_id) {
-      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/modules/canteen/withSystem", {
-        c_id: company_id
-      });
+      const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/modules/canteen/withSystem",
+        {
+          c_id: company_id
+        }
+      );
       if (res.msg === "ok") {
         this.modules = Array.from(res.data);
       }
       return res;
     },
     async getCompanyMachine(page) {
-      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/machines/company", {
-        company_id: this.company_id,
-        page: page || 1,
-        size: this.machine_size
-      });
+      const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/machines/company",
+        {
+          company_id: this.company_id,
+          page: page || 1,
+          size: this.machine_size
+        }
+      );
       if (res.msg === "ok") {
         this.machineList = Array.from(res.data.data);
         this.machine_total = res.data.total;
@@ -271,7 +286,10 @@ export default {
         type: "warning"
       })
         .then(async () => {
-          const res = await $axios.post("http://canteen.tonglingok.com/api/v1/canteen/deleteMachine", { id });
+          const res = await $axios.post(
+            "http://canteen.tonglingok.com/api/v1/canteen/deleteMachine",
+            { id }
+          );
           if (res.msg === "ok") {
             this.$message({
               type: "success",
