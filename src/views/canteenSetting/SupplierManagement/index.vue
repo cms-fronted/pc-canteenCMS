@@ -126,9 +126,10 @@ export default {
   methods: {
     fetchCompanyList() {
       $axios
-        .get("http://canteen.tonglingok.com/api/v1/companies")
+        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
         .then(res => {
-          this.companyList = flatten(Array.from(res.data.data));
+          let arr = res.data;
+          this.companyList = flatten(arr);
         })
         .catch(err => console.log(err));
     },
