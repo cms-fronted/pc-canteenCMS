@@ -5,16 +5,28 @@
       <el-divider></el-divider>
       <div class="main">
         <div class="main-header">
-          <span class="content-header"  v-if="companiesVisible">公司：</span>
+          <span class="content-header" v-if="companiesVisible">公司：</span>
           <el-select
             v-model="company_id"
             placeholder="请选择"
             v-if="companiesVisible"
+            filterable
           >
-            <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+            <el-option
+              v-for="item in companyList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
           </el-select>
-          <el-button type="primary" @click="fetchTableList">查询商品类型</el-button>
-          <el-button type="primary" @click="handleClick({c_id:company_id},'_add','增加商品类型')">增加商品类型</el-button>
+          <el-button type="primary" @click="fetchTableList"
+            >查询商品类型</el-button
+          >
+          <el-button
+            type="primary"
+            @click="handleClick({ c_id: company_id }, '_add', '增加商品类型')"
+            >增加商品类型</el-button
+          >
         </div>
         <div class="main-content">
           <el-table style="width:100%" border :data="tableList">
@@ -22,8 +34,17 @@
             <el-table-column label="商品类型" prop="name"></el-table-column>
             <el-table-column label="操作">
               <template slot-scope="scope">
-                <el-button size="mini" @click="handleClick(scope.row,'_edit','更改商品类型')">编辑</el-button>
-                <el-button size="mini" type="danger" @click="handleDelete(scope.row)">Delete</el-button>
+                <el-button
+                  size="mini"
+                  @click="handleClick(scope.row, '_edit', '更改商品类型')"
+                  >编辑</el-button
+                >
+                <el-button
+                  size="mini"
+                  type="danger"
+                  @click="handleDelete(scope.row)"
+                  >Delete</el-button
+                >
               </template>
             </el-table-column>
           </el-table>
@@ -53,11 +74,12 @@
 import $axios from "@/api/index";
 import HandleDialog from "./dialog";
 import Pagination from "@/components/Pagination";
-import store from '@/store';
+import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
+import store from "@/store";
 export default {
   data() {
     return {
-      grade: store.getters.grade,  
+      grade: store.getters.grade,
       companyList: [],
       company_id: "",
       tableList: [],
@@ -70,42 +92,46 @@ export default {
       dialogTitle: ""
     };
   },
-  components: { Pagination,HandleDialog },
+  components: { Pagination, HandleDialog },
   created() {
     this.fetchCompanyList();
   },
   computed: {
-    companiesVisible(){
+    companiesVisible() {
       return this.grade !== 3;
     }
   },
   methods: {
     fetchCompanyList() {
       $axios
-        .get("http://canteen.tonglingok.com/api/v1/companies")
+        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
         .then(res => {
-          this.companyList = Array.from(res.data.data);
+          this.companyList = flatten(Array.from(res.data.data));
         })
         .catch(err => console.log(err));
     },
     fetchTableList() {
-      if(this.companiesVisible){
+      if (this.companiesVisible) {
         $axios
-          .get(`http://canteen.tonglingok.com/api/v1/categories?c_id=${this.company_id}&page=${this.page}&size=10`)
+          .get(
+            `http://canteen.tonglingok.com/api/v1/categories?c_id=${this.company_id}&page=${this.page}&size=10`
+          )
           .then(res => {
             this.tableList = Array.from(res.data.data);
             this.total = res.data.total;
           })
           .catch(err => console.log(err));
-      }else{
+      } else {
         $axios
-        .get(`http://canteen.tonglingok.com/api/v1/categories?page=${this.page}&size=10`)
-        .then(res => {
-          console.log(res)
-          this.tableList = Array.from(res.data.data);
-          this.total = res.data.total;
-        })
-        .catch(err => console.log(err));
+          .get(
+            `http://canteen.tonglingok.com/api/v1/categories?page=${this.page}&size=10`
+          )
+          .then(res => {
+            console.log(res);
+            this.tableList = Array.from(res.data.data);
+            this.total = res.data.total;
+          })
+          .catch(err => console.log(err));
       }
     },
     handleDelete(val) {
@@ -145,16 +171,16 @@ export default {
       this.page = val;
       this.fetchTableList();
     },
-    closeDialog(val){
+    closeDialog(val) {
       this.visible = val;
     },
-    confirmUpdate(val){
-      if(val === 'ok'){
+    confirmUpdate(val) {
+      if (val === "ok") {
         this.fetchTableList();
       }
     },
-    handleClick(row = {}, type, title){
-      this.editFormdata = {}
+    handleClick(row = {}, type, title) {
+      this.editFormdata = {};
       this.visible = true;
       this.dialogTitle = title;
       this.editType = type;

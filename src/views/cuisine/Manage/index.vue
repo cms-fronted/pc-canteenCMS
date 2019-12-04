@@ -276,7 +276,9 @@ export default {
       if (!isNaN(company_id)) {
         if (company_id) {
           $axios
-            .get(`http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`)
+            .get(
+              `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
+            )
             .then(res => {
               this.diaLocationList = Array.from(res.data);
               this.locationList = getAllOptions(Array.from(res.data));
@@ -308,7 +310,9 @@ export default {
     getDinnersList(canteen_id) {
       if (!isNaN(canteen_id)) {
         $axios
-          .get(`http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`)
+          .get(
+            `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
+          )
           .then(res => {
             this.dinnersList = getAllOptions(Array.from(res.data));
           })
@@ -323,7 +327,9 @@ export default {
     getCategoryList(dinner_id) {
       if (!isNaN(dinner_id)) {
         $axios
-          .get(`http://canteen.tonglingok.com/api/v1/menus/dinner?dinner_id=${dinner_id}`)
+          .get(
+            `http://canteen.tonglingok.com/api/v1/menus/dinner?dinner_id=${dinner_id}`
+          )
           .then(res => {
             this.categoryList = getAllOptions(Array.from(res.data));
           })
@@ -335,7 +341,9 @@ export default {
     },
     async getEditDinnerList(canteen_id) {
       await $axios
-        .get(`http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`)
+        .get(
+          `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
+        )
         .then(res => {
           this.editDinnersList = Array.from(res.data);
         })
@@ -343,7 +351,9 @@ export default {
     },
     async getEditCategoryList(dinner_id) {
       await $axios
-        .get(`http://canteen.tonglingok.com/api/v1/menus/dinner?dinner_id=${dinner_id}`)
+        .get(
+          `http://canteen.tonglingok.com/api/v1/menus/dinner?dinner_id=${dinner_id}`
+        )
         .then(res => {
           this.editCategoryList = Array.from(res.data);
         })
@@ -388,12 +398,17 @@ export default {
       this.editData = {};
       this.visible = val;
     },
-    confirmEdit() {
+    async confirmEdit() {
       let data = this.editFormdata;
-      $axios
-        .post("http://canteen.tonglingok.com/api/v1/food/update", data)
-        .then(res => console.log(res))
-        .catch(err => console.log(err));
+      const res = await $axios.post(
+        "http://canteen.tonglingok.com/api/v1/food/update",
+        data
+      );
+      if (res.msg === "ok") {
+        this.editVisible = false;
+        this.editFormData = {};
+        this.fetchList(this.current_page);
+      }
     },
     openNewType() {
       this.newTypeVisible = true;
@@ -444,10 +459,9 @@ export default {
         type: "warning"
       })
         .then(() => {
-          this.$axios
-            .post("/NewJMConsumeJMHG/Mall.ashx", {
-              types: "delete_goods",
-              postID: item.postID
+          $axios
+            .post("http://canteen.tonglingok.com/api/v1/food/handel", {
+              id: item.id
             })
             .then(() => {
               this.fetchList(this.page);

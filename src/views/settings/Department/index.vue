@@ -6,7 +6,7 @@
       <div class="main-header">
         <el-form :inline="true">
           <el-form-item label="公司" v-if="companiesVisible">
-            <el-select v-model="queryForm.c_id" @change="selectCompany">
+            <el-select v-model="queryForm.c_id" @change="selectCompany" filterable>
               <el-option
                 v-for="item in companyOptions"
                 :key="item.id"
@@ -49,7 +49,7 @@
         </el-form>
         <div class="main-content">
           <el-row :gutter="10">
-            <el-col :span="4">
+            <el-col :span="6">
               <el-input
                 size="small"
                 v-model="filterText"
@@ -86,7 +86,7 @@
                 </span>
               </el-tree>
             </el-col>
-            <el-col :span="20">
+            <el-col :span="18">
               <el-table style="width:100%" :data="tabledata">
                 <el-table-column label="归属饭堂">
                   <template slot-scope="scoped">

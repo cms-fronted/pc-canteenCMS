@@ -23,6 +23,8 @@
 
 <script>
 import $axios from "@/api/index";
+import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
+
 export default {
   props: {
     visible: {
@@ -84,9 +86,9 @@ export default {
     },
     fetchCompanyList(){
       $axios
-        .get("http://canteen.tonglingok.com/api/v1/companies")
+        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
         .then(res => {
-          this.companyList = Array.from(res.data.data);
+          this.companyList = flatten(Array.from(res.data.data));
         })
         .catch(err => console.log(err));
     },
