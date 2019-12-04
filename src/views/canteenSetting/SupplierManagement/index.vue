@@ -22,7 +22,7 @@
           <el-button type="primary" @click="fetchSupplierList"
             >查询供应商</el-button
           >
-          <el-button type="primary" @click="handleClick()"
+          <el-button type="primary" @click="handleClick({ c_id: company_id })"
             >增加供应商</el-button
           >
         </div>
@@ -210,6 +210,7 @@ export default {
     },
     handleClick(row = {}) {
       this.addVisible = true;
+      Object.assign(this.editFormdata, {}, row);
     },
     handleClose() {
       this.pwd = "";
