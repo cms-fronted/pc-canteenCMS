@@ -6,7 +6,12 @@
       <div class="main-header">
         <el-form :model="queryForm" :inline="true" label-width="60px">
           <el-form-item label="公司" v-if="companiesVisible">
-            <el-select v-model="queryForm.company_id" @change="getCanteenList">
+            <el-select
+              v-model="queryForm.company_id"
+              placeholder="请选择企业"
+              filterable
+              @change="getCanteenList"
+            >
               <el-option
                 v-for="item in companiesList"
                 :label="item.name"
@@ -399,7 +404,9 @@ export default {
     async getCanteenList(company_id) {
       if (company_id) {
         await $axios
-          .get(`http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`)
+          .get(
+            `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
+          )
           .then(res => {
             this.canteenList = Array.from(res.data);
           })
@@ -417,7 +424,9 @@ export default {
       this.newSettingForm.c_id = "";
       this.newSettingForm.t_id = "";
       await $axios
-        .get(`http://canteen.tonglingok.com/api/v1/company/consumptionLocation?company_id=${company_id}`)
+        .get(
+          `http://canteen.tonglingok.com/api/v1/company/consumptionLocation?company_id=${company_id}`
+        )
         .then(res => {
           this.dialogCanteenList = Array.from(res.data.canteen);
         })
@@ -425,11 +434,14 @@ export default {
     },
     async queryList() {
       let data = await $axios
-        .get("http://canteen.tonglingok.com/api/v1/canteen/consumptionStrategy", {
-          c_id: this.queryForm.c_id,
-          page: this.current_page,
-          size: 3
-        })
+        .get(
+          "http://canteen.tonglingok.com/api/v1/canteen/consumptionStrategy",
+          {
+            c_id: this.queryForm.c_id,
+            page: this.current_page,
+            size: 3
+          }
+        )
         .then(res => {
           this.budgetList = Array.from(res.data);
           this.handleData();
@@ -447,7 +459,10 @@ export default {
       if (this.isEdit) {
         this.newSettingForm.detail = JSON.stringify(this.newSettingForm.detail);
         await $axios
-          .post("http://canteen.tonglingok.com/api/v1/canteen/consumptionStrategy/update", this.newSettingForm)
+          .post(
+            "http://canteen.tonglingok.com/api/v1/canteen/consumptionStrategy/update",
+            this.newSettingForm
+          )
           .then(res => {
             if (res.msg === "ok") {
               this.closeSettingDialog();
@@ -456,7 +471,10 @@ export default {
           .catch(err => console.log(err));
       } else {
         await $axios
-          .post("http://canteen.tonglingok.com/api/v1/canteen/consumptionStrategy/save", this.newSettingForm)
+          .post(
+            "http://canteen.tonglingok.com/api/v1/canteen/consumptionStrategy/save",
+            this.newSettingForm
+          )
           .then(res => {
             if (res.msg === "ok") {
               this.$message.success("添加成功");
@@ -543,7 +561,10 @@ export default {
       this.editSettingForm.consumption_count = this.detail.length;
       this.editSettingForm.detail = JSON.stringify(this.detail);
       await $axios
-        .post("http://canteen.tonglingok.com/api/v1/canteen/consumptionStrategy/update", this.editSettingForm)
+        .post(
+          "http://canteen.tonglingok.com/api/v1/canteen/consumptionStrategy/update",
+          this.editSettingForm
+        )
         .then(res => {
           if (res.msg === "ok") {
             this.$message.success("修改成功");

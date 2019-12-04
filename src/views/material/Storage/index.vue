@@ -8,6 +8,8 @@
           <el-form-item label="公司" v-if="companiesVisible" prop="company_id">
             <el-select
               @change="getCanteenOptions"
+              placeholder="请选择企业"
+              filterable
               v-model="queryForm.company_id"
             >
               <el-option
@@ -171,14 +173,18 @@ export default {
   },
   methods: {
     async getCompanies() {
-      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/admin/companies");
+      const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/admin/companies"
+      );
       if (res.msg === "ok") {
         this.companyOptions = flatten(res.data);
       }
     },
     async getCanteenOptions(c_id) {
       let company_id = c_id || "";
-      const res = await $axios.get(`http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`);
+      const res = await $axios.get(
+        `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
+      );
       if (res.msg === "ok") {
         this.canteenOptions = Array.from(res.data);
       }
@@ -230,9 +236,12 @@ export default {
         type: "warning"
       })
         .then(async () => {
-          const res = await $axios.post("http://canteen.tonglingok.com/api/v1/order/material/report/delete", {
-            id
-          });
+          const res = await $axios.post(
+            "http://canteen.tonglingok.com/api/v1/order/material/report/delete",
+            {
+              id
+            }
+          );
           if (res.msg === "ok") {
             this.$message.success("操作成功!");
             this.queryList(this.current_page);

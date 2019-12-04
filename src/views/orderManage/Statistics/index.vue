@@ -35,6 +35,7 @@
                   v-model="formdata.company_ids"
                   placeholder="请选择公司"
                   style="width:200px"
+                  filterable
                   @change="getList"
                 >
                   <el-option

@@ -8,6 +8,7 @@
         <el-select
           v-model="company_id"
           placeholder="请选择"
+          filterable
           style="width:150px"
           @change="getLocationList(company_id)"
           v-if="companiesVisible"

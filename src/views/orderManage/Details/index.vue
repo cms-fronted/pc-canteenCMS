@@ -25,6 +25,7 @@
             <el-form-item label="公司" v-if="companiesVisible">
               <el-select
                 v-model="formdata.company_ids"
+                filterable
                 @change="getList"
                 placeholder="请选择公司"
               >
@@ -206,7 +207,9 @@ export default {
     getDinnersList(canteen_id) {
       if (canteen_id) {
         $axios
-          .get(`http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`)
+          .get(
+            `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
+          )
           .then(res => {
             this.dinnersList = unshiftAllOptions(Array.from(res.data));
           })
@@ -216,7 +219,9 @@ export default {
     getLocationList(company_id) {
       if (company_id) {
         $axios
-          .get(`http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`)
+          .get(
+            `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
+          )
           .then(res => {
             this.locationList = unshiftAllOptions(Array.from(res.data));
           })

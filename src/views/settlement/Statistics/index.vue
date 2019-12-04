@@ -26,9 +26,10 @@
             </el-form-item>
             <el-form-item label="公司" v-if="companiesVisible">
               <el-select
+                placeholder="请选择企业"
+                filterable
                 v-model="formdata.company_ids"
                 @change="getList"
-                placeholder="请选择公司"
               >
                 <el-option
                   v-for="item in companiesList"
@@ -290,7 +291,9 @@ export default {
     getDinnersList(canteen_id) {
       if (canteen_id) {
         $axios
-          .get(`http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`)
+          .get(
+            `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
+          )
           .then(res => {
             this.dinnersList = unshiftAllOptions(Array.from(res.data));
           })
@@ -301,7 +304,9 @@ export default {
       }
     },
     async getDepartmentListWithoutCid() {
-      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/admin/departments");
+      const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/admin/departments"
+      );
       if (res.msg === "ok") {
         this.departmentList = unshiftAllOptions(Aarray.from(res.data));
       }
@@ -321,7 +326,9 @@ export default {
     getLocationList(company_id) {
       if (company_id && Number(company_id)) {
         $axios
-          .get(`http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`)
+          .get(
+            `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
+          )
           .then(res => {
             this.locationList = unshiftAllOptions(Array.from(res.data));
           })
@@ -336,7 +343,9 @@ export default {
       }
     },
     async getRoleType() {
-      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/role/types");
+      const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/role/types"
+      );
       if (res.msg === "ok") {
         this.roleOptions = unshiftAllOptions(res.data.data);
       }

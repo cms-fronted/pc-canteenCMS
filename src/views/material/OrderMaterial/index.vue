@@ -6,7 +6,12 @@
       <div class="main-header">
         <el-form :inline="true" :model="queryForm">
           <el-form-item label="公司" v-if="companiesVisible" prop="company_id">
-            <el-select @change="getCanteenOptions" v-model="queryForm.company_id">
+            <el-select
+              @change="getCanteenOptions"
+              placeholder="请选择企业"
+              filterable
+              v-model="queryForm.company_id"
+            >
               <el-option
                 v-for="item in companyOptions"
                 :key="item.id"
@@ -52,20 +57,33 @@
           <el-table-column label="日期" prop="ordering_date"></el-table-column>
           <el-table-column label="餐次" prop="dinner"></el-table-column>
           <el-table-column label="材料名称" prop="material"></el-table-column>
-          <el-table-column label="材料数量" prop="order_count"></el-table-column>
+          <el-table-column
+            label="材料数量"
+            prop="order_count"
+          ></el-table-column>
           <el-table-column label="订货数量" prop="material_count">
             <template slot-scope="scoped">
-              <el-input size="mini" width="50px" v-model="scoped.row.material_count"></el-input>
+              <el-input
+                size="mini"
+                width="50px"
+                v-model="scoped.row.material_count"
+              ></el-input>
             </template>
           </el-table-column>
           <el-table-column label="单价" prop="material_price">
             <template slot-scope="scoped">
-              <el-input size="mini" width="50px" v-model="scoped.row.material_price"></el-input>
+              <el-input
+                size="mini"
+                width="50px"
+                v-model="scoped.row.material_price"
+              ></el-input>
             </template>
           </el-table-column>
           <el-table-column label="总价">
             <template slot-scope="scoped">
-              <span>{{scoped.row.material_count * scoped.row.material_price}}</span>
+              <span>{{
+                scoped.row.material_count * scoped.row.material_price
+              }}</span>
             </template>
           </el-table-column>
         </el-table>
@@ -77,7 +95,12 @@
         ></pagination>
       </div>
     </div>
-    <el-dialog :visible.sync="dialogVisible" width="30%" title="报表名称" @close="closeDialog">
+    <el-dialog
+      :visible.sync="dialogVisible"
+      width="30%"
+      title="报表名称"
+      @close="closeDialog"
+    >
       <el-form label-width="100px">
         <el-form-item label="报表名称">
           <el-input v-model="updateForm.title"></el-input>
@@ -123,15 +146,17 @@ export default {
     };
   },
   created() {
-      if(this.companiesVisible){
+    if (this.companiesVisible) {
       this.getCompanies();
-    } else{
-      this.getCanteenOptions(0)
+    } else {
+      this.getCanteenOptions(0);
     }
   },
   methods: {
     async getCompanies() {
-      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/admin/companies");
+      const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/admin/companies"
+      );
       if (res.msg === "ok") {
         this.companyOptions = flatten(res.data);
       }
@@ -141,7 +166,9 @@ export default {
       this.canteenOptions = [];
       this.queryForm.canteen_id = "";
       if (Number(company_id)) {
-        const res = await $axios.get(`http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`);
+        const res = await $axios.get(
+          `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
+        );
         if (res.msg === "ok") {
           this.canteenOptions = Array.from(res.data);
         }

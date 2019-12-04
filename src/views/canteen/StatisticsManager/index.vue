@@ -27,6 +27,7 @@
                 v-model="formdata.company_id"
                 placeholder="请选择企业"
                 @change="getDepartmentList"
+                filterable
               >
                 <el-option
                   v-for="item in companyList"
