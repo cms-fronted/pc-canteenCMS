@@ -230,7 +230,9 @@ export default {
       }
     },
     async getDepartmentOptions(company_ids) {
-      const res = await $axios.get(`v1/departments?c_id=${company_ids}`);
+      const res = await $axios.get(
+        `http://canteen.tonglingok.com/api/v1/departments?c_id=${company_ids}`
+      );
       if (res.msg === "ok") {
         this.departmentOptions = unshiftAllOptions(flatten(res.data));
       }

@@ -184,6 +184,7 @@
       :isEdit="isEdit"
       :formdata="editForm"
       :machineList="machineList"
+      @updateCanteenList="getComsumptionLoc"
       @updateMachineTable="(val, type) => getMachineList(val, type)"
     ></add-shop-dialog>
     <edit-enterprise-dialog

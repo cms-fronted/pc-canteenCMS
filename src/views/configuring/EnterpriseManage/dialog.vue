@@ -439,6 +439,7 @@ export default {
           this.canteens = "";
           this.canteen_id = res.data.canteen_id;
           this.$message.success("饭堂创建成功，请继续操作");
+          this.$emit("updateCanteenList", this.company_id);
         })
         .catch(err => {
           this.$message.error("饭堂名称不能为空!");
@@ -522,10 +523,14 @@ export default {
       $axios
         .post(url, data)
         .then(res => {
-          this.$message.success("设置成功");
-          this.dataTable.length = 0;
-          this.$emit("updateCanteenList", this.company_id);
-          this.handleClose();
+          if (res.msg === "ok") {
+            this.$message.success("设置成功");
+            this.dataTable.length = 0;
+            this.$emit("updateCanteenList", this.company_id);
+            this.handleClose();
+          } else {
+            this.$message.error(res.msg);
+          }
         })
         .catch(err => console.log(err));
     },
