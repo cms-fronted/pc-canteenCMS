@@ -204,10 +204,13 @@ export default {
     },
     // 封装方法 changeState 处理商品状态
     changeState(id, state) {
-      this.sendPostRequest("http://canteen.tonglingok.com/api/v1/shop/product/handel", {
-        id: id,
-        state: state
-      });
+      this.sendPostRequest(
+        "http://canteen.tonglingok.com/api/v1/shop/product/handel",
+        {
+          id: id,
+          state: state
+        }
+      );
     },
     // 获取相关数据列表
     getSupplierList() {
@@ -226,7 +229,9 @@ export default {
     getCategoryList() {
       this.category_id = "";
       $axios
-        .get("http://canteen.tonglingok.com/api/v1/company/categories?&page=1&size=10")
+        .get(
+          "http://canteen.tonglingok.com/api/v1/company/categories?&page=1&size=10"
+        )
         .then(res => {
           this.categoryList = res.data;
           this.categoryList.unshift({
@@ -240,9 +245,9 @@ export default {
     fetchTableList() {
       $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/shop/cms/products?supplier_id=${this.supplier_id}&category_id=${
-            this.category_id
-          }&page=1&size=10`
+          `http://canteen.tonglingok.com/api/v1/shop/cms/products?supplier_id=${
+            this.supplier_id
+          }&category_id=${this.category_id}&page=1&size=10`
         )
         .then(res => {
           this.tabledata = Array.from(res.data.data);
@@ -282,7 +287,10 @@ export default {
     },
     confirmRevise(val) {
       this.reviseVisible = false;
-      this.sendPostRequest("http://canteen.tonglingok.com/api/v1/shop/product/update", val);
+      this.sendPostRequest(
+        "http://canteen.tonglingok.com/api/v1/shop/product/update",
+        val
+      );
     },
     // 处理添加商品弹窗
     closeAddDialog(val) {
@@ -298,7 +306,10 @@ export default {
         },
         formData
       );
-      this.sendPostRequest("http://canteen.tonglingok.com/api/v1/shop/product/save", addForm);
+      this.sendPostRequest(
+        "http://canteen.tonglingok.com/api/v1/shop/product/save",
+        addForm
+      );
       this.addVisible = false;
     },
     // 入库处理
@@ -312,10 +323,13 @@ export default {
     },
     confirmStorage() {
       this.storageFormVisible = false;
-      this.sendPostRequest("http://canteen.tonglingok.com/api/v1/shop/stock/save", {
-        product_id: this.currentProductId,
-        count: this.storageCount
-      });
+      this.sendPostRequest(
+        "http://canteen.tonglingok.com/api/v1/shop/stock/save",
+        {
+          product_id: this.currentProductId,
+          count: this.storageCount
+        }
+      );
       this.storageCount = "";
     },
     // 下架处理

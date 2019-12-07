@@ -5,9 +5,7 @@
     <div class="main">
       <div class="main-header">
         <el-button type="primary" @click="changeDefault">
-          {{
-          changeDefaultStatus ? "完成默认设置" : "更改默认设置"
-          }}
+          {{ changeDefaultStatus ? "完成默认设置" : "更改默认设置" }}
         </el-button>
         <el-button type="primary" @click="openModuleDialog">增加模块</el-button>
         <el-button type="primary">模块设置</el-button>
@@ -38,7 +36,7 @@
                     <span class="modules-tree-node" slot-scope="{ node, data }">
                       <span>
                         {{ data.type === 1 ? "PC端" : "移动端" }}——{{
-                        node.label
+                          node.label
                         }}
                       </span>
                       <span class="btns-text">
@@ -46,13 +44,15 @@
                           type="text"
                           size="mini"
                           @click="() => openEditModuleDialog(data, 2)"
-                        >编辑</el-button>
+                          >编辑</el-button
+                        >
                         <el-button
                           type="text"
                           size="mini"
                           @click="() => openModuleDialog(node, data)"
                           v-if="data.type === 1"
-                        >新增</el-button>
+                          >新增</el-button
+                        >
                       </span>
                     </span>
                   </el-tree>
@@ -64,17 +64,19 @@
                 <el-table-column label="模块名称" prop="name"></el-table-column>
                 <el-table-column label="模块类型">
                   <template slot-scope="scoped">
-                    <span>{{scoped.row.type === 1 ? "PC端" :"移动端"}}</span>
+                    <span>{{ scoped.row.type === 1 ? "PC端" : "移动端" }}</span>
                   </template>
                 </el-table-column>
                 <el-table-column label="是否默认">
                   <template slot-scope="scoped">
-                    <span>{{scoped.row.default === 1 ? "默认" :'非默认'}}</span>
+                    <span>{{
+                      scoped.row.default === 1 ? "默认" : "非默认"
+                    }}</span>
                   </template>
                 </el-table-column>
                 <el-table-column label="状态">
                   <template slot-scope="scoped">
-                    <span>{{scoped.row.state === 1 ? "启用" : "停用"}}</span>
+                    <span>{{ scoped.row.state === 1 ? "启用" : "停用" }}</span>
                   </template>
                 </el-table-column>
                 <el-table-column label="操作">
@@ -82,7 +84,8 @@
                     <el-button
                       size="small"
                       @click="changeModulesState(scoped.row)"
-                    >{{scoped.row.state === 1 ? "停用":"启用"}}</el-button>
+                      >{{ scoped.row.state === 1 ? "停用" : "启用" }}</el-button
+                    >
                   </template>
                 </el-table-column>
               </el-table>
@@ -98,7 +101,12 @@
       width="30%"
       @close="closeModuleDialog"
     >
-      <el-form :model="modulesForm" ref="modulesForm" label-width="80px" label-position="right">
+      <el-form
+        :model="modulesForm"
+        ref="modulesForm"
+        label-width="80px"
+        label-position="right"
+      >
         <el-form-item label="功能类型" prop="system" v-if="false">
           <el-radio-group v-model="systemType">
             <el-radio :label="1">系统功能</el-radio>
@@ -148,7 +156,9 @@
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button @click="closeEditModuleDialog">取 消</el-button>
-        <el-button type="primary" @click="submitEditModulesForm">确定</el-button>
+        <el-button type="primary" @click="submitEditModulesForm"
+          >确定</el-button
+        >
       </div>
     </el-dialog>
   </div>
@@ -248,7 +258,10 @@ export default {
         }
       );
       form.modules = JSON.stringify(form.modules);
-      let res = await $axios.post("http://canteen.tonglingok.com/api/v1/module/default/handel", form);
+      let res = await $axios.post(
+        "http://canteen.tonglingok.com/api/v1/module/default/handel",
+        form
+      );
       if (res.msg === "ok") {
         if (!obj.items) {
           this.timer = setTimeout(() => {
@@ -265,7 +278,8 @@ export default {
     },
     async submitModulesForm() {
       let type = this.systemType;
-      const url = "http://canteen.tonglingok.com/api/v1/module/system/canteen/save";
+      const url =
+        "http://canteen.tonglingok.com/api/v1/module/system/canteen/save";
       let res = await $axios.post(url, this.modulesForm);
       if (res.msg === "ok") {
         this.closeModuleDialog();
@@ -274,7 +288,10 @@ export default {
       }
     },
     async submitEditModulesForm() {
-      let res = await $axios.post("http://canteen.tonglingok.com/api/v1/module/update", this.editModuleForm);
+      let res = await $axios.post(
+        "http://canteen.tonglingok.com/api/v1/module/update",
+        this.editModuleForm
+      );
       if (res.msg === "ok") {
         this.closeEditModuleDialog();
         this.$message.success("修改成功");
@@ -283,7 +300,9 @@ export default {
     },
     async renderModules() {
       try {
-        const res = await $axios.get("http://canteen.tonglingok.com/api/v1/modules?type=2");
+        const res = await $axios.get(
+          "http://canteen.tonglingok.com/api/v1/modules?type=2"
+        );
         if (res.msg === "ok") {
           console.log(res);
           this.canteenModules = Array.from(res.data);
@@ -318,7 +337,10 @@ export default {
       data.id = row.id;
       data.state = row.state === 1 ? 2 : 1;
       console.log(data);
-      const res = await $axios.post("http://canteen.tonglingok.com/api/v1/module/system/handel", data);
+      const res = await $axios.post(
+        "http://canteen.tonglingok.com/api/v1/module/system/handel",
+        data
+      );
       if (res.msg === "ok") {
         this.$$message.success("操作成功!");
         this.renderModules();

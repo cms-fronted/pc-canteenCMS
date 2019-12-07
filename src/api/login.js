@@ -13,6 +13,6 @@ export function getInfo() {
   return $axios.get(url);
 }
 export function getUserModules() {
-  const url = 'http://canteen.tonglingok.com/api/v1/modules/admin';
+  const url = "http://canteen.tonglingok.com/api/v1/modules/admin";
   return $axios.get(url);
 }

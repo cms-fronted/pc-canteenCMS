@@ -212,11 +212,14 @@ export default {
   computed: {
     companiesVisible() {
       return this.grade !== 3;
-    },
+    }
   },
   methods: {
     async getCompanies() {
-      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/admin/companies", this.queryForm);
+      const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/admin/companies",
+        this.queryForm
+      );
       if (res.msg === "ok") {
         this.companyOptions = flatten(res.data);
       }
@@ -224,7 +227,10 @@ export default {
     async fetchList(page) {
       page = page || 1;
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/roles?page=" + page + "&size=" + this.size,
+        "http://canteen.tonglingok.com/api/v1/roles?page=" +
+          page +
+          "&size=" +
+          this.size,
         this.queryForm
       );
       if (res.msg === "ok") {
@@ -287,9 +293,15 @@ export default {
       return;
       if (this.isEdit) {
         this.roleForm.canteen = []; //没有字段不传
-        const res = await $axios.post("http://canteen.tonglingok.com/api/v1/role/update", this.roleForm);
+        const res = await $axios.post(
+          "http://canteen.tonglingok.com/api/v1/role/update",
+          this.roleForm
+        );
       } else {
-        const res = await $axios.post("http://canteen.tonglingok.com/api/v1/role/save", this.roleForm);
+        const res = await $axios.post(
+          "http://canteen.tonglingok.com/api/v1/role/save",
+          this.roleForm
+        );
         if (res.msg === "ok") {
           this.$message.success("新增角色成功");
           await this.fetchList();
@@ -314,10 +326,13 @@ export default {
       } else {
         state = 1;
       }
-      const res = await $axios.post("http://canteen.tonglingok.com/api/v1/role/handel", {
-        id: row.id,
-        state: state
-      });
+      const res = await $axios.post(
+        "http://canteen.tonglingok.com/api/v1/role/handel",
+        {
+          id: row.id,
+          state: state
+        }
+      );
       if (res.msg === "ok") {
         this.$message.success("修改成功");
         await this.fetchList();
@@ -358,7 +373,9 @@ export default {
       this.roleForm.rules = rules;
     },
     async getEditRole(id) {
-      const res = await $axios.get(`http://canteen.tonglingok.com/api/v1/role?id=${id}`);
+      const res = await $axios.get(
+        `http://canteen.tonglingok.com/api/v1/role?id=${id}`
+      );
       return res;
     }
   }

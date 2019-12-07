@@ -171,14 +171,18 @@ export default {
   },
   methods: {
     async getCompanies() {
-      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/admin/companies");
+      const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/admin/companies"
+      );
       if (res.msg === "ok") {
         this.companyOptions = flatten(res.data);
       }
     },
     async getCanteenOptions(c_id) {
       let company_id = c_id || "";
-      const res = await $axios.get(`http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`);
+      const res = await $axios.get(
+        `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
+      );
       if (res.msg === "ok") {
         this.canteenOptions = Array.from(res.data);
       }
@@ -187,7 +191,9 @@ export default {
     async queryList(page) {
       page = page || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/material/reports?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/order/material/reports?page=${page}&size=${
+          this.size
+        }`,
         this.queryForm
       );
       if (res.msg === "ok") {
@@ -199,7 +205,9 @@ export default {
     async getDetailList(page) {
       page = page || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/material/report?page=${page}&size=${this.detailSize}&id=${this.detailForm.id}`
+        `http://canteen.tonglingok.com/api/v1/order/material/report?page=${page}&size=${
+          this.detailSize
+        }&id=${this.detailForm.id}`
       );
       if (res.msg === "ok") {
         this.detailData = Array.from(res.data.list.data);
@@ -230,9 +238,12 @@ export default {
         type: "warning"
       })
         .then(async () => {
-          const res = await $axios.post("http://canteen.tonglingok.com/api/v1/order/material/report/delete", {
-            id
-          });
+          const res = await $axios.post(
+            "http://canteen.tonglingok.com/api/v1/order/material/report/delete",
+            {
+              id
+            }
+          );
           if (res.msg === "ok") {
             this.$message.success("操作成功!");
             this.queryList(this.current_page);

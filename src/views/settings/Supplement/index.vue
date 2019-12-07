@@ -31,7 +31,12 @@
           </div>
         </div>
         <div class="main-content">
-          <el-table style="width:100%" :data="tableData" border @selection-change="handleSelectionChange">
+          <el-table
+            style="width:100%"
+            :data="tableData"
+            border
+            @selection-change="handleSelectionChange"
+          >
             <el-table-column type="selection" width="55"> </el-table-column>
             <el-table-column label="公司" prop="company"></el-table-column>
             <!-- <el-table-column label="归属饭堂" prop="canteen"></el-table-column> -->
@@ -40,10 +45,15 @@
             <el-table-column label="员工编号" prop="code"></el-table-column>
             <el-table-column label="卡号" prop="card_num"></el-table-column>
           </el-table>
-          <pagination v-show="total > 10" :total="total" :page.sync="current_page" @pagination="getList"></pagination>
+          <pagination
+            v-show="total > 10"
+            :total="total"
+            :page.sync="current_page"
+            @pagination="getList"
+          ></pagination>
           <div class="supply-form">
             <el-form :inline="true" :model="formdata" label-width="80px">
-              <el-form-item label="公司"  v-if="companiesVisible">
+              <el-form-item label="公司" v-if="companiesVisible">
                 <el-select
                   v-model="company_ids"
                   @change="getCanteenList"
@@ -114,7 +124,9 @@
             </el-form>
             <div class="btn-area">
               <el-button type="primary">取消</el-button>
-              <el-button type="primary" @click="confirmSupplement">确定</el-button>
+              <el-button type="primary" @click="confirmSupplement"
+                >确定</el-button
+              >
             </div>
           </div>
         </div>
@@ -126,7 +138,7 @@
 <script>
 import $axios from "@/api/index";
 import uploadDialog from "./dialog";
-import store from '@/store';
+import store from "@/store";
 import Pagination from "@/components/Pagination";
 import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
 export default {
@@ -157,23 +169,22 @@ export default {
         token: store.getters.token
       },
       total: 0,
-      current_page: 1,
-
+      current_page: 1
     };
   },
   created() {
-    if(this.companiesVisible){
+    if (this.companiesVisible) {
       this.getCompanies();
-    }else{
+    } else {
       this.fetchCanteenList();
     }
   },
   computed: {
-    companiesVisible(){
+    companiesVisible() {
       return this.grade !== 3;
     }
   },
-  components:{Pagination},
+  components: { Pagination },
   methods: {
     sendMessage(msg) {
       if (msg === "ok") {
@@ -188,10 +199,14 @@ export default {
         });
       }
     },
-    queryList(){
-      console.log(this.current_page)
+    queryList() {
+      console.log(this.current_page);
       $axios
-        .get(`http://canteen.tonglingok.com/api/v1/department/staffs/recharge?page=${this.current_page}&size=10&department_id=0&key=${this.key}`)
+        .get(
+          `http://canteen.tonglingok.com/api/v1/department/staffs/recharge?page=${
+            this.current_page
+          }&size=10&department_id=0&key=${this.key}`
+        )
         .then(res => {
           this.tableData = Array.from(res.data.data);
         })
@@ -216,12 +231,14 @@ export default {
     fetchCanteenList(company_id) {
       if (company_id) {
         $axios
-          .get(`http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`)
+          .get(
+            `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
+          )
           .then(res => {
             this.canteenList = Array.from(res.data);
           })
           .catch(err => console.log(err));
-      }else{
+      } else {
         $axios
           .get("http://canteen.tonglingok.com/api/v1/managerCanteens")
           .then(res => {
@@ -234,38 +251,43 @@ export default {
       this.formdata.dinner_id = "";
       if (canteen_id) {
         $axios
-          .get(`http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`)
+          .get(
+            `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
+          )
           .then(res => {
             this.dinnersList = Array.from(res.data);
           })
           .catch(err => console.log(err));
       }
     },
-    handleSelectionChange(arr){
+    handleSelectionChange(arr) {
       let detail = [];
       arr.forEach(item => {
-        detail.push(item.id)
-      })
-      this.formdata.staff_ids = detail.join(',');
+        detail.push(item.id);
+      });
+      this.formdata.staff_ids = detail.join(",");
     },
-    confirmSupplement(){
+    confirmSupplement() {
       $axios
-        .post("http://canteen.tonglingok.com/api/v1/wallet/supplement",this.formdata)
+        .post(
+          "http://canteen.tonglingok.com/api/v1/wallet/supplement",
+          this.formdata
+        )
         .then(res => {
           // console.log(res)
           this.sendMessage(res.msg);
         })
         .catch(err => console.log(err));
     },
-    getList(val){
+    getList(val) {
       this.current_page = val;
       this.queryList();
     },
-    handleSuccess(res){
+    handleSuccess(res) {
       // console.log(res)
       this.sendMessage(res.msg);
     },
-    handleError(res){
+    handleError(res) {
       // console.log(res)
     }
   }
@@ -277,7 +299,7 @@ export default {
   .content-header {
     padding: 12px 10px;
   }
-  .upload{
+  .upload {
     display: inline-block;
   }
 }

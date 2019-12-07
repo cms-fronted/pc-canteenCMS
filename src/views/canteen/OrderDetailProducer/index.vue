@@ -63,15 +63,29 @@
         </div>
         <div class="main-content">
           <el-table style="width:100%" :data="tableData" border>
-            <el-table-column label="序号" type="index" width="50px"></el-table-column>
-            <el-table-column label="下单时间" prop="create_time"></el-table-column>
+            <el-table-column
+              label="序号"
+              type="index"
+              width="50px"
+            ></el-table-column>
+            <el-table-column
+              label="下单时间"
+              prop="create_time"
+            ></el-table-column>
             <el-table-column label="类型" prop="category"></el-table-column>
             <el-table-column label="商品名称" prop="product"></el-table-column>
             <!-- <el-table-column label="单位" prop="goodsUnit"></el-table-column> -->
             <el-table-column label="商品数量" prop="count"></el-table-column>
-            <el-table-column label="商品金额(元)" prop="price"></el-table-column>
+            <el-table-column
+              label="商品金额(元)"
+              prop="price"
+            ></el-table-column>
           </el-table>
-          <pagination :total="total" :currentPage="current_page" :pageSize="size"></pagination>
+          <pagination
+            :total="total"
+            :currentPage="current_page"
+            :pageSize="size"
+          ></pagination>
         </div>
       </div>
     </div>
@@ -111,7 +125,9 @@ export default {
   },
   methods: {
     async getCategoryOptions() {
-      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/company/categories");
+      const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/company/categories"
+      );
       if (res.msg === "ok") {
         this.categoryOptions = unshiftAllOptions(Array.from(res.data));
       }
@@ -125,7 +141,9 @@ export default {
     async fetchList(page) {
       page = page || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/shop/order/statistic/supplier?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/shop/order/statistic/supplier?page=${page}&size=${
+          this.size
+        }`,
         this.queryform
       );
       if (res.msg === "ok") {
@@ -142,7 +160,9 @@ export default {
       console.log("点击导出表格");
     },
     async getProductsId() {
-      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/shop/supplierProducts/search");
+      const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/shop/supplierProducts/search"
+      );
       if (res.msg === "ok") {
         this.productOptions = unshiftAllOptions(Array.from(res.data));
       }

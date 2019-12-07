@@ -33,7 +33,12 @@
           <el-table-column label="照片">
             <template slot-scope="props">
               <div style="text-align:center">
-                <img style="height:100px;" :src="props.row.image" :alt="props.row.name" srcset />
+                <img
+                  style="height:100px;"
+                  :src="props.row.image"
+                  :alt="props.row.name"
+                  srcset
+                />
               </div>
             </template>
           </el-table-column>
@@ -83,13 +88,17 @@ export default {
   },
   methods: {
     async getCategoryList(company_id) {
-      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/company/categories");
+      const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/company/categories"
+      );
       if (res.msg === "ok") {
         this.categoryOptions = unshiftAllOptions(Array.from(res.data));
       }
     },
     async getSupplierList() {
-      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/company/suppliers");
+      const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/company/suppliers"
+      );
       if (res.msg === "ok") {
         this.supplierOptions = unshiftAllOptions(Array.from(res.data));
       }
@@ -97,7 +106,9 @@ export default {
     async queryList(page) {
       page = page || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/shop/cms/products?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/shop/cms/products?page=${page}&size=${
+          this.size
+        }`,
         this.queryForm
       );
       if (res.msg === "ok") {
@@ -110,5 +121,4 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

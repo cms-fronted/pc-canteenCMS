@@ -60,7 +60,10 @@ export default {
   methods: {
     async modifyPsw() {
       await $axios
-        .post("http://canteen.tonglingok.com/api/v1/role/passwd/update", this.passwordForm)
+        .post(
+          "http://canteen.tonglingok.com/api/v1/role/passwd/update",
+          this.passwordForm
+        )
         .then(res => {
           if (res.msg === "ok") {
             this.$message.success("密码修改成功");

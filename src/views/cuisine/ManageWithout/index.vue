@@ -6,7 +6,11 @@
       <div class="main">
         <div class="main-header">
           <el-form :inline="true" label-width="80px" :model="queryForm">
-            <el-form-item label="公司" prop="company_ids" v-if="companiesVisible">
+            <el-form-item
+              label="公司"
+              prop="company_ids"
+              v-if="companiesVisible"
+            >
               <el-select
                 v-model="queryForm.company_id"
                 @change="getLocationList"
@@ -218,16 +222,16 @@ export default {
   },
   components: { CuisineDialog, Pagination },
   created() {
-    if(this.companiesVisible){
+    if (this.companiesVisible) {
       this.getCompanies();
-    }else{
+    } else {
       this.getLocationList(0);
     }
   },
   computed: {
     companiesVisible() {
       return this.grade !== 3;
-    },
+    }
   },
   methods: {
     fetchList(p) {
@@ -269,24 +273,23 @@ export default {
       this.queryForm.dinner_id = null;
       this.queryForm.m_id = null;
       if (!isNaN(company_id)) {
-          if(company_id){
-            $axios
-              .get(`/v1/canteens?company_id=${company_id}`)
-              .then(res => {
-                this.diaLocationList = Array.from(res.data);
-                this.locationList = getAllOptions(Array.from(res.data));
-              })
-              .catch(err => console.log(err));
-          }else{
-            
-            $axios
-              .get("/v1/managerCanteens")
-              .then(res => {
-                this.diaLocationList = Array.from(res.data);
-                this.locationList = getAllOptions(Array.from(res.data));
-              })
-              .catch(err => console.log(err));
-          }
+        if (company_id) {
+          $axios
+            .get(`/v1/canteens?company_id=${company_id}`)
+            .then(res => {
+              this.diaLocationList = Array.from(res.data);
+              this.locationList = getAllOptions(Array.from(res.data));
+            })
+            .catch(err => console.log(err));
+        } else {
+          $axios
+            .get("/v1/managerCanteens")
+            .then(res => {
+              this.diaLocationList = Array.from(res.data);
+              this.locationList = getAllOptions(Array.from(res.data));
+            })
+            .catch(err => console.log(err));
+        }
       } else {
         this.locationList = [];
         this.categoryList = [];

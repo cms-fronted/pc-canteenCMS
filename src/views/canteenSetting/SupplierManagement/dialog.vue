@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :visible.sync="isOpen" title="新增供应商"  @close="handleClose">
+  <el-dialog :visible.sync="isOpen" title="新增供应商" @close="handleClose">
     <el-form ref="addForm" label-width="100px" :model="formdata">
       <el-form-item label="公司" v-if="companiesVisible">
         <el-select
@@ -22,7 +22,11 @@
         <el-input placeholder="请输入" v-model="formdata.account"></el-input>
       </el-form-item>
       <el-form-item label="密码">
-        <el-input placeholder="请输入" type="password" v-model="formdata.pwd"></el-input>
+        <el-input
+          placeholder="请输入"
+          type="password"
+          v-model="formdata.pwd"
+        ></el-input>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -47,7 +51,7 @@ export default {
       isOpen: this.visible,
       companyList: [],
       formdata: {}
-    }
+    };
   },
   watch: {
     visible(val) {
@@ -67,15 +71,18 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    handleClose(){
+    handleClose() {
       this.$emit("close", false);
-      this.$refs['addForm'].resetFields();
+      this.$refs["addForm"].resetFields();
     },
     addSupplier() {
       $axios
-        .post('http://canteen.tonglingok.com/api/v1/supplier/save',this.formdata)
+        .post(
+          "http://canteen.tonglingok.com/api/v1/supplier/save",
+          this.formdata
+        )
         .then(res => {
-          this.$refs['addForm'].resetFields();
+          this.$refs["addForm"].resetFields();
           this.$emit("close", false, res.msg);
         })
         .catch(err => console.log(err));

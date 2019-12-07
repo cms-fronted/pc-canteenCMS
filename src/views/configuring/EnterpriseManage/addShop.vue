@@ -104,7 +104,12 @@
                 @click="_editMachine(scoped.row)"
                 >编辑</el-button
               >
-              <el-button size="small" type="text" @click="_deleteMachine(scoped.row)">删除</el-button>
+              <el-button
+                size="small"
+                type="text"
+                @click="_deleteMachine(scoped.row)"
+                >删除</el-button
+              >
             </template>
           </el-table-column>
         </el-table>
@@ -234,7 +239,10 @@ export default {
           .catch(err => console.log(err));
       } else {
         $axios
-          .post("http://canteen.tonglingok.com/api/v1/canteen/updateMachine", this.machineForm)
+          .post(
+            "http://canteen.tonglingok.com/api/v1/canteen/updateMachine",
+            this.machineForm
+          )
           .then(res => {
             this.$emit(
               "updateMachineTable",
@@ -285,7 +293,10 @@ export default {
         type: "warning"
       })
         .then(async () => {
-          const res = await $axios.post("http://canteen.tonglingok.com/api/v1/canteen/deleteMachine", { id });
+          const res = await $axios.post(
+            "http://canteen.tonglingok.com/api/v1/canteen/deleteMachine",
+            { id }
+          );
           if (res.msg === "ok") {
             this.$message({
               type: "success",

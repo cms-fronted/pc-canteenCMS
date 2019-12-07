@@ -6,7 +6,10 @@
       <div class="main-header">
         <el-form :inline="true" :model="queryForm">
           <el-form-item label="公司" v-if="companiesVisible" prop="company_id">
-            <el-select @change="getCanteenOptions" v-model="queryForm.company_ids">
+            <el-select
+              @change="getCanteenOptions"
+              v-model="queryForm.company_ids"
+            >
               <el-option
                 v-for="item in companyOptions"
                 :key="item.id"
@@ -80,15 +83,17 @@ export default {
     };
   },
   created() {
-    if(this.companiesVisible){
+    if (this.companiesVisible) {
       this.getCompanies();
-    } else{
-      this.getCanteenOptions(0)
+    } else {
+      this.getCanteenOptions(0);
     }
   },
   methods: {
     async getCompanies() {
-      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/admin/companies");
+      const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/admin/companies"
+      );
       if (res.msg === "ok") {
         this.companyOptions = getAllOptions(flatten(res.data));
       }
@@ -98,7 +103,9 @@ export default {
       this.canteenOptions = [];
       this.queryForm.canteen_ids = "";
       if (Number(company_id)) {
-        const res = await $axios.get(`http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`);
+        const res = await $axios.get(
+          `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
+        );
         if (res.msg === "ok") {
           this.canteenOptions = getAllOptions(Array.from(res.data));
         }
@@ -123,7 +130,9 @@ export default {
         delete form.canteen_ids;
       }
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/materials?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/materials?page=${page}&size=${
+          this.size
+        }`,
         form
       );
       if (res.msg === "ok") {

@@ -248,7 +248,9 @@ export default {
     getComsumptionLoc(id) {
       this.shopLocData = [];
       $axios
-        .get(`http://canteen.tonglingok.com/api/v1/company/consumptionLocation?company_id=${id}`)
+        .get(
+          `http://canteen.tonglingok.com/api/v1/company/consumptionLocation?company_id=${id}`
+        )
         .then(res => {
           this.canteensLocData = Array.from(res.data.canteen);
           if (res.data.shop) {
@@ -322,7 +324,9 @@ export default {
     async getCanteenConfig(id) {
       let data = null;
       await $axios
-        .get(`http://canteen.tonglingok.com/api/v1/canteen/configuration?c_id=${id}`)
+        .get(
+          `http://canteen.tonglingok.com/api/v1/canteen/configuration?c_id=${id}`
+        )
         .then(res => {
           data = res.data;
         })
@@ -330,9 +334,12 @@ export default {
       return data;
     },
     async getSystemModules(id) {
-      const res = $axios.get("http://canteen.tonglingok.com/api/v1/modules/canteen/withSystem", {
-        c_id: id
-      });
+      const res = $axios.get(
+        "http://canteen.tonglingok.com/api/v1/modules/canteen/withSystem",
+        {
+          c_id: id
+        }
+      );
       return res;
     },
     async _editCanteen(val) {

@@ -11,10 +11,19 @@
             placeholder="请选择"
             v-if="companiesVisible"
           >
-            <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+            <el-option
+              v-for="item in companyList"
+              :key="item.id"
+              :label="item.name"
+              :value="item.id"
+            ></el-option>
           </el-select>
-          <el-button type="primary" @click="fetchSupplierList">查询供应商</el-button>
-          <el-button type="primary" @click="handleClick()">增加供应商</el-button>
+          <el-button type="primary" @click="fetchSupplierList"
+            >查询供应商</el-button
+          >
+          <el-button type="primary" @click="handleClick()"
+            >增加供应商</el-button
+          >
         </div>
         <div class="main-content">
           <el-table style="width:100%" border :data="supplierList">
@@ -23,8 +32,15 @@
             <el-table-column label="账号" prop="account"></el-table-column>
             <el-table-column label="操作">
               <template slot-scope="scope">
-                <el-button size="mini" type="danger" @click="handleDelete(scope.row)">Delete</el-button>
-                <el-button size="mini" @click="handleEdit(scope.row)">重置密码</el-button>
+                <el-button
+                  size="mini"
+                  type="danger"
+                  @click="handleDelete(scope.row)"
+                  >Delete</el-button
+                >
+                <el-button size="mini" @click="handleEdit(scope.row)"
+                  >重置密码</el-button
+                >
               </template>
             </el-table-column>
           </el-table>
@@ -35,15 +51,24 @@
             @pagination="getList"
           ></pagination>
         </div>
-        <add-dialog 
-          :visible="addVisible" 
-          @close="closeDialog" 
+        <add-dialog
+          :visible="addVisible"
+          @close="closeDialog"
           :editData="editFormdata"
           :companiesVisible="companiesVisible"
         ></add-dialog>
-        <el-dialog title="重置密码" :visible.sync="resetpwdVisible" @close="handleClose">
+        <el-dialog
+          title="重置密码"
+          :visible.sync="resetpwdVisible"
+          @close="handleClose"
+        >
           <span class="content-header">密码：</span>
-          <el-input placeholder="请输入" type="password" v-model="pwd" style="width: 320px;"></el-input>
+          <el-input
+            placeholder="请输入"
+            type="password"
+            v-model="pwd"
+            style="width: 320px;"
+          ></el-input>
           <span slot="footer" class="dialog-footer">
             <el-button @click="handleClose">取 消</el-button>
             <el-button type="primary" @click="confirmReset">确 定</el-button>
@@ -57,8 +82,8 @@
 <script>
 import $axios from "@/api/index";
 import AddDialog from "./dialog";
-import Pagination from '@/components/Pagination';
-import store from '@/store';
+import Pagination from "@/components/Pagination";
+import store from "@/store";
 export default {
   data() {
     return {
@@ -78,26 +103,26 @@ export default {
       page: 1,
       total: 0,
       editFormdata: {
-        "c_id": "",
-        "name": "",
-        "account": "",
-        "pwd": ""
+        c_id: "",
+        name: "",
+        account: "",
+        pwd: ""
       },
       pwd: "",
       resetpwdVisible: false
-    }
+    };
   },
-  components: { AddDialog,Pagination },
-  created(){
+  components: { AddDialog, Pagination },
+  created() {
     this.fetchCompanyList();
   },
   computed: {
-    companiesVisible(){
+    companiesVisible() {
       return this.grade !== 3;
     }
   },
-  methods:{
-    fetchCompanyList(){
+  methods: {
+    fetchCompanyList() {
       $axios
         .get("http://canteen.tonglingok.com/api/v1/companies")
         .then(res => {
@@ -105,18 +130,26 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    fetchSupplierList(){
-      if(this.companiesVisible){
+    fetchSupplierList() {
+      if (this.companiesVisible) {
         $axios
-          .get(`http://canteen.tonglingok.com/api/v1/suppliers?c_id=${this.company_id}&page=${this.page}&size=10`)
+          .get(
+            `http://canteen.tonglingok.com/api/v1/suppliers?c_id=${
+              this.company_id
+            }&page=${this.page}&size=10`
+          )
           .then(res => {
             this.supplierList = Array.from(res.data.data);
             this.total = res.data.total;
           })
           .catch(err => console.log(err));
-      }else{
+      } else {
         $axios
-          .get(`http://canteen.tonglingok.com/api/v1/suppliers?page=${this.page}&size=10`)
+          .get(
+            `http://canteen.tonglingok.com/api/v1/suppliers?page=${
+              this.page
+            }&size=10`
+          )
           .then(res => {
             this.supplierList = Array.from(res.data.data);
             this.total = res.data.total;
@@ -127,10 +160,10 @@ export default {
     showAddSupplier() {
       this.addVisible = true;
     },
-    handleEdit(val){
+    handleEdit(val) {
       this.resetpwdVisible = true;
-      let {id,name,account} = val;
-      this.reviseSupplierForm = {id,name,account};
+      let { id, name, account } = val;
+      this.reviseSupplierForm = { id, name, account };
     },
     handleDelete(val) {
       this.currentSupplierId = val.id;
@@ -165,28 +198,31 @@ export default {
         });
       }
     },
-    closeDialog(val,msg){
+    closeDialog(val, msg) {
       this.addVisible = val;
       if (msg === "ok") {
         this.fetchSupplierList();
         this.sendMessage(msg);
       }
     },
-    getList(val){
+    getList(val) {
       this.page = val;
       this.fetchSupplierList();
     },
-    handleClick(row = {}){
+    handleClick(row = {}) {
       this.addVisible = true;
     },
-    handleClose(){
+    handleClose() {
       this.pwd = "";
       this.resetpwdVisible = false;
     },
-    confirmReset(){
+    confirmReset() {
       this.reviseSupplierForm.pwd = this.pwd;
       $axios
-        .post("http://canteen.tonglingok.com/api/v1/supplier/update",this.reviseSupplierForm)
+        .post(
+          "http://canteen.tonglingok.com/api/v1/supplier/update",
+          this.reviseSupplierForm
+        )
         .then(res => {
           this.resetpwdVisible = false;
           this.pwd = "";

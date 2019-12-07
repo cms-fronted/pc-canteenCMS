@@ -67,7 +67,10 @@ export default {
     },
     handleConfirm() {
       $axios
-        .post("http://canteen.tonglingok.com/api/v1/category/save", this.goodsForm)
+        .post(
+          "http://canteen.tonglingok.com/api/v1/category/save",
+          this.goodsForm
+        )
         .then(res => {
           this.$emit("closeDialog1", false, res.msg);
         })
