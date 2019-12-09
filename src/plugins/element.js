@@ -48,7 +48,7 @@ import {
   Checkbox,
   CheckboxGroup,
   Loading,
-  TimePicker,
+  TimePicker
 } from "element-ui";
 Message.install = () => {
   Vue.prototype.$message = Message;

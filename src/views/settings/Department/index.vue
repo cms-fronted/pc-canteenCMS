@@ -24,8 +24,11 @@
             type="primary"
             :disabled="!!!queryForm.c_id"
             @click="() => openDepartmentDialog({}, { id: 0 })"
-          >新增一级部门</el-button>
-          <el-button type="primary" @click="openStaffDialog" :disabled="!!!d_id">新增人员</el-button>
+            >新增一级部门</el-button
+          >
+          <el-button type="primary" @click="openStaffDialog" :disabled="!!!d_id"
+            >新增人员</el-button
+          >
           <el-upload
             class="upload-excel"
             ref="upload"
@@ -38,15 +41,25 @@
             :data="{ c_id: c_id }"
             name="staffs"
           >
-            <el-button type="primary" :disabled="!!!c_id">批量导入人员</el-button>
+            <el-button type="primary" :disabled="!!!c_id"
+              >批量导入人员</el-button
+            >
           </el-upload>
-          <el-button type="danger" :disabled="!!!d_id" @click="deleteDepartment">删除部门</el-button>
-          <el-button type="primary" @click="openRoleTypeDialog">新增类型</el-button>
+          <el-button type="danger" :disabled="!!!d_id" @click="deleteDepartment"
+            >删除部门</el-button
+          >
+          <el-button type="primary" @click="openRoleTypeDialog"
+            >新增类型</el-button
+          >
         </el-form>
         <div class="main-content">
           <el-row :gutter="10">
             <el-col :span="6">
-              <el-input size="small" v-model="filterText" placeholder="关键字查询"></el-input>
+              <el-input
+                size="small"
+                v-model="filterText"
+                placeholder="关键字查询"
+              ></el-input>
               <el-tree
                 class="tree"
                 ref="tree"
@@ -57,19 +70,23 @@
               >
                 <span class="department-tree-node" slot-scope="{ node, data }">
                   <span>
-                    <el-button type="text" @click="handleNodeClick(data)">{{ node.label }}</el-button>
+                    <el-button type="text" @click="handleNodeClick(data)">{{
+                      node.label
+                    }}</el-button>
                   </span>
                   <span class="btns-text">
                     <el-button
                       type="text"
                       size="small"
                       @click="() => editDepartmentDialog(node, data)"
-                    >编辑</el-button>
+                      >编辑</el-button
+                    >
                     <el-button
                       type="text"
                       size="small"
                       @click="() => openDepartmentDialog(node, data)"
-                    >新增</el-button>
+                      >新增</el-button
+                    >
                   </span>
                 </span>
               </el-tree>
@@ -80,14 +97,14 @@
                   <template slot-scope="scoped">
                     <span>
                       {{
-                      scoped.row.canteens
-                      .map(item => {
-                      if (item.info && item.info.name) {
-                      return item.info.name;
-                      }
-                      })
-                      .filter(item => item)
-                      .join(",")
+                        scoped.row.canteens
+                          .map(item => {
+                            if (item.info && item.info.name) {
+                              return item.info.name;
+                            }
+                          })
+                          .filter(item => item)
+                          .join(",")
                       }}
                       <!--使用filter去除空对象-->
                     </span>
@@ -96,7 +113,10 @@
                 <el-table-column label="人员类型" prop="type"></el-table-column>
                 <el-table-column label="员工编号" prop="code"></el-table-column>
                 <el-table-column label="姓名" prop="username"></el-table-column>
-                <el-table-column label="手机号码" prop="phone"></el-table-column>
+                <el-table-column
+                  label="手机号码"
+                  prop="phone"
+                ></el-table-column>
                 <el-table-column label="卡号" prop="card_num"></el-table-column>
                 <el-table-column label="二维码有效周期" show-overflow-tooltip>
                   <template slot-scope="scoped">
@@ -104,7 +124,8 @@
                       size="mini"
                       type="text"
                       @click="showQRcode(scoped.row)"
-                    >{{ scoped.row.expiry_date }}</el-button>
+                      >{{ scoped.row.expiry_date }}</el-button
+                    >
                   </template>
                 </el-table-column>
                 <el-table-column label="操作" prop="new">
@@ -114,18 +135,25 @@
                         size="mini"
                         style="marginRight:5px;marginBottom: 5px"
                         @click="editStaff(scoped.row)"
-                      >编辑</el-button>
+                        >编辑</el-button
+                      >
                       <el-button
                         size="mini"
                         style="marginRight:5px;marginBottom: 5px"
                         @click="openMoveStaff(scoped.row)"
-                      >移动</el-button>
+                        >移动</el-button
+                      >
                       <el-button
                         size="mini"
                         style="marginRight:5px;marginBottom: 5px"
                         @click="_deleteStaff(scoped.row)"
-                      >删除</el-button>
-                      <el-button size="mini" @click="openQRSettingDialog(scoped.row)">生成二维码</el-button>
+                        >删除</el-button
+                      >
+                      <el-button
+                        size="mini"
+                        @click="openQRSettingDialog(scoped.row)"
+                        >生成二维码</el-button
+                      >
                     </div>
                   </template>
                 </el-table-column>
@@ -158,7 +186,8 @@
               :label="item"
               :key="item.id"
               :value="item.id"
-            >{{ item.name }}</el-checkbox>
+              >{{ item.name }}</el-checkbox
+            >
           </el-checkbox-group>
         </el-form-item>
         <el-form-item label="人员类型" prop="t_id">
@@ -202,7 +231,10 @@
           <el-input v-model="departmentForm.name"></el-input>
         </el-form-item>
         <el-form-item v-if="departmentForm.parent_id" label="归属部门">
-          <el-input :disabled="true" v-model="departmentForm.parent_name"></el-input>
+          <el-input
+            :disabled="true"
+            v-model="departmentForm.parent_name"
+          ></el-input>
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -245,7 +277,11 @@
           <el-input v-model="cureentDepartment.department" disabled></el-input>
         </el-form-item>
         <el-form-item label="移至">
-          <el-select filterable placeholder="请选择部门" v-model="cureentDepartment.new_d_id">
+          <el-select
+            filterable
+            placeholder="请选择部门"
+            v-model="cureentDepartment.new_d_id"
+          >
             <el-option
               v-for="item in departmentOptions"
               :key="item.id"
@@ -294,7 +330,7 @@
         <li>失效时间：{{ QRcodeDetail.expiry_date }}</li>
       </ul>
       <span slot="footer" class="dialog-footer">
-        <el-button @click="QRcodeVisible=false">关 闭</el-button>
+        <el-button @click="QRcodeVisible = false">关 闭</el-button>
         <el-button type="success" @click="_print">打 印</el-button>
       </span>
     </el-dialog>
@@ -562,7 +598,9 @@ export default {
     async fetchList(page) {
       page = page || this.current_page;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/staffs?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/staffs?page=${page}&size=${
+          this.size
+        }`,
         {
           c_id: this.c_id, //company_id,
           d_id: this.d_id //d_id,

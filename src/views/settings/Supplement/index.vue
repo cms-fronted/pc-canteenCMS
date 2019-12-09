@@ -204,7 +204,9 @@ export default {
       console.log(this.current_page);
       $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/department/staffs/recharge?page=${this.current_page}&size=10&department_id=0&key=${this.key}`
+          `http://canteen.tonglingok.com/api/v1/department/staffs/recharge?page=${
+            this.current_page
+          }&size=10&department_id=0&key=${this.key}`
         )
         .then(res => {
           this.tableData = Array.from(res.data.data);

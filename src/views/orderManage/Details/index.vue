@@ -196,7 +196,9 @@ export default {
     },
     getDepartmentList(company_id) {
       $axios
-        .get(`v1/departments?c_id=${company_id}`)
+        .get(
+          `http://canteen.tonglingok.com/api/v1/departments?c_id=${company_id}`
+        )
         .then(res => {
           let arr = res.data;
           let departmentList = unshiftAllOptions(flatten(arr));

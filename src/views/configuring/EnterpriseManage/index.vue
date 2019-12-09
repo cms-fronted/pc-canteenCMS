@@ -322,13 +322,15 @@ export default {
         company_id: this.company_id
       });
       console.log(formdata);
-      const res = await $axios.post("http://canteen.tonglingok.com/api/v1/company/wxConfig/save");
-      if(res.msg==='ok'){
-        this.$message.success('新增支付信息成功')
-        this.closePayConfig()
-      } else{
-        this.$message.error("请填写正确信息")
-        this.closePayConfig()
+      const res = await $axios.post(
+        "http://canteen.tonglingok.com/api/v1/company/wxConfig/save"
+      );
+      if (res.msg === "ok") {
+        this.$message.success("新增支付信息成功");
+        this.closePayConfig();
+      } else {
+        this.$message.error("请填写正确信息");
+        this.closePayConfig();
       }
     },
     closeShopDialog(val) {

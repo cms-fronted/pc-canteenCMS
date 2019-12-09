@@ -571,9 +571,9 @@ router.beforeEach(async (to, from, next) => {
           const addRoutes = await store.dispatch(
             "permission/getAsyncRoutes",
             roles
-          )
-          router.addRoutes(addRoutes)
-          next({ ...to, replace: true })
+          );
+          router.addRoutes(addRoutes);
+          next({ ...to, replace: true });
         } catch (error) {
           console.log(error);
         }

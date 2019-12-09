@@ -17,7 +17,11 @@
               label-width="60px"
               v-if="companiesVisible"
             >
-              <el-select v-model="queryForm.name" filterable placeholder="请选择企业">
+              <el-select
+                v-model="queryForm.name"
+                filterable
+                placeholder="请选择企业"
+              >
                 <el-option
                   v-for="item in companyOptions"
                   :label="item.name"

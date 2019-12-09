@@ -137,7 +137,9 @@ export default {
       if (this.companiesVisible) {
         $axios
           .get(
-            `http://canteen.tonglingok.com/api/v1/suppliers?c_id=${this.company_id}&page=${this.page}&size=10`
+            `http://canteen.tonglingok.com/api/v1/suppliers?c_id=${
+              this.company_id
+            }&page=${this.page}&size=10`
           )
           .then(res => {
             this.supplierList = Array.from(res.data.data);
@@ -147,7 +149,9 @@ export default {
       } else {
         $axios
           .get(
-            `http://canteen.tonglingok.com/api/v1/suppliers?page=${this.page}&size=10`
+            `http://canteen.tonglingok.com/api/v1/suppliers?page=${
+              this.page
+            }&size=10`
           )
           .then(res => {
             this.supplierList = Array.from(res.data.data);
