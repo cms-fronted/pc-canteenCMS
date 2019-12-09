@@ -558,6 +558,7 @@ router.beforeEach(async (to, from, next) => {
   if (to.path === "/login") {
     next();
   } else {
+    next();
     // let res = await store.dispatch('user/_getUserModules')
     if (store.getters.token) {
       const hasRoles = store.getters.roles.length > 0;
@@ -570,29 +571,13 @@ router.beforeEach(async (to, from, next) => {
           const addRoutes = await store.dispatch(
             "permission/getAsyncRoutes",
             roles
-          );
-          router.addRoutes(addRoutes);
-          next({ ...to, replace: true });
-        } catch (error) {}
+          )
+          router.addRoutes(addRoutes)
+          next({ ...to, replace: true })
+        } catch (error) {
+          console.log(error);
+        }
       }
-      // if (hasRoles) {
-      //   next()
-      // } else {
-      //   try {
-      //     const { roles } = await store.dispatch('user/_getUserModules)')
-      // const addRoutes = await store.dispatch(
-      //   'permission/getAsyncRoutes',
-      //   roles
-      // )
-      // router.addRoutes(addRoutes)
-
-      //     // hack method to ensure that addRoutes is complete
-      //     // set the replace: true, so the navigation will not leave a history record
-      //     next({ ...to, replace: true })
-      //   } catch (error) {
-      //     Message.error(error)
-      //   }
-      // }
     } else {
       next({
         path: "/login",

@@ -68,6 +68,10 @@
                 <el-button :disabled="!company_id" @click="addShop"
                   >新增小卖部</el-button
                 >
+                <el-button :disabled="!company_id" @click="addPayConfig"
+                  >新增支付信息</el-button
+                >
+
                 <el-table
                   style="width:50%;margin: 0 auto"
                   size="mini"
@@ -87,7 +91,7 @@
                           @click="_editCanteen(scoped.row)"
                           >操作</el-button
                         >
-                        <el-button type="text" size="mini">删除</el-button>
+                        <!-- <el-button type="text" size="mini">删除</el-button> -->
                       </span>
                     </template>
                   </el-table-column>
@@ -103,7 +107,7 @@
                   <el-table-column>
                     <template slot-scope="scoped">
                       <span>
-                        <el-button type="text" size="mini">删除</el-button>
+                        <!-- <el-button type="text" size="mini">删除</el-button> -->
                         <el-button
                           type="text"
                           size="mini"
@@ -138,6 +142,26 @@
         <el-button type="primary" @click="_addEnterprise">确 定</el-button>
       </span>
     </el-dialog>
+
+    <el-dialog
+      :visible="payConfigVisible"
+      width="40%"
+      title="新增支付方式"
+      @close="closePayConfig"
+    >
+      <el-form ref="newPayConfig" :model="payConfigForm" label-width="120px">
+        <el-form-item label="公众号appId">
+          <el-input v-model="payConfigForm.app_id"></el-input>
+        </el-form-item>
+        <el-form-item label="支付商户id">
+          <el-input v-model="payConfigForm.mch_id"></el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="_addPayConfig">确 定</el-button>
+        <el-button @click="closePayConfig">取 消</el-button>
+      </span>
+    </el-dialog>
     <add-canteen-dialog
       @closeAdd="_cancelCanteen"
       :dialogTitle="canteenDialogTitle"
@@ -160,6 +184,7 @@
       :isEdit="isEdit"
       :formdata="editForm"
       :machineList="machineList"
+      @updateCanteenList="getComsumptionLoc"
       @updateMachineTable="(val, type) => getMachineList(val, type)"
     ></add-shop-dialog>
     <edit-enterprise-dialog
@@ -188,6 +213,7 @@ export default {
       addCanteenVisible: false,
       addEnterpriseVisible: false,
       addShopVisible: false,
+      payConfigVisible: false,
       canteenDialogTitle: "",
       shopDialogTitle: "",
       editDinnersList: [],
@@ -222,7 +248,8 @@ export default {
       editForm: {
         dinnersList: [],
         account: {}
-      }
+      },
+      payConfigForm: {}
     };
   },
   created() {
@@ -283,6 +310,27 @@ export default {
       this.shopDialogTitle = "新增小卖部";
       this.addShopVisible = true;
     },
+    addPayConfig() {
+      this.payConfigVisible = true;
+    },
+    closePayConfig() {
+      this.payConfigVisible = false;
+      this.payConfigForm = {};
+    },
+    async _addPayConfig() {
+      let formdata = Object.assign({}, this.payConfigForm, {
+        company_id: this.company_id
+      });
+      console.log(formdata);
+      const res = await $axios.post("http://canteen.tonglingok.com/api/v1/company/wxConfig/save");
+      if(res.msg==='ok'){
+        this.$message.success('新增支付信息成功')
+        this.closePayConfig()
+      } else{
+        this.$message.error("请填写正确信息")
+        this.closePayConfig()
+      }
+    },
     closeShopDialog(val) {
       this.isEdit = val;
       this.addShopVisible = val;
@@ -314,7 +362,9 @@ export default {
         .then(res => {
           this.fetchCompanyList();
           this.addEnterpriseVisible = false;
-          this.$message.success("添加成功");
+          this.$message.success(
+            `添加成功，企业账号为:${res.data.company_id}-admin`
+          );
           this.$refs.newEnterprise.resetFields();
           this.parent.id = "";
           this.parent_name = "";

@@ -47,7 +47,8 @@ import {
   RadioGroup,
   Checkbox,
   CheckboxGroup,
-  Loading
+  Loading,
+  TimePicker,
 } from "element-ui";
 Message.install = () => {
   Vue.prototype.$message = Message;
@@ -58,7 +59,7 @@ MessageBox.install = () => {
 Notification.install = () => {
   Vue.prototype.$notify = Notification;
 };
-
+Vue.use(TimePicker);
 Vue.use(InputNumber);
 Vue.use(Loading);
 Vue.use(TimeSelect);

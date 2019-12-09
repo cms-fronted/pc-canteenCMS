@@ -23,7 +23,7 @@
             ></el-date-picker>
           </el-form-item>
           <el-form-item label="供应商">
-            <el-select v-model="formdata.supplier_id">
+            <el-select filterable v-model="formdata.supplier_id">
               <el-option
                 v-for="item in supplierOptions"
                 :key="item.id"

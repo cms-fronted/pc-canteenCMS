@@ -22,7 +22,6 @@ const mutations = {
     localStorage.removeItem("token");
   },
   SET_ROLE(state, val) {
-    console.log(val);
     state.role = val;
   },
   DEL_ROLE(state) {

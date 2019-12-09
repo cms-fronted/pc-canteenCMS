@@ -141,10 +141,7 @@ export default {
           department_id
         })
         .then(res => {
-          console.log(res);
           this.tableData = Array.from(res.data.data);
-
-          console.log("hi");
         })
         .catch(err => console.log(err));
     },

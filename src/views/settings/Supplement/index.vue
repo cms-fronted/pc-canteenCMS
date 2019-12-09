@@ -59,6 +59,7 @@
                   @change="getCanteenList"
                   style="width:200px"
                   placeholder="请选择公司"
+                  filterable
                 >
                   <el-option
                     v-for="item in companiesList"
@@ -203,9 +204,7 @@ export default {
       console.log(this.current_page);
       $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/department/staffs/recharge?page=${
-            this.current_page
-          }&size=10&department_id=0&key=${this.key}`
+          `http://canteen.tonglingok.com/api/v1/department/staffs/recharge?page=${this.current_page}&size=10&department_id=0&key=${this.key}`
         )
         .then(res => {
           this.tableData = Array.from(res.data.data);

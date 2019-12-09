@@ -13,7 +13,7 @@
         width="40%"
         :visible.sync="dinnersVisible"
         append-to-body
-        @close="dinnersVisible = false"
+        @close="_closeDinnerForm"
       >
         <el-form ref="dinnerForm" :model="dinnerForm" label-width="120px">
           <el-form-item label="餐次名称" prop="name">
@@ -63,8 +63,12 @@
           </el-form-item>
           <el-form-item label prop="limit_time">
             <el-time-select
-              :picker-options="{ start: '06:30', step: '00:30', end: '23:30' }"
               v-model="dinnerForm.limit_time"
+              :picker-options="{
+                start: '00:00',
+                step: '00:01',
+                end: '23:59'
+              }"
               placeholder="请选择时间"
               style="marginTop: 5px; marginLeft: 5px; "
             ></el-time-select>
@@ -74,7 +78,11 @@
               style="width:100px"
               placeholder="起始"
               v-model="dinnerForm.meal_time_begin"
-              :picker-options="{ start: '06:30', step: '00:30', end: '23:30' }"
+              :picker-options="{
+                start: '00:00',
+                step: '00:01',
+                end: '23:59'
+              }"
             ></el-time-select>
             <span style="margin: 0 10px;">——</span>
             <el-time-select
@@ -82,9 +90,9 @@
               placeholder="结束"
               v-model="dinnerForm.meal_time_end"
               :picker-options="{
-                start: '06:30',
-                step: '00:30',
-                end: '23:30',
+                start: '00:00',
+                step: '00:01',
+                end: '23:59',
                 minTime: dinnerForm.meal_time_begin
               }"
             ></el-time-select>
@@ -230,8 +238,16 @@
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scoped">
-              <el-button size="small" type="text">编辑</el-button>
-              <el-button size="small" type="text" @click="_delete(scoped.row)"
+              <el-button
+                size="small"
+                type="text"
+                @click="_editDinner(scoped.row)"
+                >编辑</el-button
+              >
+              <el-button
+                size="small"
+                type="text"
+                @click="_deleteDinner(scoped.row)"
                 >删除</el-button
               >
             </template>
@@ -348,6 +364,8 @@ export default {
       editDinnerData: this.editDinnerList,
       editAccountForm: this.editAccount,
       isEditMachine: false,
+      isEditDinner: false,
+      editedDinnerIndex: null,
       machineForm: {
         id: "",
         belong_id: "",
@@ -356,7 +374,6 @@ export default {
         number: "",
         pwd: ""
       },
-
       canteen_id: null,
       canteens: null,
       advancedType: 1,
@@ -422,13 +439,74 @@ export default {
           this.canteens = "";
           this.canteen_id = res.data.canteen_id;
           this.$message.success("饭堂创建成功，请继续操作");
+          this.$emit("updateCanteenList", this.company_id);
+        })
+        .catch(err => {
+          this.$message.error("饭堂名称不能为空!");
         });
     },
     _addDinner() {
       //添加餐次信息
-      this.dataTable.push({ ...this.dinnerForm });
+      if (
+        !this.dinnerForm.meal_time_begin ||
+        !this.dinnerForm.meal_time_end ||
+        !this.dinnerForm.limit_time ||
+        !this.dinnerForm.name
+      ) {
+        this.$message.error("请正确填写餐次信息");
+        return;
+      }
+      if (this.isEditDinner) {
+        this.$set(this.dataTable, this.editedDinnerIndex, this.dinnerForm);
+      } else {
+        this.dataTable.push({ ...this.dinnerForm });
+      }
+      this._closeDinnerForm();
+    },
+    _editDinner(row) {
+      this.dinnerForm = Object.assign({}, row);
+      this.editedDinnerIndex = this.dataTable.findIndex(item => item === row);
+      this.isEditDinner = true;
+      this.dinnersVisible = true;
+    },
+    _deleteDinner(row) {
+      if (row.id) {
+        this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        })
+          .then(async () => {
+            this.dataTable = this.dataTable.filter(item => item !== row);
+            const res = await this.$axios.post(
+              "http://canteen.tonglingok.com/api/v1/canteen/dinner/delete",
+              {
+                dinner_id: row.id
+              }
+            );
+
+            if (res.msg === "ok") {
+              this.$message({
+                type: "success",
+                message: "删除成功!"
+              });
+            }
+          })
+          .catch(() => {
+            this.$message({
+              type: "info",
+              message: "已取消删除"
+            });
+          });
+      } else {
+        this.dataTable = this.dataTable.filter(item => item !== row);
+      }
+    },
+    _closeDinnerForm() {
       this.$refs.dinnerForm.resetFields();
+      this.editedDinnerIndex = null;
       this.dinnersVisible = false;
+      this.isEditDinner = false;
     },
     _submitOptions() {
       let data = {};
@@ -445,10 +523,14 @@ export default {
       $axios
         .post(url, data)
         .then(res => {
-          this.$message.success("设置成功");
-          this.dataTable.length = 0;
-          this.$emit("updateCanteenList", this.company_id);
-          this.handleClose();
+          if (res.msg === "ok") {
+            this.$message.success("设置成功");
+            this.dataTable.length = 0;
+            this.$emit("updateCanteenList", this.company_id);
+            this.handleClose();
+          } else {
+            this.$message.error(res.msg);
+          }
         })
         .catch(err => console.log(err));
     },
@@ -469,7 +551,7 @@ export default {
       this.isEditMachine = false;
       this.machineForm = {};
     },
-    async _deleteMachine(row) {
+    _deleteMachine(row) {
       let id = row.id;
       this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
         confirmButtonText: "确定",

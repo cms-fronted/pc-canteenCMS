@@ -6,7 +6,12 @@
       <div class="main-header">
         <el-form :inline="true">
           <el-form-item label="公司" v-if="companiesVisible">
-            <el-select v-model="queryForm.c_id" @change="selectCompany">
+            <el-select
+              v-model="queryForm.c_id"
+              placeholder="请选择企业"
+              filterable
+              @change="selectCompany"
+            >
               <el-option
                 v-for="item in companyOptions"
                 :key="item.id"
@@ -40,7 +45,7 @@
         </el-form>
         <div class="main-content">
           <el-row :gutter="10">
-            <el-col :span="4">
+            <el-col :span="6">
               <el-input size="small" v-model="filterText" placeholder="关键字查询"></el-input>
               <el-tree
                 class="tree"
@@ -69,7 +74,7 @@
                 </span>
               </el-tree>
             </el-col>
-            <el-col :span="20">
+            <el-col :span="18">
               <el-table style="width:100%" :data="tabledata">
                 <el-table-column label="归属饭堂">
                   <template slot-scope="scoped">
@@ -273,18 +278,26 @@
         <el-button type="primary" @click="_addRoleType">确 定</el-button>
       </span>
     </el-dialog>
-    <el-dialog :visible.sync="QRcodeVisible" width="20%" ref="print" center title="二维码信息" top="5vh">
+    <el-dialog
+      :visible.sync="QRcodeVisible"
+      :show-close="false"
+      width="40%"
+      ref="print"
+      center
+      title="二维码信息"
+      top="5vh"
+    >
       <img width="100%" :src="QRcodeDetail.url" alt />
       <ul class="qr-detail">
         <li>员工姓名：{{ QRcodeDetail.username }}</li>
         <li>生成时间：{{ QRcodeDetail.create_time }}</li>
         <li>失效时间：{{ QRcodeDetail.expiry_date }}</li>
       </ul>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="QRcodeVisible=false">关 闭</el-button>
+        <el-button type="success" @click="_print">打 印</el-button>
+      </span>
     </el-dialog>
-    <span slot="footer" class="dialog-footer">
-      <el-button @click="QRcodeVisible=false">关 闭</el-button>
-      <el-button type="success" @click="_print">打 印</el-button>
-    </span>
   </div>
 </template>
 
@@ -301,7 +314,6 @@ export default {
       header: {
         token: store.getters.token
       },
-      grade: store.getters.grade,
       d_id: "", //该页面全局部门id
       c_id: "", //该页面全局企业id
       addStaffVisible: false,

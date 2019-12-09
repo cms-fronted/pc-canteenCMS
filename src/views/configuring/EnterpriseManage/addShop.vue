@@ -267,6 +267,7 @@ export default {
           if (res.msg === "ok") {
             this.$message.success("新增成功");
             this.shop_id = res.data.shop_id;
+            this.$emit("updateCanteenList", this.company_id);
           } else {
             this.$message.error(res.msg);
           }
@@ -281,7 +282,10 @@ export default {
           taking_mode: this.taking_mode
         })
         .then(res => {
-          if (res.msg === "ok") this.$message.success("修改成功");
+          if (res.msg === "ok") {
+            this.$message.success("修改成功");
+            this.$emit("updateCanteenList", this.company_id);
+          }
         })
         .catch(err => console.log(err));
     },

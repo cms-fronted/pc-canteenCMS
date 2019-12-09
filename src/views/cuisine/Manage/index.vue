@@ -5,7 +5,7 @@
       <el-divider></el-divider>
       <div class="main">
         <div class="main-header">
-          <el-form :inline="true" label-width="80px" :model="queryForm">
+          <el-form :inline="true" label-width="60px" :model="queryForm">
             <el-form-item
               label="公司"
               prop="company_ids"
@@ -13,6 +13,8 @@
             >
               <el-select
                 v-model="queryForm.company_id"
+                placeholder="请选择企业"
+                filterable
                 @change="getLocationList"
               >
                 <el-option
@@ -23,7 +25,7 @@
                 ></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="消费地点" prop="canteen_id">
+            <el-form-item label="消费地点" label-width="80px" prop="canteen_id">
               <el-select
                 v-model="queryForm.canteen_id"
                 @change="getDinnersList"
@@ -398,12 +400,17 @@ export default {
       this.editData = {};
       this.visible = val;
     },
-    confirmEdit() {
+    async confirmEdit() {
       let data = this.editFormdata;
-      $axios
-        .post("http://canteen.tonglingok.com/api/v1/food/update", data)
-        .then(res => console.log(res))
-        .catch(err => console.log(err));
+      const res = await $axios.post(
+        "http://canteen.tonglingok.com/api/v1/food/update",
+        data
+      );
+      if (res.msg === "ok") {
+        this.editVisible = false;
+        this.editFormData = {};
+        this.fetchList(this.current_page);
+      }
     },
     openNewType() {
       this.newTypeVisible = true;
@@ -454,10 +461,9 @@ export default {
         type: "warning"
       })
         .then(() => {
-          this.$axios
-            .post("/NewJMConsumeJMHG/Mall.ashx", {
-              types: "delete_goods",
-              postID: item.postID
+          $axios
+            .post("http://canteen.tonglingok.com/api/v1/food/handel", {
+              id: item.id
             })
             .then(() => {
               this.fetchList(this.page);
@@ -482,6 +488,14 @@ export default {
 .cuisine-manage {
   .main {
     height: 100%;
+    .main-header {
+      .el-select {
+        width: 180px;
+      }
+      .el-input {
+        width: 180px;
+      }
+    }
     .main-content {
       display: flex;
       width: 100%;

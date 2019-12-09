@@ -6,7 +6,12 @@
       <div class="main-header">
         <el-form :model="queryForm" :inline="true" label-width="60px">
           <el-form-item label="公司" v-if="companiesVisible">
-            <el-select v-model="queryForm.company_id" @change="getCanteenList">
+            <el-select
+              v-model="queryForm.company_id"
+              placeholder="请选择企业"
+              filterable
+              @change="getCanteenList"
+            >
               <el-option
                 v-for="item in companiesList"
                 :label="item.name"

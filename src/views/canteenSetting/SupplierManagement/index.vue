@@ -10,6 +10,7 @@
             v-model="company_id"
             placeholder="请选择"
             v-if="companiesVisible"
+            filterable
           >
             <el-option
               v-for="item in companyList"
@@ -21,7 +22,7 @@
           <el-button type="primary" @click="fetchSupplierList"
             >查询供应商</el-button
           >
-          <el-button type="primary" @click="handleClick()"
+          <el-button type="primary" @click="handleClick({ c_id: company_id })"
             >增加供应商</el-button
           >
         </div>
@@ -83,6 +84,7 @@
 import $axios from "@/api/index";
 import AddDialog from "./dialog";
 import Pagination from "@/components/Pagination";
+import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
 import store from "@/store";
 export default {
   data() {
@@ -124,9 +126,10 @@ export default {
   methods: {
     fetchCompanyList() {
       $axios
-        .get("http://canteen.tonglingok.com/api/v1/companies")
+        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
         .then(res => {
-          this.companyList = Array.from(res.data.data);
+          let arr = res.data;
+          this.companyList = flatten(arr);
         })
         .catch(err => console.log(err));
     },
@@ -134,9 +137,7 @@ export default {
       if (this.companiesVisible) {
         $axios
           .get(
-            `http://canteen.tonglingok.com/api/v1/suppliers?c_id=${
-              this.company_id
-            }&page=${this.page}&size=10`
+            `http://canteen.tonglingok.com/api/v1/suppliers?c_id=${this.company_id}&page=${this.page}&size=10`
           )
           .then(res => {
             this.supplierList = Array.from(res.data.data);
@@ -146,9 +147,7 @@ export default {
       } else {
         $axios
           .get(
-            `http://canteen.tonglingok.com/api/v1/suppliers?page=${
-              this.page
-            }&size=10`
+            `http://canteen.tonglingok.com/api/v1/suppliers?page=${this.page}&size=10`
           )
           .then(res => {
             this.supplierList = Array.from(res.data.data);
@@ -211,6 +210,7 @@ export default {
     },
     handleClick(row = {}) {
       this.addVisible = true;
+      Object.assign(this.editFormdata, {}, row);
     },
     handleClose() {
       this.pwd = "";

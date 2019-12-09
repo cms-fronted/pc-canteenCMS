@@ -9,6 +9,7 @@
           v-model="company_id"
           placeholder="请选择"
           style="width:150px"
+          filterable
           @change="fetchCanteenList(company_id)"
           v-if="companiesVisible"
         >

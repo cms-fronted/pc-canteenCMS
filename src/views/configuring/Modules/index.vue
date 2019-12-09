@@ -342,7 +342,7 @@ export default {
         data
       );
       if (res.msg === "ok") {
-        this.$$message.success("操作成功!");
+        this.$message.success("操作成功!");
         this.renderModules();
       }
     }

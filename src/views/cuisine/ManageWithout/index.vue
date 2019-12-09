@@ -5,7 +5,7 @@
       <el-divider></el-divider>
       <div class="main">
         <div class="main-header">
-          <el-form :inline="true" label-width="80px" :model="queryForm">
+          <el-form :inline="true" label-width="60px" :model="queryForm">
             <el-form-item
               label="公司"
               prop="company_ids"
@@ -13,6 +13,8 @@
             >
               <el-select
                 v-model="queryForm.company_id"
+                placeholder="请选择企业"
+                filterable
                 @change="getLocationList"
               >
                 <el-option
@@ -23,7 +25,7 @@
                 ></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="消费地点" prop="canteen_id">
+            <el-form-item label="消费地点" label-width="80px" prop="canteen_id">
               <el-select
                 v-model="queryForm.canteen_id"
                 @change="getDinnersList"
@@ -149,7 +151,7 @@
         <el-form-item style="display:block" label="图片">
           <el-upload
             ref="editUpload"
-            action="/v1/image/upload"
+            action="http://canteen.tonglingok.com/api/v1/image/upload"
             name="image"
             :file-list="fileList"
             list-type="picture-card"
@@ -239,7 +241,7 @@ export default {
       let queryForm = this.queryForm;
       let { m_id, dinner_id, canteen_id, company_id } = queryForm;
       $axios
-        .get(`/v1/foods`, {
+        .get(`http://canteen.tonglingok.com/api/v1/foods`, {
           f_type: 1,
           page: page,
           size: this.pageSize,
@@ -257,7 +259,7 @@ export default {
     },
     getCompanies() {
       $axios
-        .get("/v1/admin/companies")
+        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
         .then(res => {
           let arr = res.data;
           let companiesList = flatten(arr);
@@ -275,7 +277,9 @@ export default {
       if (!isNaN(company_id)) {
         if (company_id) {
           $axios
-            .get(`/v1/canteens?company_id=${company_id}`)
+            .get(
+              `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
+            )
             .then(res => {
               this.diaLocationList = Array.from(res.data);
               this.locationList = getAllOptions(Array.from(res.data));
@@ -283,7 +287,7 @@ export default {
             .catch(err => console.log(err));
         } else {
           $axios
-            .get("/v1/managerCanteens")
+            .get("http://canteen.tonglingok.com/api/v1/managerCanteens")
             .then(res => {
               this.diaLocationList = Array.from(res.data);
               this.locationList = getAllOptions(Array.from(res.data));
@@ -299,7 +303,9 @@ export default {
     getDinnersList(canteen_id) {
       if (!isNaN(canteen_id)) {
         $axios
-          .get(`/v1/canteen/dinners?canteen_id=${canteen_id}`)
+          .get(
+            `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
+          )
           .then(res => {
             this.dinnersList = getAllOptions(Array.from(res.data));
           })
@@ -314,7 +320,9 @@ export default {
     getCategoryList(dinner_id) {
       if (!isNaN(dinner_id)) {
         $axios
-          .get(`/v1/menus/dinner?dinner_id=${dinner_id}`)
+          .get(
+            `http://canteen.tonglingok.com/api/v1/menus/dinner?dinner_id=${dinner_id}`
+          )
           .then(res => {
             this.categoryList = getAllOptions(Array.from(res.data));
           })
@@ -326,7 +334,9 @@ export default {
     },
     async getEditDinnerList(canteen_id) {
       await $axios
-        .get(`/v1/canteen/dinners?canteen_id=${canteen_id}`)
+        .get(
+          `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
+        )
         .then(res => {
           this.editDinnersList = Array.from(res.data);
         })
@@ -334,7 +344,9 @@ export default {
     },
     async getEditCategoryList(dinner_id) {
       await $axios
-        .get(`/v1/menus/dinner?dinner_id=${dinner_id}`)
+        .get(
+          `http://canteen.tonglingok.com/api/v1/menus/dinner?dinner_id=${dinner_id}`
+        )
         .then(res => {
           this.editCategoryList = Array.from(res.data);
         })
@@ -358,7 +370,7 @@ export default {
       this.editFormdata = { ...item };
       delete this.editFormdata.img_url;
       await $axios
-        .get("/v1/food", {
+        .get("http://canteen.tonglingok.com/api/v1/food", {
           id: item.id
         })
         .then(res => {
@@ -379,12 +391,17 @@ export default {
       this.editData = {};
       this.visible = val;
     },
-    confirmEdit() {
+    async confirmEdit() {
       let data = this.editFormdata;
-      $axios
-        .post("/v1/food/update", data)
-        .then(res => console.log(res))
-        .catch(err => console.log(err));
+      const res = await $axios.post(
+        "http://canteen.tonglingok.com/api/v1/food/update",
+        data
+      );
+      if (res.msg === "ok") {
+        this.editVisible = false;
+        this.editFormData = {};
+        this.fetchList(this.current_page);
+      }
     },
     openNewType() {
       this.newTypeVisible = true;
@@ -435,10 +452,9 @@ export default {
         type: "warning"
       })
         .then(() => {
-          this.$axios
-            .post("/NewJMConsumeJMHG/Mall.ashx", {
-              types: "delete_goods",
-              postID: item.postID
+          $axios
+            .post("http://canteen.tonglingok.com/api/v1/food/handel", {
+              id: item.id
             })
             .then(() => {
               this.fetchList(this.page);
@@ -460,8 +476,16 @@ export default {
 </script>
 
 <style lang="scss">
-.manage {
+.cuisine-manage {
   .main {
+    .main-header {
+      .el-select {
+        width: 180px;
+      }
+      .el-input {
+        width: 180px;
+      }
+    }
     height: 100%;
     .main-content {
       display: flex;

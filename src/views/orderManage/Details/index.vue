@@ -25,6 +25,7 @@
             <el-form-item label="公司" v-if="companiesVisible">
               <el-select
                 v-model="formdata.company_ids"
+                filterable
                 @change="getList"
                 placeholder="请选择公司"
               >

@@ -8,6 +8,8 @@
           <el-form-item label="公司" v-if="companiesVisible" prop="company_id">
             <el-select
               @change="getCanteenOptions"
+              placeholder="请选择企业"
+              filterable
               v-model="queryForm.company_id"
             >
               <el-option

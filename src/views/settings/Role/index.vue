@@ -11,7 +11,11 @@
           label-width="60px"
         >
           <el-form-item label="公司" prop="c_name" v-if="companiesVisible">
-            <el-select v-model="queryForm.c_name">
+            <el-select
+              v-model="queryForm.c_name"
+              placeholder="请选择企业"
+              filterable
+            >
               <el-option
                 v-for="item in companyOptions"
                 :key="item.id"
@@ -263,8 +267,8 @@ export default {
     },
     closeNewRoleDialog() {
       this.isEdit = false;
-      this.roleForm = {};
-      this.modules = [];
+      // this.roleForm = {};
+      // this.modules = [];
       this.newRoleDialogVisible = false;
     },
     async selectCompany(id) {
@@ -277,11 +281,11 @@ export default {
     async _confirm() {
       if (!this.isConfirmRules) {
         this.$message.warning("请先确定角色模块");
+        return;
       }
       let canteens = [];
       let newCanteen = [];
       canteens = this.roleForm.canteens ? this.roleForm.canteens : [];
-      console.log(canteens);
       canteens.forEach(item => {
         newCanteen.push({
           c_id: item.id,
@@ -290,7 +294,6 @@ export default {
       });
       this.roleForm.canteens = JSON.stringify(newCanteen);
       this.roleForm.rules = this.roleForm.rules.toString();
-      return;
       if (this.isEdit) {
         this.roleForm.canteen = []; //没有字段不传
         const res = await $axios.post(

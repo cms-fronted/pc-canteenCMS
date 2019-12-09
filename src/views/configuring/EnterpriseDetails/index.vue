@@ -14,10 +14,10 @@
             <el-form-item
               label="公司"
               prop="name"
-              label-width="80px"
+              label-width="60px"
               v-if="companiesVisible"
             >
-              <el-select v-model="queryForm.name">
+              <el-select v-model="queryForm.name" filterable placeholder="请选择企业">
                 <el-option
                   v-for="item in companyOptions"
                   :label="item.name"
@@ -221,6 +221,8 @@ export default {
       );
       if (res.msg === "ok") {
         this.companyList = Array.from(res.data.data);
+        this.total = res.data.total;
+        this.current_page = res.data.current_page;
       }
     },
     async getCompaniesList() {
