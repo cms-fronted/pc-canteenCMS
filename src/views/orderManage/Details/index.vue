@@ -252,16 +252,19 @@ export default {
         department_id
       } = this.formdata;
       $axios
-        .get(`v1/order/orderStatistic/detail?page=${page}&size=${pageSize}`, {
-          name: name,
-          company_ids: company_ids,
-          time_end: time_end,
-          time_begin: time_begin,
-          dinner_id: dinner_id,
-          phone: phone,
-          canteen_id: canteen_id,
-          department_id: department_id
-        })
+        .get(
+          `http://canteen.tonglingok.com/api/v1/order/orderStatistic/detail?page=${page}&size=${pageSize}`,
+          {
+            name: name,
+            company_ids: company_ids,
+            time_end: time_end,
+            time_begin: time_begin,
+            dinner_id: dinner_id,
+            phone: phone,
+            canteen_id: canteen_id,
+            department_id: department_id
+          }
+        )
         .then(res => {
           this.tableData = Array.from(res.data.data);
           this.total = res.data.total;
