@@ -1,6 +1,18 @@
 <template>
-  <el-dialog title="菜品管理" :visible.sync="isOpen" class="diaForm" width="40%" @close="handleClose">
-    <el-dialog :visible.sync="materialDialogVisible" width="20%" title="添加材料" center append-to-body>
+  <el-dialog
+    title="菜品管理"
+    :visible.sync="isOpen"
+    class="diaForm"
+    width="40%"
+    @close="handleClose"
+  >
+    <el-dialog
+      :visible.sync="materialDialogVisible"
+      width="20%"
+      title="添加材料"
+      center
+      append-to-body
+    >
       <el-form ref="materialForm" :model="materialForm" label-width="60px">
         <el-form-item label="名称" prop="name">
           <el-input v-model="materialForm.name"></el-input>
@@ -14,7 +26,12 @@
         <el-button type="primary" @click="_addMaterial">确 定</el-button>
       </span>
     </el-dialog>
-    <el-form ref="cuisineManageForm" :model="formdata" :rules="rules" label-width="80px">
+    <el-form
+      ref="cuisineManageForm"
+      :model="formdata"
+      :rules="rules"
+      label-width="80px"
+    >
       <el-form-item label="饭堂名称" prop="canteen_id">
         <el-select
           v-model="formdata.c_id"
@@ -22,7 +39,12 @@
           style="width:120px"
           @change="getDinnersList"
         >
-          <el-option v-for="item in canteenList" :key="item.id" :value="item.id" :label="item.name"></el-option>
+          <el-option
+            v-for="item in canteenList"
+            :key="item.id"
+            :value="item.id"
+            :label="item.name"
+          ></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="餐次" prop="dinner_id">
@@ -32,11 +54,20 @@
           style="width:120px"
           @change="getCategoryList"
         >
-          <el-option v-for="item in dinnerList" :key="item.id" :value="item.id" :label="item.name"></el-option>
+          <el-option
+            v-for="item in dinnerList"
+            :key="item.id"
+            :value="item.id"
+            :label="item.name"
+          ></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="类型" prop="m_id">
-        <el-select v-model="formdata.m_id" placeholder="请选择" style="width:120px">
+        <el-select
+          v-model="formdata.m_id"
+          placeholder="请选择"
+          style="width:120px"
+        >
           <el-option
             v-for="item in categoryList"
             :key="item.id"
@@ -83,7 +114,8 @@
           style="float: right; padding: 3px 0"
           type="text"
           @click="materialDialogVisible = true"
-        >添加材料</el-button>
+          >添加材料</el-button
+        >
       </div>
       <el-table :data="material" style="width:100%" size="mini">
         <el-table-column label="名称" prop="name"></el-table-column>
@@ -91,7 +123,12 @@
         <el-table-column label="操作">
           <template slot-scope="scoped">
             <el-button size="small" type="text">编辑</el-button>
-            <el-button size="small" type="text" @click="_deleteMaterial(scoped.row)">删除</el-button>
+            <el-button
+              size="small"
+              type="text"
+              @click="_deleteMaterial(scoped.row)"
+              >删除</el-button
+            >
           </template>
         </el-table-column>
       </el-table>
@@ -173,7 +210,9 @@ export default {
       this.formdata.dinner_id = "";
       this.formdata.m_id = "";
       $axios
-        .get(`http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${c_id}`)
+        .get(
+          `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${c_id}`
+        )
         .then(res => {
           this.dinnerList = Array.from(res.data);
         })
@@ -182,7 +221,9 @@ export default {
     getCategoryList(dinner_id) {
       this.formdata.m_id = "";
       $axios
-        .get(`http://canteen.tonglingok.com/api/v1/menus/dinner?dinner_id=${dinner_id}`)
+        .get(
+          `http://canteen.tonglingok.com/api/v1/menus/dinner?dinner_id=${dinner_id}`
+        )
         .then(res => (this.categoryList = Array.from(res.data)))
         .catch(err => console.log(err));
     },

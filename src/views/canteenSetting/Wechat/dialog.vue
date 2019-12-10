@@ -7,7 +7,12 @@
           v-model="formdata.c_id"
           style="width: 265px;"
         >
-          <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          <el-option
+            v-for="item in companyList"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          ></el-option>
         </el-select>
       </el-form-item>
       <el-form-item label="商品类型">
@@ -49,7 +54,7 @@ export default {
       isOpen: this.visible,
       companyList: [],
       formdata: {}
-    }
+    };
   },
   watch: {
     visible(val) {
@@ -57,34 +62,34 @@ export default {
       this.formdata = Object.assign({}, this.editFormdata);
     }
   },
-  created(){
+  created() {
     this.fetchCompanyList();
   },
   methods: {
-    sendPostRequest(url,data){
+    sendPostRequest(url, data) {
       $axios
-        .post(url,data)
+        .post(url, data)
         .then(res => {
           this.handleClose();
           this.sendMessage(res.msg);
-          this.$emit("confirm",res.msg);
+          this.$emit("confirm", res.msg);
         })
         .catch(err => console.log(err));
     },
-    sendMessage(msg){
-      if(msg === 'ok'){
+    sendMessage(msg) {
+      if (msg === "ok") {
         this.$message({
           type: "success",
           message: "操作成功!"
         });
-      }else {
+      } else {
         this.$message({
           type: "info",
           message: "操作失败"
-        })
+        });
       }
     },
-    fetchCompanyList(){
+    fetchCompanyList() {
       $axios
         .get("http://canteen.tonglingok.com/api/v1/admin/companies")
         .then(res => {
@@ -93,17 +98,23 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    handleClose(){
+    handleClose() {
       this.$emit("close", false);
     },
-    handleConfirm(){
+    handleConfirm() {
       let data = this.formdata;
-      if(this.type === '_add'){
-        this.sendPostRequest("http://canteen.tonglingok.com/api/v1/category/save", data);
+      if (this.type === "_add") {
+        this.sendPostRequest(
+          "http://canteen.tonglingok.com/api/v1/category/save",
+          data
+        );
         this.$refs["addGoodsForm"].resetFields();
-      }else{
-        let {id,name} = data;
-        this.sendPostRequest("http://canteen.tonglingok.com/api/v1/category/update", {id,name});
+      } else {
+        let { id, name } = data;
+        this.sendPostRequest(
+          "http://canteen.tonglingok.com/api/v1/category/update",
+          { id, name }
+        );
         this.$refs["addGoodsForm"].resetFields();
       }
     }
@@ -111,5 +122,4 @@ export default {
 };
 </script>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

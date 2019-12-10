@@ -71,7 +71,10 @@ export default {
     },
     ConfirmRevise() {
       $axios
-        .post("http://canteen.tonglingok.com/api/v1/category/update", this.reviseForm)
+        .post(
+          "http://canteen.tonglingok.com/api/v1/category/update",
+          this.reviseForm
+        )
         .then(res => {
           this.$emit("closeDialog2", false, res.msg);
         })

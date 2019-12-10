@@ -274,7 +274,9 @@ export default {
     } else {
       this.getDepartmentListWithoutCid();
     }
-    $axios.get("http://canteen.tonglingok.com/api/v1/order/detail?id=8&type=1").then(res => console.log(res));
+    $axios
+      .get("http://canteen.tonglingok.com/api/v1/order/detail?id=8&type=1")
+      .then(res => console.log(res));
   },
   methods: {
     tableRowClassName({ row, column, rowIndex, columnIndex }) {
@@ -298,7 +300,9 @@ export default {
       }
     },
     async getDepartmentListWithoutCid() {
-      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/admin/departments");
+      const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/admin/departments"
+      );
       if (res.msg === "ok") {
         this.departmentList = unshiftAllOptions(Aarray.from(res.data));
       }
@@ -307,7 +311,9 @@ export default {
       page = typeof page === Number ? page : 1;
       // page = page || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/shop/order/statistic/manager?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/shop/order/statistic/manager?page=${page}&size=${
+          this.size
+        }`,
         this.formdata
       );
       if (res.msg === "ok") {
@@ -323,7 +329,9 @@ export default {
     },
     async checkDetail(row) {
       let id = row.order_id;
-      const res = await $axios.get(`http://canteen.tonglingok.com/api/v1/shop/order/products?order_id=${id}`);
+      const res = await $axios.get(
+        `http://canteen.tonglingok.com/api/v1/shop/order/products?order_id=${id}`
+      );
       if (res.msg === "ok") {
         this.detailForm = Object.assign({}, res.data);
         this.detailDialogVisible = true;
@@ -333,7 +341,9 @@ export default {
     async print(row) {
       this.isPrint = true;
       let id = row.order_id;
-      const res = await $axios.get(`http://canteen.tonglingok.com/api/v1/shop/order/products?order_id=${id}`);
+      const res = await $axios.get(
+        `http://canteen.tonglingok.com/api/v1/shop/order/products?order_id=${id}`
+      );
       if (res.msg === "ok") {
         this.detailForm = Object.assign({}, res.data);
         this.detailDialogVisible = true;

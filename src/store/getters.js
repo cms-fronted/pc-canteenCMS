@@ -9,13 +9,13 @@ const getters = {
   routes: state => state.permission.routes,
   addRoutes: state => state.permission.addRoutes,
   opened: state => {
-    if (state.app.opened === 'false') {
-      return false
-    } else if (state.app.opened === 'true') {
-      return true
+    if (state.app.opened === "false") {
+      return false;
+    } else if (state.app.opened === "true") {
+      return true;
     }
   },
   msgIsShow: state => state.app.msgIsShow,
   showDriver: state => state.app.showDriver
-}
-export default getters
+};
+export default getters;

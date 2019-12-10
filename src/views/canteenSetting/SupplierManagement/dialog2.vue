@@ -72,7 +72,10 @@ export default {
     },
     reviseSupplier() {
       $axios
-        .post("http://canteen.tonglingok.com/api/v1/supplier/update", this.reviseSupplierForm)
+        .post(
+          "http://canteen.tonglingok.com/api/v1/supplier/update",
+          this.reviseSupplierForm
+        )
         .then(res => {
           this.$emit("closeDialog2", false, res.msg);
         })

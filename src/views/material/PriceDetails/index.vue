@@ -13,11 +13,25 @@
           @change="fetchCanteenList(company_id)"
           v-if="companiesVisible"
         >
-          <el-option v-for="item in companyList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+          <el-option
+            v-for="item in companyList"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          ></el-option>
         </el-select>
         <span class="content-header">消费地点：</span>
-        <el-select v-model="canteen_id" placeholder="请选择" style="width:150px">
-          <el-option v-for="item in canteenList" :key="item.id" :label="item.name" :value="item.id"></el-option>
+        <el-select
+          v-model="canteen_id"
+          placeholder="请选择"
+          style="width:150px"
+        >
+          <el-option
+            v-for="item in canteenList"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          ></el-option>
         </el-select>
         <el-input
           placeholder="请输入内容"
@@ -26,7 +40,13 @@
           v-model="keyword"
           style="width:180px;margin: 0 15px;"
         ></el-input>
-        <el-button type="primary" plain style="margin-left:0" @click="fetchTableList">查询</el-button>
+        <el-button
+          type="primary"
+          plain
+          style="margin-left:0"
+          @click="fetchTableList"
+          >查询</el-button
+        >
         <el-button type="primary" @click="deriveData">导出</el-button>
         <el-upload
           class="upload-excel"
@@ -42,7 +62,11 @@
         >
           <el-button type="primary">批量导入</el-button>
         </el-upload>
-        <el-button type="primary" @click="handleClick({ c_id: canteen_id }, '_add', '新增材料')">添加</el-button>
+        <el-button
+          type="primary"
+          @click="handleClick({ c_id: canteen_id }, '_add', '新增材料')"
+          >添加</el-button
+        >
       </div>
       <!-- 共有{{total}}条记录 -->
       <div class="total" v-show="total > 0">
@@ -53,19 +77,36 @@
       </div>
       <div class="main-content">
         <el-table style="width:100%; font-size:14px" :data="tableData" border>
-          <el-table-column prop="id" label="序号" width="200px"></el-table-column>
+          <el-table-column
+            prop="id"
+            label="序号"
+            width="200px"
+          ></el-table-column>
           <el-table-column prop="name" label="材料名称"></el-table-column>
           <el-table-column label="单价/元">
-            <template slot-scope="scope">{{ scope.row.price }}元/kg</template>
+            <template slot-scope="scope"
+              >{{ scope.row.price }}元/kg</template
+            >
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <el-button size="mini" @click="handleClick(scope.row, '_edit', '编辑材料')">编辑</el-button>
-              <el-button size="mini" type="danger" @click="_delete(scope.row)">Delete</el-button>
+              <el-button
+                size="mini"
+                @click="handleClick(scope.row, '_edit', '编辑材料')"
+                >编辑</el-button
+              >
+              <el-button size="mini" type="danger" @click="_delete(scope.row)"
+                >Delete</el-button
+              >
             </template>
           </el-table-column>
         </el-table>
-        <pagination v-show="total > 10" :total="total" :page.sync="page" @pagination="getList"></pagination>
+        <pagination
+          v-show="total > 10"
+          :total="total"
+          :page.sync="page"
+          @pagination="getList"
+        ></pagination>
       </div>
     </div>
     <handle-dialog
@@ -109,12 +150,11 @@ export default {
     };
   },
   created() {
-      if(this.companiesVisible){
+    if (this.companiesVisible) {
       this.fetchCompanyList();
-    } else{
-      this.fetchCanteenList(0)
+    } else {
+      this.fetchCanteenList(0);
     }
-    
   },
   computed: {
     companiesVisible() {
@@ -168,7 +208,9 @@ export default {
           this.canteenList.unshift({ id: "", name: "全部" });
         } else {
           $axios
-            .get(`http://canteen.tonglingok.com/api/v1/canteens?company_id=${id}`)
+            .get(
+              `http://canteen.tonglingok.com/api/v1/canteens?company_id=${id}`
+            )
             .then(res => {
               this.canteenList = Array.from(res.data);
             })
@@ -186,7 +228,11 @@ export default {
     fetchTableList() {
       $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/materials?page=${this.page}&size=10&key=${this.keyword}&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
+          `http://canteen.tonglingok.com/api/v1/materials?page=${
+            this.page
+          }&size=10&key=${this.keyword}&canteen_ids=${
+            this.canteen_id
+          }&company_ids=${this.company_id}`
         )
         .then(res => {
           this.tableData = res.data.data;
@@ -238,7 +284,9 @@ export default {
     deriveData() {
       $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/material/export?key=${this.keyword}&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
+          `http://canteen.tonglingok.com/api/v1/material/export?key=${
+            this.keyword
+          }&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
         )
         .then(res => {
           if (this.tableData.length > 0) {

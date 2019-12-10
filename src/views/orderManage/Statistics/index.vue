@@ -170,9 +170,13 @@ export default {
     async getLocationList(company_id) {
       let res;
       if (company_id) {
-        res = await $axios.get(`http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`);
+        res = await $axios.get(
+          `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
+        );
       } else {
-        res = await $axios.get("http://canteen.tonglingok.com/api/v1/managerCanteens");
+        res = await $axios.get(
+          "http://canteen.tonglingok.com/api/v1/managerCanteens"
+        );
       }
       if (res.msg === "ok") {
         this.canteenOptions = unshiftAllOptions(Array.from(res.data));
@@ -181,7 +185,9 @@ export default {
     async queryList(page) {
       page = page || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/orderStatistic?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/order/orderStatistic?page=${page}&size=${
+          this.size
+        }`,
         this.formdata
       );
       if (res.msg === "ok") {

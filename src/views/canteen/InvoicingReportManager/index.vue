@@ -1,5 +1,5 @@
 <template>
-<!--TODO: 增加外层Card组件设置表头-->
+  <!--TODO: 增加外层Card组件设置表头-->
   <div class="invoicing-report-manager">
     <div class="nav-title">进销统计报表</div>
     <el-divider></el-divider>
@@ -108,7 +108,9 @@ export default {
   },
   methods: {
     async getSupplierList() {
-      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/company/suppliers");
+      const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/company/suppliers"
+      );
       if (res.msg === "ok") {
         this.supplierOptions = Array.from(res.data);
       }
@@ -116,7 +118,9 @@ export default {
     async queryList(page) {
       page = typeof page == Number ? page : 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/shop/salesReport/manager?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/shop/salesReport/manager?page=${page}&size=${
+          this.size
+        }`,
         this.formdata
       );
       if (res.msg === "ok") {

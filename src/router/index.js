@@ -26,9 +26,9 @@ export const currencyRoutes = [
     redirect: "/order"
   },
   {
-    path: '/404',
-    name: '404',
-    component: () => import('@/views/error'),
+    path: "/404",
+    name: "404",
+    component: () => import("@/views/error"),
     hidden: true
   },
   {
@@ -36,15 +36,17 @@ export const currencyRoutes = [
     name: "Home",
     redirect: "/home/index",
     component: Layout,
-    children: [{
-      path: "index",
-      name: "HomeIndex",
-      component: () => import("@/views/home"),
-      meta: {
-        title: "首页",
-        icon: "el-icon-document"
-      },
-    }],
+    children: [
+      {
+        path: "index",
+        name: "HomeIndex",
+        component: () => import("@/views/home"),
+        meta: {
+          title: "首页",
+          icon: "el-icon-document"
+        }
+      }
+    ]
   },
   {
     path: "/login",
@@ -117,7 +119,7 @@ export const currencyRoutes = [
         meta: {
           title: "消费明细"
         }
-      },
+      }
     ]
   },
   {
@@ -243,11 +245,11 @@ export const currencyRoutes = [
         }
       },
       {
-        path: 'invoicing-report-manager',
-        name: 'Canteen-invocing-report-manager',
-        component: () => import('@/views/canteen/InvoicingReportManager'),
+        path: "invoicing-report-manager",
+        name: "Canteen-invocing-report-manager",
+        component: () => import("@/views/canteen/InvoicingReportManager"),
         meta: {
-          title: '进销统计报表(管)'
+          title: "进销统计报表(管)"
         }
       },
       {
@@ -275,13 +277,13 @@ export const currencyRoutes = [
         }
       },
       {
-        path: 'invoicing-report-producer',
-        name: 'Canteen-invocing-report-producer',
-        component: () => import('@/views/canteen/InvoicingReportProducer'),
+        path: "invoicing-report-producer",
+        name: "Canteen-invocing-report-producer",
+        component: () => import("@/views/canteen/InvoicingReportProducer"),
         meta: {
-          title: '进销统计报表(供)'
+          title: "进销统计报表(供)"
         }
-      },
+      }
     ]
   },
   {
@@ -452,9 +454,9 @@ export const currencyRoutes = [
     ]
   },
   {
-    path: '*',
-    name: '*404',
-    redirect: '/404',
+    path: "*",
+    name: "*404",
+    redirect: "/404",
     hidden: true
   }
 ];
@@ -503,7 +505,7 @@ export const producerRoutes = [
   //     }
   //   ]
   // }
-]
+];
 export const asyncRoutes = [
   // {
   //   path: '/recharge',
@@ -553,38 +555,38 @@ export function resetRouter() {
 
 router.beforeEach(async (to, from, next) => {
   document.title = getTitle(to.meta.title);
-  if (to.path === '/login') {
-    next()
+  if (to.path === "/login") {
+    next();
   } else {
     next();
     // let res = await store.dispatch('user/_getUserModules')
     if (store.getters.token) {
-      const hasRoles = store.getters.roles.length > 0
+      const hasRoles = store.getters.roles.length > 0;
       if (hasRoles) {
-        next()
+        next();
       } else {
         try {
-          let data = await store.dispatch('user/_getUserModules')
+          let data = await store.dispatch("user/_getUserModules");
           let roles = data.roles;
           const addRoutes = await store.dispatch(
-            'permission/getAsyncRoutes',
+            "permission/getAsyncRoutes",
             roles
-          )
-          router.addRoutes(addRoutes)
-          next({ ...to, replace: true })
+          );
+          router.addRoutes(addRoutes);
+          next({ ...to, replace: true });
         } catch (error) {
           console.log(error);
         }
       }
     } else {
       next({
-        path: '/login',
+        path: "/login",
         query: {
           redirect: to.fullPath
         }
-      })
+      });
     }
   }
-})
+});
 
 export default router;

@@ -132,7 +132,9 @@ export default {
         delete form.canteen_ids;
       }
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/materials?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/materials?page=${page}&size=${
+          this.size
+        }`,
         form
       );
       if (res.msg === "ok") {

@@ -1,7 +1,7 @@
 import { login, getInfo, producerLogin, getUserModules } from "@/api/login";
 import { Message } from "element-ui";
 import router, { resetRouter } from "@/router";
-import { treeToArr } from "@/utils/flatternArr"
+import { treeToArr } from "@/utils/flatternArr";
 import { stat } from "fs";
 const state = {
   token: localStorage.getItem("token") ? localStorage.getItem("token") : "", // 认证凭证'
@@ -46,9 +46,8 @@ const mutations = {
     state.isProducer = val;
   },
   DEL_PRODUCER(state) {
-    state.isProducer = ""
+    state.isProducer = "";
   }
-
 };
 const actions = {
   // user login
@@ -115,7 +114,7 @@ const actions = {
     return new Promise((resolve, reject) => {
       getUserModules()
         .then(res => {
-          if (res.msg === 'ok') {
+          if (res.msg === "ok") {
             let data = treeToArr(res.data);
             roles = data.map(item => item.url);
             commit("SET_ROLES", roles);
@@ -123,9 +122,9 @@ const actions = {
           resolve({ roles });
         })
         .catch(error => {
-          reject(error)
-        })
-    })
+          reject(error);
+        });
+    });
   },
   _getInfo({ commit }) {
     return new Promise((resolve, reject) => {

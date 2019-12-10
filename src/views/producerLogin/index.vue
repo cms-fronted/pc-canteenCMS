@@ -122,8 +122,7 @@ export default {
     shopTip() {
       this.notifyObj = this.$notify({
         title: "提示",
-        message:
-          "当前界面为供应商登录界面",
+        message: "当前界面为供应商登录界面",
         duration: 0,
         iconClass: "el-icon-s-opportunity"
       });

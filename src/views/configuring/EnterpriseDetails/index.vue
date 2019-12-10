@@ -17,7 +17,11 @@
               label-width="60px"
               v-if="companiesVisible"
             >
-              <el-select v-model="queryForm.name" filterable placeholder="请选择企业">
+              <el-select
+                v-model="queryForm.name"
+                filterable
+                placeholder="请选择企业"
+              >
                 <el-option
                   v-for="item in companyOptions"
                   :label="item.name"
@@ -214,7 +218,9 @@ export default {
     async fetchList(page) {
       page = page || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/companies?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/companies?page=${page}&size=${
+          this.size
+        }`,
         this.queryForm
       );
       if (res.msg === "ok") {

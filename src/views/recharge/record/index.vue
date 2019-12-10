@@ -34,10 +34,17 @@
                 </el-select>
               </el-form-item>-->
               <el-form-item label="姓名">
-                <el-input placeholder="请输入姓名" v-model="formdata.username"></el-input>
+                <el-input
+                  placeholder="请输入姓名"
+                  v-model="formdata.username"
+                ></el-input>
               </el-form-item>
               <el-form-item label="充值途径">
-                <el-select v-model="formdata.type" placeholder="请选择" style="width:200px">
+                <el-select
+                  v-model="formdata.type"
+                  placeholder="请选择"
+                  style="width:200px"
+                >
                   <el-option
                     v-for="item in recharge_wayList"
                     :key="item.id"
@@ -47,7 +54,11 @@
                 </el-select>
               </el-form-item>
               <el-form-item label="充值人员">
-                <el-select v-model="formdata.admin_id" placeholder="请选择" style="width:200px">
+                <el-select
+                  v-model="formdata.admin_id"
+                  placeholder="请选择"
+                  style="width:200px"
+                >
                   <el-option
                     v-for="item in adminList"
                     :key="item.id"
@@ -71,7 +82,10 @@
         </div>
         <div class="main-content">
           <el-table style="width:100%" :data="tableData" border>
-            <el-table-column label="创建时间" prop="create_time"></el-table-column>
+            <el-table-column
+              label="创建时间"
+              prop="create_time"
+            ></el-table-column>
             <el-table-column label="姓名" prop="username"></el-table-column>
             <el-table-column label="充值金额" prop="money"></el-table-column>
             <el-table-column label="充值途径" prop="type"></el-table-column>
@@ -178,7 +192,9 @@ export default {
     fetchAdminList() {
       // module_id 暂时固定为14
       $axios
-        .get("http://canteen.tonglingok.com/api/v1/wallet/recharge/admins?module_id=14")
+        .get(
+          "http://canteen.tonglingok.com/api/v1/wallet/recharge/admins?module_id=14"
+        )
         .then(res => {
           console.log(res);
           this.adminList = res.data;
@@ -194,7 +210,10 @@ export default {
     fetchTableList() {
       this.formdata.page = this.current_page;
       $axios
-        .get("http://canteen.tonglingok.com/api/v1/wallet/recharges", this.formdata)
+        .get(
+          "http://canteen.tonglingok.com/api/v1/wallet/recharges",
+          this.formdata
+        )
         .then(res => {
           // console.log(res)
           this.tableData = Array.from(res.data.data);

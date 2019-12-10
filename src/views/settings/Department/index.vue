@@ -70,9 +70,9 @@
               >
                 <span class="department-tree-node" slot-scope="{ node, data }">
                   <span>
-                    <el-button type="text" @click="handleNodeClick(data)">
-                      {{ node.label }}
-                    </el-button>
+                    <el-button type="text" @click="handleNodeClick(data)">{{
+                      node.label
+                    }}</el-button>
                   </span>
                   <span class="btns-text">
                     <el-button
@@ -316,9 +316,12 @@
     </el-dialog>
     <el-dialog
       :visible.sync="QRcodeVisible"
-      width="20%"
+      :show-close="false"
+      width="40%"
+      ref="print"
       center
       title="二维码信息"
+      top="5vh"
     >
       <img width="100%" :src="QRcodeDetail.url" alt />
       <ul class="qr-detail">
@@ -326,6 +329,10 @@
         <li>生成时间：{{ QRcodeDetail.create_time }}</li>
         <li>失效时间：{{ QRcodeDetail.expiry_date }}</li>
       </ul>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="QRcodeVisible = false">关 闭</el-button>
+        <el-button type="success" @click="_print">打 印</el-button>
+      </span>
     </el-dialog>
   </div>
 </template>
@@ -591,7 +598,9 @@ export default {
     async fetchList(page) {
       page = page || this.current_page;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/staffs?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/staffs?page=${page}&size=${
+          this.size
+        }`,
         {
           c_id: this.c_id, //company_id,
           d_id: this.d_id //d_id,
@@ -899,6 +908,9 @@ export default {
     closeQRcode() {
       this.QRcodeVisible = false;
       this.QRcodeDetail = {};
+    },
+    _print() {
+      this.$print(this.$refs.print, { noPrint: ".el-button" });
     }
   }
 };

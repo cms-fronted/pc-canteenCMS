@@ -303,7 +303,9 @@ export default {
       queryForm.canteen_id = queryForm.canteen_id ? queryForm.canteen_id : 0;
       queryForm.dinner_id = queryForm.dinner_id ? queryForm.dinner_id : 0;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/takeoutStatistic?page=${this.current_page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/order/takeoutStatistic?page=${
+          this.current_page
+        }&size=${this.size}`,
         queryForm
       );
       if (res.msg === "ok") {

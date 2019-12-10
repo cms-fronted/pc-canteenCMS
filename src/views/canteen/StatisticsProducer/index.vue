@@ -206,7 +206,9 @@ export default {
   },
   methods: {
     async getCategoryOptions() {
-      const res = await $axios.get("http://canteen.tonglingok.com/api/v1/company/categories");
+      const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/company/categories"
+      );
       if (res.msg === "ok") {
         this.categoryOptions = unshiftAllOptions(Array.from(res.data));
       }
@@ -242,7 +244,9 @@ export default {
     async queryList(page) {
       page = page || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/shop/orderConsumption?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/shop/orderConsumption?page=${page}&size=${
+          this.size
+        }`,
         this.formdata
       );
       if (res.msg === "ok") {
