@@ -297,6 +297,14 @@ export const currencyRoutes = [
     component: Layout,
     children: [
       {
+        path: "detail",
+        name: "Matertial-detail",
+        component: () => import("@/views/material/Details"),
+        meta: {
+          title: "菜品材料明细"
+        }
+      },
+      {
         path: "storage",
         name: "Material-storage",
         component: () => import("@/views/material/Storage"),
@@ -313,8 +321,8 @@ export const currencyRoutes = [
         }
       },
       {
-        path: "parice-details",
-        name: "Material-pricedetails",
+        path: "price-details",
+        name: "Material-price-details",
         component: () => import("@/views/material/PriceDetails"),
         meta: {
           title: "材料价格明细"
