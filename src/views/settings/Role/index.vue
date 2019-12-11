@@ -79,11 +79,11 @@
           </el-table-column>
         </el-table>
         <pagination
-          :total="total"
-          :pageSize="size"
-          :currentPage="current_page"
-          @pagination="fetchList"
-        ></pagination>
+                :total="total"
+                :pageSize="size"
+                :currentPage="current_page"
+                @pagination="fetchList"
+        />
       </div>
     </div>
     <el-dialog
@@ -121,6 +121,7 @@
                 <el-checkbox
                   class="canteenCheckbox"
                   v-for="item in canteenGroup"
+                  :value="item.id"
                   :key="item.id"
                   :label="item"
                   >{{ item.name }}</el-checkbox
@@ -253,7 +254,7 @@ export default {
       }
       return res;
     },
-    async getCanteenModuls(company_id) {
+    async getCanteenModules(company_id) {
       const res = await $axios.get(
         `http://canteen.tonglingok.com/api/v1/modules/canteen/withoutSystem?company_id=${company_id}`
       );
@@ -276,7 +277,7 @@ export default {
       this.roleForm.company = company[0].name;
       this.isConfirmRules = false;
       await this.getCanteenList(id);
-      await this.getCanteenModuls(id);
+      await this.getCanteenModules(id);
     },
     async _confirm() {
       if (!this.isConfirmRules) {
