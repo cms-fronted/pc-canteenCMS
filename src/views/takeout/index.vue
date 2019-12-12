@@ -177,22 +177,7 @@ export default {
         canteen_id: "",
         used: 3
       },
-      tableData: [
-        {
-          order_id: 8,
-          money: "10.0",
-          used: 2,
-          ordering_date: "2019-09-07",
-          dinner: "中餐",
-          canteen: "饭堂1",
-          username: "张三",
-          phone: "18956225230",
-          province: "广东省",
-          area: "蓬江区",
-          city: "江门市",
-          address: "江门市白石大道东4号路3栋"
-        }
-      ],
+      tableData: [],
       canteenOptions: [],
       companyOptions: [],
       dinnersOptions: [],

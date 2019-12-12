@@ -176,7 +176,7 @@ export default {
     _add() {
       this.formdata = { c_id: this.c_id, ...this.formdata };
       $axios
-        .post("/v1/food/save", this.formdata)
+        .post("http://canteen.tonglingok.com/api/v1/food/save", this.formdata)
         .then(res => {
           this.$refs.addUpload.clearFiles();
           this.handleClose();
@@ -187,7 +187,7 @@ export default {
       this.formdata.dinner_id = "";
       this.formdata.m_id = "";
       $axios
-        .get(`/v1/canteen/dinners?canteen_id=${canteen_id}`)
+        .get(`http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`)
         .then(res => {
           this.dinnerList = Array.from(res.data);
         })
@@ -195,7 +195,7 @@ export default {
     },
     getCategoryList(dinner_id) {
       $axios
-        .get(`/v1/menus/dinner?dinner_id=${dinner_id}`)
+        .get(`http://canteen.tonglingok.com/api/v1/menus/dinner?dinner_id=${dinner_id}`)
         .then(res => (this.categoryList = Array.from(res.data)))
         .catch(err => console.log(err));
     },
