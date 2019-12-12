@@ -59,7 +59,7 @@
           <el-col :span="16">
             <el-card>
               <div slot="header" class="clearfix">
-                <span>云饭堂</span>
+                <span>{{this.parent.name||"云饭堂"}}</span>
               </div>
               <div class="card-content">
                 <el-button @click="addCanteen" :disabled="!company_id"
