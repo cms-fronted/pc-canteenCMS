@@ -1,28 +1,20 @@
 <template>
   <div class="order-statistics">
     <div class="nav-title">消费总报表</div>
-    <el-divider></el-divider>
+    <el-divider />
     <div class="main">
       <div class="main-header">
         <div class="select-title">
           <el-form :inline="true" :model="formdata" label-width="80px">
-            <el-form-item label="开始">
+            <el-form-item label="时间">
               <el-date-picker
-                placeholder="请选择时间"
-                v-model="formdata.time_begin"
-                value-format="yyyy-MM-dd HH:mm:ss"
-                format="yyyy-MM-dd"
-                type="datetime"
-              ></el-date-picker>
-            </el-form-item>
-            <el-form-item label="结束">
-              <el-date-picker
-                placeholder="请选择时间"
-                v-model="formdata.time_end"
-                value-format="yyyy-MM-dd HH:mm:ss"
-                format="yyyy-MM-dd"
-                type="datetime"
-              ></el-date-picker>
+                value-format="yyyy-MM-dd"
+                v-model="formdata.date"
+                range-separator="~"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                type="daterange"
+              />
             </el-form-item>
             <el-form-item label="公司" v-if="companiesVisible">
               <el-select
@@ -36,21 +28,17 @@
                   :key="item.id"
                   :label="item.name"
                   :value="item.id"
-                ></el-option>
+                />
               </el-select>
             </el-form-item>
             <el-form-item label="消费地点">
-              <el-select
-                v-model="formdata.canteen_id"
-                @change="getDinnersList"
-                placeholder="请选择饭堂"
-              >
+              <el-select v-model="formdata.canteen_id" placeholder="请选择饭堂">
                 <el-option
                   v-for="item in locationList"
                   :key="item.id"
                   :label="item.name"
                   :value="item.id"
-                ></el-option>
+                />
               </el-select>
             </el-form-item>
             <el-form-item label="部门" v-if="companiesVisible">
@@ -63,14 +51,11 @@
                   :key="item.id"
                   :label="item.name"
                   :value="item.id"
-                ></el-option>
+                />
               </el-select>
             </el-form-item>
             <el-form-item label="姓名">
-              <el-input
-                v-model="formdata.username"
-                placeholder="请输入姓名"
-              ></el-input>
+              <el-input v-model="formdata.username" placeholder="请输入姓名" />
             </el-form-item>
             <el-form-item label="消费类型">
               <el-select v-model="formdata.status">
@@ -79,7 +64,7 @@
                   :key="item.id"
                   :label="item.name"
                   :value="item.id"
-                ></el-option>
+                />
               </el-select>
             </el-form-item>
             <el-form-item label="人员类型">
@@ -89,7 +74,7 @@
                   :key="item.id"
                   :label="item.name"
                   :value="item.id"
-                ></el-option>
+                />
               </el-select>
             </el-form-item>
             <el-form-item class="types-radio">
@@ -173,7 +158,7 @@
           :pageSize="size"
           :currentPage="current_page"
           @pagination="queryList"
-        ></pagination>
+        />
       </div>
     </div>
   </div>
@@ -184,6 +169,8 @@ import $axios from "@/api/index";
 import Pagination from "@/components/Pagination";
 import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
 import store from "@/store";
+import moment from "moment";
+
 const consumption_options = [
   { id: 0, name: "全部" },
   { id: 1, name: "订餐就餐" },
@@ -199,15 +186,27 @@ export default {
       company_id: "",
       canteen_id: "",
       formdata: {
-        type: 1
+        type: 1,
+        date: [
+          moment()
+            .subtract(7, "d")
+            .format("YYYY-MM-DD"),
+          moment().format("YYYY-MM-DD")
+        ],
+        time_begin: "",
+        time_end: "",
+        staff_type_id: "",
+        name: "",
+        status: "",
+        department_id: "",
+        canteen_id: ""
       },
       departmentList: [],
-      dinnersList: [],
       locationList: [],
       companiesList: [],
       roleOptions: [],
       tableData: [
-        {
+        /* {
           statistic: "股东",
           time_begin: "2019-10-11",
           time_end: "2019-11-30",
@@ -232,114 +231,111 @@ export default {
               order_money: 3
             }
           ]
-        }
+        }*/
       ],
       consumptionOptions: consumption_options,
-      isDisabled: true,
       current_page: 1,
       size: 10,
       total: 0
     };
   },
   computed: {
-    isAble() {
-      return !!this.formdata.time_end && !!this.formdata.time_begin;
+    isDisabled() {
+      return !!!this.formdata.date;
     },
     companiesVisible() {
       return this.grade !== 3;
     }
   },
   watch: {
-    isAble(val) {
-      this.isDisabled = !val;
+    formdata: {
+      handler: function(val, oldVal) {
+        if (val.date) {
+          this.formdata.time_begin = this.formdata.date[0];
+          this.formdata.time_end = this.formdata.date[1];
+        }
+      },
+      deep: true,
+      immediate: true
     }
   },
-  created() {
+  async created() {
     if (this.companiesVisible) {
-      this.getCompanies();
+      await this.getCompanies();
+      await this.queryList(1);
     } else {
-      this.getLocationList();
-      this.getDepartmentListWithoutCid();
+      await this.getLocationList();
+      await this.getDepartmentListWithoutCid();
+      await this.queryList(1);
     }
     this.getRoleType();
   },
   methods: {
     getList(val) {
       if (String(val).includes(",")) {
-        this.departmentList = [{ name: "全部" }];
-        this.locationList = [{ name: "全部" }];
-        this.dinnersList = [{ name: "全部" }];
-        this.formdata.department_id = "";
-        this.formdata.canteen_id = "";
-        this.dinner_id = "";
+        this.departmentList = [{ name: "全部", id: 0 }];
+        this.locationList = [{ name: "全部", id: 0 }];
+        this.formdata.department_id = 0;
+        this.formdata.canteen_id = 0;
       } else {
         this.getDepartmentList(val);
         this.getLocationList(val);
       }
     },
-    getCompanies() {
-      $axios
+    async getCompanies() {
+      await $axios
         .get("http://canteen.tonglingok.com/api/v1/admin/companies")
         .then(res => {
           let arr = res.data;
-          let allCompanies = [];
           let companiesList = getAllOptions(flatten(arr));
           this.companiesList = companiesList;
+          this.departmentList = [{ name: "全部", id: 0 }];
+          this.locationList = [{ name: "全部", id: 0 }];
+          this.formdata.department_id = 0;
+          this.formdata.canteen_id = 0;
+          this.formdata.company_ids = this.companiesList[0].id;
         })
         .catch(err => console.log(err));
     },
-    getDinnersList(canteen_id) {
-      if (canteen_id) {
-        $axios
-          .get(
-            `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
-          )
-          .then(res => {
-            this.dinnersList = unshiftAllOptions(Array.from(res.data));
-          })
-          .catch(err => console.log(err));
-      } else {
-        this.formdata.dinner_id = "";
-        this.dinnersList = [{ name: "全部" }];
-      }
-    },
+
     async getDepartmentListWithoutCid() {
       const res = await $axios.get(
         "http://canteen.tonglingok.com/api/v1/admin/departments"
       );
       if (res.msg === "ok") {
         this.departmentList = unshiftAllOptions(Aarray.from(res.data));
+        this.formdata.department_id = this.departmentList[0].id;
       }
     },
-    getDepartmentList(company_id) {
+    async getDepartmentList(company_id) {
       if (company_id && Number(company_id)) {
-        $axios
-          .get(`v1/departments?c_id=${company_id}`)
+        await $axios
+          .get(
+            `http://canteen.tonglingok.com/api/v1/departments?c_id=${company_id}`
+          )
           .then(res => {
             let arr = res.data;
             let departmentList = unshiftAllOptions(flatten(arr));
             this.departmentList = departmentList;
+            this.formdata.department_id = this.departmentList[0].id;
           })
           .catch(err => console.log(err));
       }
     },
-    getLocationList(company_id) {
+    async getLocationList(company_id) {
+      let res = null;
       if (company_id && Number(company_id)) {
-        $axios
-          .get(
-            `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
-          )
-          .then(res => {
-            this.locationList = unshiftAllOptions(Array.from(res.data));
-          })
-          .catch(err => console.log(err));
+        res = await $axios.get(
+          `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
+        );
       } else {
-        $axios
-          .get("http://canteen.tonglingok.com/api/v1/managerCanteens")
-          .then(res => {
-            this.locationList = unshiftAllOptions(Array.from(res.data));
-          })
-          .catch(err => console.log(err));
+        res = $axios.get(
+          "http://canteen.tonglingok.com/api/v1/managerCanteens"
+        );
+      }
+      if (res.msg === "ok") {
+        this.locationList = unshiftAllOptions(Array.from(res.data));
+        this.formdata.canteen_id = this.locationList[0].id;
       }
     },
     async getRoleType() {
@@ -348,11 +344,15 @@ export default {
       );
       if (res.msg === "ok") {
         this.roleOptions = unshiftAllOptions(res.data.data);
+        this.formdata.staff_type_id = this.roleOptions[0].id;
       }
     },
     async queryList(page) {
-      page = page || 1;
+      page = typeof page == "number" ? page : 1;
       const type = this.formdata.type;
+      if (this.formdata.canteen_id) {
+        delete this.formdata.company_ids;
+      }
       const res = await $axios.get(
         `http://canteen.tonglingok.com/api/v1/order/consumptionStatistic?page=${page}&size=${
           this.size
@@ -370,9 +370,6 @@ export default {
           this.total = res.data.total;
         }
       }
-    },
-    test(scoped) {
-      console.log(scoped);
     }
   }
 };

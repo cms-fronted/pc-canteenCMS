@@ -2,26 +2,20 @@
   <div>
     <div class="record">
       <div class="nav-title">充值记录明细</div>
-      <el-divider></el-divider>
+      <el-divider />
       <div class="main">
         <div class="main-header clearfix">
           <div class="select-title">
             <el-form :inline="true" :model="formdata" label-width="80px">
-              <el-form-item label="开始">
+              <el-form-item label="时间">
                 <el-date-picker
-                  v-model="formdata.time_begin"
                   value-format="yyyy-MM-dd"
-                  style="width:200px"
-                  type="datetime"
-                ></el-date-picker>
-              </el-form-item>
-              <el-form-item label="结束">
-                <el-date-picker
-                  v-model="formdata.time_end"
-                  value-format="yyyy-MM-dd"
-                  style="width:200px"
-                  type="datetime"
-                ></el-date-picker>
+                  v-model="formdata.date"
+                  range-separator="~"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期"
+                  type="daterange"
+                />
               </el-form-item>
               <!-- <el-form-item label="公司"  v-if="companiesVisible">
                 <el-select v-model="formdata.company_ids" placeholder="请选择公司" style="width:200px">
@@ -37,7 +31,7 @@
                 <el-input
                   placeholder="请输入姓名"
                   v-model="formdata.username"
-                ></el-input>
+                />
               </el-form-item>
               <el-form-item label="充值途径">
                 <el-select
@@ -50,7 +44,7 @@
                     :key="item.id"
                     :label="item.name"
                     :value="item.type"
-                  ></el-option>
+                  />
                 </el-select>
               </el-form-item>
               <el-form-item label="充值人员">
@@ -64,7 +58,7 @@
                     :key="item.id"
                     :label="item.role"
                     :value="item.id"
-                  ></el-option>
+                  />
                 </el-select>
               </el-form-item>
             </el-form>
@@ -82,22 +76,19 @@
         </div>
         <div class="main-content">
           <el-table style="width:100%" :data="tableData" border>
-            <el-table-column
-              label="创建时间"
-              prop="create_time"
-            ></el-table-column>
-            <el-table-column label="姓名" prop="username"></el-table-column>
-            <el-table-column label="充值金额" prop="money"></el-table-column>
-            <el-table-column label="充值途径" prop="type"></el-table-column>
-            <el-table-column label="充值人员" prop="admin"></el-table-column>
-            <el-table-column label="备注" prop="remark"></el-table-column>
+            <el-table-column label="创建时间" prop="create_time" />
+            <el-table-column label="姓名" prop="username" />
+            <el-table-column label="充值金额" prop="money" />
+            <el-table-column label="充值途径" prop="type" />
+            <el-table-column label="充值人员" prop="admin" />
+            <el-table-column label="备注" prop="remark" />
           </el-table>
           <pagination
             v-show="total > 10"
             :total="total"
             :page.sync="current_page"
             @pagination="getList"
-          ></pagination>
+          />
         </div>
       </div>
     </div>
@@ -109,11 +100,18 @@ import $axios from "@/api/index";
 import Pagination from "@/components/Pagination";
 import { flatten } from "@/utils/flatternArr";
 import store from "@/store";
+import moment from "moment";
 export default {
   data() {
     return {
       grade: store.getters.grade,
       formdata: {
+        date: [
+          moment()
+            .subtract(7, "d")
+            .format("YYYY-MM-DD"),
+          moment().format("YYYY-MM-DD")
+        ],
         time_begin: "",
         time_end: "",
         admin_id: "",
@@ -123,11 +121,7 @@ export default {
         size: 10
       },
       companiesList: [],
-      adminList: [
-        /* {id: 1,"role": "饭堂管理员1"},
-        {id: 2,"role": "饭堂管理员2"},
-        {id: 3,"role": "饭堂管理员3"} */
-      ],
+      adminList: [],
       recharge_wayList: [
         { id: "0", name: "全部", type: "all" },
         { id: "1", name: "现金", type: "cash" },
@@ -163,6 +157,18 @@ export default {
   computed: {
     companiesVisible() {
       return this.grade !== 3;
+    }
+  },
+  watch: {
+    formdata: {
+      handler: function(val, oldVal) {
+        if (val.date) {
+          this.formdata.time_begin = this.formdata.date[0];
+          this.formdata.time_end = this.formdata.date[1];
+        }
+      },
+      deep: true,
+      immediate: true
     }
   },
   components: { Pagination },

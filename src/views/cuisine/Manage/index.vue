@@ -2,7 +2,7 @@
   <div>
     <div class="cuisine-manage">
       <span class="nav-title">菜品管理</span>
-      <el-divider></el-divider>
+      <el-divider />
       <div class="main">
         <div class="main-header">
           <el-form :inline="true" label-width="60px" :model="queryForm">
@@ -22,7 +22,7 @@
                   :label="item.name"
                   :key="item.id"
                   :value="item.id"
-                ></el-option>
+                />
               </el-select>
             </el-form-item>
             <el-form-item label="消费地点" label-width="80px" prop="canteen_id">
@@ -35,7 +35,7 @@
                   :label="item.name"
                   :key="item.id"
                   :value="item.id"
-                ></el-option>
+                />
               </el-select>
             </el-form-item>
             <el-form-item label="餐次" prop="dinner_id">
@@ -48,7 +48,7 @@
                   :label="item.name"
                   :key="item.id"
                   :value="item.id"
-                ></el-option>
+                />
               </el-select>
             </el-form-item>
             <el-form-item label="类型" prop="category">
@@ -58,7 +58,7 @@
                   :label="item.name"
                   :key="item.id"
                   :value="item.id"
-                ></el-option>
+                />
               </el-select>
             </el-form-item>
             <el-button type="primary" @click="fetchList">查询</el-button>
@@ -101,7 +101,7 @@
           :pageSize="pageSize"
           @pagination="fetchList"
           background
-        ></pagination>
+        />
       </div>
     </div>
     <cuisine-dialog
@@ -127,7 +127,7 @@
               :key="item.id"
               :label="item.name"
               :value="item.id"
-            ></el-option>
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="餐次" prop="dinner_id">
@@ -137,17 +137,17 @@
               :label="item.name"
               :key="item.id"
               :value="item.id"
-            ></el-option>
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="名称" prop="name">
-          <el-input v-model="editFormdata.name"></el-input>
+          <el-input v-model="editFormdata.name" />
         </el-form-item>
         <el-form-item label="价格" prop="price">
-          <el-input v-model="editFormdata.price"></el-input>
+          <el-input v-model="editFormdata.price" />
         </el-form-item>
         <el-form-item label="主厨" prop="chef">
-          <el-input v-model="editFormdata.chef"></el-input>
+          <el-input v-model="editFormdata.chef" />
         </el-form-item>
         <el-form-item style="display:block" label="图片">
           <el-upload
@@ -162,7 +162,7 @@
             :class="{ hide: hideUpload }"
             :on-success="handleSuccess"
           >
-            <i class="el-icon-plus"></i>
+            <i class="el-icon-plus" />
           </el-upload>
           <el-dialog :visible.sync="dialogVisible">
             <img width="100%" :src="dialogImageUrl" alt />
@@ -224,11 +224,13 @@ export default {
     };
   },
   components: { CuisineDialog, Pagination },
-  created() {
+  async created() {
     if (this.companiesVisible) {
-      this.getCompanies();
+      await this.getCompanies();
+      await this.fetchList(1);
     } else {
-      this.getLocationList(0);
+      await this.getLocationList(0);
+      await this.fetchList(1);
     }
   },
   computed: {
@@ -237,11 +239,11 @@ export default {
     }
   },
   methods: {
-    fetchList(page) {
+    async fetchList(page) {
       page = page || 1;
       let queryForm = this.queryForm;
       let { m_id, dinner_id, canteen_id, company_id } = queryForm;
-      $axios
+      await $axios
         .get(`http://canteen.tonglingok.com/api/v1/foods`, {
           f_type: 2,
           page: page,
@@ -258,43 +260,35 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    getCompanies() {
-      $axios
+    async getCompanies() {
+      await $axios
         .get("http://canteen.tonglingok.com/api/v1/admin/companies")
         .then(res => {
           let arr = res.data;
           let companiesList = flatten(arr);
           this.companyList = getAllOptions(companiesList);
-          this.queryForm.canteen_id = null;
-          this.queryForm.dinner_id = null;
-          this.queryForm.m_id = null;
+          this.queryForm.company_id = this.companyList[0].id;
+          this.locationList = [{ name: "全部", id: 0 }];
+          this.queryForm.canteen_id = 0;
+          this.dinnersList = [{ name: "全部", id: 0 }];
+          this.queryForm.dinner_id = 0;
+          this.categoryList = [{ name: "全部", id: 0 }];
+          this.queryForm.m_id = 0;
         })
         .catch(err => console.log(err));
     },
-    getLocationList(company_id) {
-      this.queryForm.canteen_id = null;
-      this.queryForm.dinner_id = null;
-      this.queryForm.m_id = null;
+    async getLocationList(company_id) {
+      let res = null;
       if (!isNaN(company_id)) {
         if (company_id) {
-          $axios
-            .get(
-              `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
-            )
-            .then(res => {
-              this.diaLocationList = Array.from(res.data);
-              this.locationList = getAllOptions(Array.from(res.data));
-            })
-            .catch(err => console.log(err));
+          res = await $axios.get(
+            `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
+          );
         } else {
           //两种都可以
-          $axios
-            .get("http://canteen.tonglingok.com/api/v1/managerCanteens")
-            .then(res => {
-              this.diaLocationList = Array.from(res.data);
-              this.locationList = getAllOptions(Array.from(res.data));
-            })
-            .catch(err => console.log(err));
+          res = await $axios.get(
+            "http://canteen.tonglingok.com/api/v1/managerCanteens"
+          );
           /*   $axios
             .get(`http://canteen.tonglingok.com/api/v1/canteens?company_id=0`)
             .then(res => {
@@ -303,10 +297,20 @@ export default {
             })
             .catch(err => console.log(err)); */
         }
+        this.diaLocationList = Array.from(res.data);
+        this.locationList = getAllOptions(Array.from(res.data));
+        this.queryForm.canteen_id = this.locationList[0].id;
+        this.dinnersList = [{ name: "全部", id: 0 }];
+        this.queryForm.dinner_id = 0;
+        this.categoryList = [{ name: "全部", id: 0 }];
+        this.queryForm.m_id = 0;
       } else {
-        this.locationList = [];
-        this.categoryList = [];
-        this.dinnersList = [];
+        this.locationList = [{ name: "全部", id: 0 }];
+        this.queryForm.canteen_id = 0;
+        this.dinnersList = [{ name: "全部", id: 0 }];
+        this.queryForm.dinner_id = 0;
+        this.categoryList = [{ name: "全部", id: 0 }];
+        this.queryForm.m_id = 0;
       }
     },
     getDinnersList(canteen_id) {
@@ -317,12 +321,14 @@ export default {
           )
           .then(res => {
             this.dinnersList = getAllOptions(Array.from(res.data));
+            this.queryForm.dinner_id = this.dinnersList[0].id;
           })
           .catch(err => console.log(err));
       } else {
-        this.queryForm.dinner_id = "";
-        this.queryForm.m_id = "";
-        this.dinnersList = [];
+        this.dinnersList = [{ name: "全部", id: 0 }];
+        this.queryForm.dinner_id = 0;
+        this.categoryList = [{ name: "全部", id: 0 }];
+        this.queryForm.m_id = 0;
       }
     },
 
@@ -334,11 +340,12 @@ export default {
           )
           .then(res => {
             this.categoryList = getAllOptions(Array.from(res.data));
+            this.queryForm.m_id = this.categoryList[0].id;
           })
           .catch(err => console.log(err));
       } else {
-        this.categoryList = [];
-        this.queryForm.m_id = "";
+        this.categoryList = [{ name: "全部", id: 0 }];
+        this.queryForm.m_id = 0;
       }
     },
     async getEditDinnerList(canteen_id) {
@@ -362,8 +369,6 @@ export default {
         .catch(err => console.log(err));
     },
     async _edit(item) {
-      let d_list = [];
-      let c_list = [];
       let data = [];
       this.fileList.push(
         Object.assign(

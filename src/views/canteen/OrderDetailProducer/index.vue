@@ -2,27 +2,19 @@
   <div>
     <div class="canteen-order">
       <div class="nav-title">订单明细查询</div>
-      <el-divider></el-divider>
+      <el-divider />
       <div class="main clearfix">
         <div class="main-header">
           <el-form :model="queryform" :inline="true">
-            <el-form-item label="开始时间">
+            <el-form-item label="时间">
               <el-date-picker
-                v-model="queryform.time_begin"
-                style="width:200px"
-                value-format="yyyy-MM-dd HH:mm:ss"
-                format="yyyy-MM-dd"
-                type="datetime"
-              ></el-date-picker>
-            </el-form-item>
-            <el-form-item label="结束时间">
-              <el-date-picker
-                v-model="queryform.time_end"
-                style="width:200px"
-                value-format="yyyy-MM-dd HH:mm:ss"
-                format="yyyy-MM-dd"
-                type="datetime"
-              ></el-date-picker>
+                value-format="yyyy-MM-dd"
+                v-model="queryform.date"
+                range-separator="~"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                type="daterange"
+              />
             </el-form-item>
             <el-form-item label="商品类型">
               <el-select
@@ -36,7 +28,7 @@
                   :key="item.id"
                   :label="item.name"
                   :value="item.id"
-                ></el-option>
+                />
               </el-select>
             </el-form-item>
             <el-form-item label="商品名称">
@@ -54,7 +46,7 @@
                   :key="item.id"
                   :label="item.name"
                   :value="item.id"
-                ></el-option>
+                />
               </el-select>
             </el-form-item>
             <el-button type="primary" @click="deriveData">导出</el-button>
@@ -63,29 +55,19 @@
         </div>
         <div class="main-content">
           <el-table style="width:100%" :data="tableData" border>
-            <el-table-column
-              label="序号"
-              type="index"
-              width="50px"
-            ></el-table-column>
-            <el-table-column
-              label="下单时间"
-              prop="create_time"
-            ></el-table-column>
-            <el-table-column label="类型" prop="category"></el-table-column>
-            <el-table-column label="商品名称" prop="product"></el-table-column>
+            <el-table-column label="序号" type="index" width="50px" />
+            <el-table-column label="下单时间" prop="create_time" />
+            <el-table-column label="类型" prop="category" />
+            <el-table-column label="商品名称" prop="product" />
             <!-- <el-table-column label="单位" prop="goodsUnit"></el-table-column> -->
-            <el-table-column label="商品数量" prop="count"></el-table-column>
-            <el-table-column
-              label="商品金额(元)"
-              prop="price"
-            ></el-table-column>
+            <el-table-column label="商品数量" prop="count" />
+            <el-table-column label="商品金额(元)" prop="price" />
           </el-table>
           <pagination
             :total="total"
             :currentPage="current_page"
             :pageSize="size"
-          ></pagination>
+          />
         </div>
       </div>
     </div>
@@ -102,7 +84,7 @@ import $axios from "@/api/index";
 import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
 import Pagination from "@/components/Pagination";
 import store from "@/store";
-
+import moment from "moment";
 export default {
   components: { Pagination },
   data() {
@@ -111,7 +93,19 @@ export default {
       loading: false,
       categoryOptions: [],
       productOptions: [],
-      queryform: {},
+      queryform: {
+        date: [
+          moment()
+            .subtract(7, "d")
+            .format("YYYY-MM-DD"),
+          moment().format("YYYY-MM-DD")
+        ],
+        status:0,
+        time_begin: "",
+        time_end: "",
+        category_id: "",
+        product_id: ""
+      },
       tableData: [],
       total: 0,
       current_page: 1,
@@ -119,9 +113,22 @@ export default {
     };
   },
   computed: {},
-  created() {
-    this.getCategoryOptions();
-    this.getProductsId();
+  watch: {
+    queryform: {
+      handler: function(val, oldVal) {
+        if (val.date) {
+          this.queryform.time_begin = this.queryform.date[0];
+          this.queryform.time_end = this.queryform.date[1];
+        }
+      },
+      deep: true,
+      immediate: true
+    }
+  },
+  async created() {
+    await this.getCategoryOptions();
+    await this.getProductsId();
+    await this.fetchList(1);
   },
   methods: {
     async getCategoryOptions() {
@@ -130,16 +137,17 @@ export default {
       );
       if (res.msg === "ok") {
         this.categoryOptions = unshiftAllOptions(Array.from(res.data));
+        this.queryform.category_id = this.categoryOptions[0].id;
       }
     },
-    async getProductsId(id) {
+    /*    async getProductsId(id) {
       const res = await $axios.get(
         `http://canteen.tonglingok.com/api/v1/shop/supplier/products?category_id=${id}&page=1&size=1000`
       );
       console.log(res);
-    },
+    },*/
     async fetchList(page) {
-      page = page || 1;
+      page = Number(page) || 1;
       const res = await $axios.get(
         `http://canteen.tonglingok.com/api/v1/shop/order/statistic/supplier?page=${page}&size=${
           this.size
@@ -165,6 +173,7 @@ export default {
       );
       if (res.msg === "ok") {
         this.productOptions = unshiftAllOptions(Array.from(res.data));
+        this.queryform.product_id = this.productOptions[0].id;
       }
     },
     async remoteMethod(query) {

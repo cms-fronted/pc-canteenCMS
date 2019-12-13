@@ -6,21 +6,15 @@
       <div class="main-header">
         <div class="select-title">
           <el-form :inline="true" :model="formdata" label-width="80px">
-            <el-form-item label="开始">
+            <el-form-item label="时间">
               <el-date-picker
-                v-model="formdata.time_begin"
-                value-format="yyyy-MM-dd HH:mm:ss"
-                format="yyyy-MM-dd"
-                type="datetime"
-              ></el-date-picker>
-            </el-form-item>
-            <el-form-item label="结束">
-              <el-date-picker
-                v-model="formdata.time_end"
-                value-format="yyyy-MM-dd HH:mm:ss"
-                format="yyyy-MM-dd"
-                type="datetime"
-              ></el-date-picker>
+                value-format="yyyy-MM-dd"
+                v-model="formdata.date"
+                range-separator="~"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                type="daterange"
+              />
             </el-form-item>
             <el-form-item label="公司" v-if="companiesVisible">
               <el-select
@@ -34,7 +28,7 @@
                   :key="item.id"
                   :label="item.name"
                   :value="item.id"
-                ></el-option>
+                />
               </el-select>
             </el-form-item>
             <el-form-item label="部门">
@@ -47,7 +41,7 @@
                   :key="item.id"
                   :label="item.name"
                   :value="item.id"
-                ></el-option>
+                />
               </el-select>
             </el-form-item>
             <el-form-item label="商品类型">
@@ -57,7 +51,7 @@
                   :key="item.id"
                   :value="item.id"
                   :label="item.name"
-                ></el-option>
+                />
               </el-select>
             </el-form-item>
             <el-form-item label="商品名称">
@@ -75,7 +69,7 @@
                   :key="item.id"
                   :label="item.name"
                   :value="item.id"
-                ></el-option>
+                />
               </el-select>
             </el-form-item>
             <el-form-item label="状态">
@@ -85,7 +79,7 @@
                   :key="item.id"
                   :label="item.name"
                   :value="item.id"
-                ></el-option>
+                />
               </el-select>
             </el-form-item>
             <el-form-item class="types-radio">
@@ -111,11 +105,7 @@
       </div>
       <div class="main-content">
         <el-table border :data="tableData">
-          <el-table-column
-            label="序号"
-            type="index"
-            width="50px"
-          ></el-table-column>
+          <el-table-column label="序号" type="index" width="50px" />
           <el-table-column label="统计变量">
             <div
               slot-scope="scoped"
@@ -182,7 +172,7 @@
           :pageSize="size"
           @pagination="queryList"
           :currentPage="current_page"
-        ></pagination>
+        />
       </div>
     </div>
   </div>
@@ -193,6 +183,7 @@ import $axios from "@/api/index";
 import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
 import store from "@/store";
 import Pagination from "@/components/Pagination";
+import moment from "moment";
 const good_state = [
   { id: 0, name: "全部" },
   { id: 1, name: "已完成" },
@@ -209,7 +200,19 @@ export default {
       company_id: "",
       canteen_id: "",
       formdata: {
-        type: 1
+        type: 1,
+        date: [
+          moment()
+            .subtract(7, "d")
+            .format("YYYY-MM-DD"),
+          moment().format("YYYY-MM-DD")
+        ],
+        status: 0,
+        time_begin: "",
+        time_end: "",
+        category_id: "",
+        product_id: "",
+        department_id: ""
       },
       companyList: [],
       departmentList: [],
@@ -217,51 +220,67 @@ export default {
       productOptions: [],
       goodStateOptions: good_state,
       tableData: [],
-      isDisabled: true,
       current_page: 1,
       size: 10,
       total: 0
     };
   },
   computed: {
-    isAble() {
-      return !!this.formdata.time_end && !!this.formdata.time_begin;
+    isDisabled() {
+      return !!!this.formdata.date;
     },
     companiesVisible() {
       return this.grade !== 3;
     }
   },
   watch: {
-    isAble(val) {
-      this.isDisabled = !val;
+    formdata: {
+      handler: function(val, oldVal) {
+        if (val.date) {
+          this.formdata.time_begin = this.formdata.date[0];
+          this.formdata.time_end = this.formdata.date[1];
+        }
+      },
+      deep: true,
+      immediate: true
     }
   },
-  created() {
+  async created() {
+    await this.getCategoryOptions();
+    await this.getProductsId();
     if (this.companiesVisible) {
-      this.getCompanies();
+      await this.getCompanies();
     } else {
-      this.getDepartmentListWithoutCid();
+      await this.getDepartmentListWithoutCid();
     }
-    this.getCategoryOptions();
-    this.getProductsId();
+    await this.queryList(1);
   },
   methods: {
-    getCompanies() {
-      $axios
+    async getCompanies() {
+      await $axios
         .get("http://canteen.tonglingok.com/api/v1/admin/companies")
-        .then(res => {
+        .then(async res => {
           let arr = res.data;
-          let allCompanies = [];
           let companiesList = flatten(arr);
           this.companyList = companiesList;
+          this.formdata.company_id = companiesList[0].id;
+          await this.getDepartmentList(companiesList[0].id);
         })
         .catch(err => console.log(err));
     },
     async getDepartmentList(company_id) {
-      const res = await $axios.get(`v1/departments?c_id=${company_id}`);
-      if (res.msg === "ok") {
-        this.departmentList = unshiftAllOptions(Array.from(flatten(res.data)));
-      }
+      await $axios
+        .get(
+          `http://canteen.tonglingok.com/api/v1/departments?c_id=${company_id}`
+        )
+        .then(res => {
+          if (res.msg === "ok") {
+            this.departmentList = unshiftAllOptions(
+              Array.from(flatten(res.data))
+            );
+            this.formdata.department_id = this.departmentList[0].id;
+          }
+        });
     },
     async getDepartmentListWithoutCid() {
       const res = await $axios.get(
@@ -269,6 +288,7 @@ export default {
       );
       if (res.msg === "ok") {
         this.departmentList = unshiftAllOptions(Aarray.from(res.data));
+        this.formdata.department_id = this.departmentList[0].id;
       }
     },
     async getCategoryOptions() {
@@ -277,30 +297,27 @@ export default {
       );
       if (res.msg === "ok") {
         this.categoryOptions = unshiftAllOptions(Array.from(res.data));
+        this.formdata.category_id = this.categoryOptions[0].id;
       }
     },
-    async getProductsId(id) {
-      const res = await this.$axios({
-        url: `http://canteen.tonglingok.com/api/v1/shop/supplierProducts/search`,
-        methods: "get",
-        headers: { token: store.getters.token }
-      });
-      if (res.data.msg === "ok") {
-        console.log(res.data.data);
-        this.productOptions = unshiftAllOptions(Array.from(res.data.data));
+    async getProductsId() {
+      const res = await $axios.get(
+        `http://canteen.tonglingok.com/api/v1/shop/supplierProducts/search`
+      );
+      if (res.msg === "ok") {
+        this.productOptions = unshiftAllOptions(Array.from(res.data));
+        this.formdata.product_id = this.productOptions[0].id;
       }
     },
     async remoteMethod(query) {
       if (query != "") {
         this.loading = true;
-        const res = await this.$axios({
-          url: `http://canteen.tonglingok.com/api/v1/shop/supplierProducts/search?product=${query}`,
-          methods: "get",
-          headers: { token: store.getters.token }
-        });
-        if (res.data.msg === "ok") {
+        const res = await $axios.get(
+          `http://canteen.tonglingok.com/api/v1/shop/supplierProducts/search?product=${query}`
+        );
+        if (res.msg === "ok") {
           console.log(res.data.data);
-          this.productOptions = Array.from(res.data.data);
+          this.productOptions = Array.from(res.data);
         }
         this.loading = false;
       } else {
