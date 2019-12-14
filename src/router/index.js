@@ -31,7 +31,7 @@ export const currencyRoutes = [
     component: () => import("@/views/error"),
     hidden: true
   },
-  {
+/*  {
     path: "/home",
     name: "Home",
     redirect: "/home/index",
@@ -47,7 +47,7 @@ export const currencyRoutes = [
         }
       }
     ]
-  },
+  },*/
   {
     path: "/login",
     name: "Login",

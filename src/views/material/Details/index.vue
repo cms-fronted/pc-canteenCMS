@@ -36,13 +36,52 @@
       </div>
       <div class="main-content">
         <el-table style="width:100%" :data="tableData">
-          <el-table-column label="序号"></el-table-column>
-          <el-table-column label="餐次"></el-table-column>
-          <el-table-column label="菜品"></el-table-column>
-          <el-table-column label="操作"></el-table-column>
-          <el-table-column label="材料名称"></el-table-column>
-          <el-table-column label="单位"></el-table-column>
-          <el-table-column label="数量"></el-table-column>
+          <el-table-column type="expand">
+            <template slot-scope="prop">
+              <el-table :data="prop.row.material">
+                <el-table-column label="材料名称" prop="name">
+                </el-table-column>
+                <el-table-column label="数量" prop="count"></el-table-column>
+                <el-table-column label="操作">
+                  <template slot-scope="scoped">
+                    <span
+                      ><el-button
+                        type="text"
+                        @click="openMaterialDialog(scoped.row, 'edit')"
+                        size="mini"
+                        >编辑</el-button
+                      ><el-button
+                        type="text"
+                        @click="deleteMaterial(scoped.row)"
+                        size="mini"
+                        >删除</el-button
+                      ></span
+                    >
+                  </template>
+                </el-table-column>
+              </el-table>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="序号"
+            type="index"
+            width="50"
+          ></el-table-column>
+          <el-table-column label="公司" prop="company"> </el-table-column>
+          <el-table-column label="饭堂" prop="canteen"></el-table-column>
+          <el-table-column label="餐次" prop="dinner"></el-table-column>
+          <el-table-column label="菜品" prop="name"></el-table-column>
+          <el-table-column label="操作">
+            <template slot-scope="scoped">
+              <span
+                ><el-button
+                  type="text"
+                  @click="openMaterialDialog(scoped.row, 'add')"
+                  >添加材料</el-button
+                ></span
+              >
+            </template>
+          </el-table-column>
         </el-table>
         <pagination
           :total="total"
@@ -51,6 +90,25 @@
           @pagination="queryList"
         ></pagination>
       </div>
+      <el-dialog
+        :title="isEditMaterial ? '编辑材料' : '新增材料'"
+        :visible.sync="materialDialog"
+        @close="closeMaterialDialog"
+        width="30%"
+      >
+        <el-form ref="materialForm" :model="materialForm" label-width="60px">
+          <el-form-item label="名称" prop="name">
+            <el-input v-model="materialForm.name" />
+          </el-form-item>
+          <el-form-item label="数量" prop="count">
+            <el-input v-model="materialForm.count" />
+          </el-form-item>
+        </el-form>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="closeMaterialDialog">取 消</el-button>
+          <el-button type="primary" @click="submitMaterial">确 定</el-button>
+        </span>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -71,6 +129,8 @@ export default {
   data() {
     return {
       grade: store.getters.grade,
+      materialDialog: false,
+      isEditMaterial: false,
       companyOptions: [],
       canteenOptions: [],
       dinnerOptions: [],
@@ -79,8 +139,13 @@ export default {
         company_ids: "",
         canteen_ids: ""
       },
+      materialDetail: {},
+      materialForm: {
+        name: "",
+        count: ""
+      },
       current_page: 1,
-      size: 5,
+      size: 10,
       total: 0
     };
   },
@@ -132,7 +197,7 @@ export default {
         delete form.canteen_ids;
       }
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/materials?page=${page}&size=${
+        `http://canteen.tonglingok.com/api/v1/materials/food?page=${page}&size=${
           this.size
         }`,
         form
@@ -142,6 +207,91 @@ export default {
         this.total = res.data.total;
         this.current_page = res.data.current_page;
       }
+    },
+    openMaterialDialog(row, type) {
+      console.log(row);
+      this.materialForm.id = row.id;
+      if (type == "edit") {
+        this.materialForm = Object.assign({}, row);
+        this.isEdit = true;
+      }
+      this.materialDialog = true;
+    },
+    async submitMaterial() {
+      let res = null;
+      let materials = [];
+      let f_id = this.isEdit ? this.materialForm.f_id : this.materialForm.id;
+      if (this.isEdit) {
+        let id = this.materialForm.id;
+        materials.push(
+          {
+            id: id,
+            count: this.materialForm.count
+          },
+          {
+            id: id,
+            name: this.materialForm.name
+          }
+        );
+        res = await $axios.post(
+          "http://canteen.tonglingok.com/api/v1/food/material/update",
+          {
+            id: f_id,
+            material: JSON.stringify(materials)
+          }
+        );
+      } else {
+        materials.push({
+          name: this.materialForm.name,
+          count: this.materialForm.count
+        });
+        res = await $axios.post(
+          "http://canteen.tonglingok.com/api/v1/food/material/update",
+          {
+            id: f_id,
+            material: JSON.stringify(materials)
+          }
+        );
+      }
+      if (res.msg === "ok") {
+        this.closeMaterialDialog();
+        this.$message.success("操作成功！");
+        this.queryList(this.current_page);
+      }
+    },
+    closeMaterialDialog() {
+      this.materialDialog = false;
+      this.isEdit = false;
+      this.$refs.materialForm.resetFields();
+    },
+    deleteMaterial(row) {
+      this.$confirm("此操作将删除该条材料明细, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(async () => {
+          const res = await $axios.post(
+            "http://canteen.tonglingok.com/api/v1/food/material/update",
+            {
+              id: row.f_id,
+              material: JSON.stringify([{ id: row.id, state: 2 }])
+            }
+          );
+          if (res.msg === "ok") {
+            this.queryList(this.current_page);
+            this.$message({
+              type: "success",
+              message: "删除成功!"
+            });
+          }
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
     }
   }
 };
