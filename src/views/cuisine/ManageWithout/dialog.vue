@@ -187,7 +187,9 @@ export default {
       this.formdata.dinner_id = "";
       this.formdata.m_id = "";
       $axios
-        .get(`http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`)
+        .get(
+          `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
+        )
         .then(res => {
           this.dinnerList = Array.from(res.data);
         })
@@ -195,7 +197,9 @@ export default {
     },
     getCategoryList(dinner_id) {
       $axios
-        .get(`http://canteen.tonglingok.com/api/v1/menus/dinner?dinner_id=${dinner_id}`)
+        .get(
+          `http://canteen.tonglingok.com/api/v1/menus/dinner?dinner_id=${dinner_id}`
+        )
         .then(res => (this.categoryList = Array.from(res.data)))
         .catch(err => console.log(err));
     },

@@ -5,6 +5,16 @@
     <div class="main">
       <div class="main-header">
         <el-form :inline="true" :model="queryForm">
+          <el-form-item label="时间">
+            <el-date-picker
+              value-format="yyyy-MM-dd"
+              v-model="queryForm.date"
+              range-separator="~"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              type="daterange"
+            />
+          </el-form-item>
           <el-form-item label="公司" v-if="companiesVisible" prop="company_id">
             <el-select
               @change="getCanteenOptions"
@@ -30,22 +40,7 @@
               ></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="开始" prop="time_begin">
-            <el-date-picker
-              v-model="queryForm.time_begin"
-              value-format="yyyy-MM-dd HH:mm:ss"
-              format="yyyy-MM-dd"
-              type="datetime"
-            ></el-date-picker>
-          </el-form-item>
-          <el-form-item label="结束" prop="time_end">
-            <el-date-picker
-              v-model="queryForm.time_end"
-              value-format="yyyy-MM-dd HH:mm:ss"
-              format="yyyy-MM-dd"
-              type="datetime"
-            ></el-date-picker>
-          </el-form-item>
+
           <el-button @click="queryList(1)">查询</el-button>
         </el-form>
       </div>
@@ -94,6 +89,7 @@
       <el-card>
         <div slot="header" class="clearfix">
           <span>{{ detailForm.title }}</span>
+          <span style="float: right">总价：{{ detailMoney }}</span>
         </div>
         <el-table :data="detailData">
           <el-table-column type="index" width="50px"></el-table-column>
@@ -134,6 +130,7 @@ import $axios from "@/api/index";
 import { mapState } from "vuex";
 import Pagination from "@/components/Pagination";
 import { flatten, unshiftAllOptions } from "@/utils/flatternArr";
+import moment from "moment";
 export default {
   components: { Pagination },
   data() {
@@ -141,7 +138,16 @@ export default {
       detailVisible: false,
       companyOptions: [],
       canteenOptions: [],
-      queryForm: {},
+      queryForm: {
+        date: [
+          moment()
+            .subtract(7, "d")
+            .format("YYYY-MM-DD"),
+          moment().format("YYYY-MM-DD")
+        ],
+        company_id: "",
+        canteen_id: ""
+      },
       tableData: [],
       detailData: [],
       detailForm: {},
@@ -150,6 +156,7 @@ export default {
       total: 0,
       detailTotal: 0,
       detailSize: 5,
+      detailMoney: 0,
       detailCurrentPage: 1,
       checked_id: []
     };
@@ -164,12 +171,25 @@ export default {
       return this.grade !== 3;
     }
   },
-  created() {
-    if (this.companiesVisible) {
-      this.getCompanies();
-    } else {
-      this.getCanteenOptions(0);
+  watch: {
+    queryForm: {
+      handler: function(val, oldVal) {
+        if (val.date) {
+          this.queryForm.time_begin = this.queryForm.date[0];
+          this.queryForm.time_end = this.queryForm.date[1];
+        }
+      },
+      deep: true,
+      immediate: true
     }
+  },
+  async created() {
+    if (this.companiesVisible) {
+      await this.getCompanies();
+    } else {
+      await this.getCanteenOptions(0);
+    }
+    await this.queryList(1);
   },
   methods: {
     async getCompanies() {
@@ -178,6 +198,8 @@ export default {
       );
       if (res.msg === "ok") {
         this.companyOptions = flatten(res.data);
+        this.queryForm.company_id = this.companyOptions[0].id;
+        await this.getCanteenOptions(this.queryForm.company_id);
       }
     },
     async getCanteenOptions(c_id) {
@@ -187,6 +209,7 @@ export default {
       );
       if (res.msg === "ok") {
         this.canteenOptions = Array.from(res.data);
+        this.queryForm.canteen_id = this.canteenOptions[0].id;
       }
       return res;
     },
@@ -215,6 +238,7 @@ export default {
         this.detailData = Array.from(res.data.list.data);
         this.detailTotal = res.data.list.total;
         this.detailCurrentPage = res.data.list.current_page;
+        this.detailMoney = res.data.money;
       }
       console.log(this.detailData);
     },
@@ -222,7 +246,6 @@ export default {
       console.log(val);
     },
     async showDetail(row) {
-      console.log(row);
       this.detailForm = Object.assign({}, row);
       await this.getDetailList();
       this.detailVisible = true;

@@ -1,1 +1,15 @@
-.page404[data-v-1d24c816]{width:100%;height:100%;text-align:center;background:#b5c794 url(../img/404.fc7ec393.jpg) no-repeat 50%!important}.page404 .page404_p0[data-v-1d24c816]{width:200px;font-size:20px;color:#fff;text-align:center;position:absolute;left:calc(50% - 100px);top:70%}
+.page404[data-v-1d24c816] {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  background: #b5c794 url(../img/404.fc7ec393.jpg) no-repeat 50% !important;
+}
+.page404 .page404_p0[data-v-1d24c816] {
+  width: 200px;
+  font-size: 20px;
+  color: #fff;
+  text-align: center;
+  position: absolute;
+  left: calc(50% - 100px);
+  top: 70%;
+}

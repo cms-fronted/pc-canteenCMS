@@ -79,10 +79,10 @@
           </el-table-column>
         </el-table>
         <pagination
-                :total="total"
-                :pageSize="size"
-                :currentPage="current_page"
-                @pagination="fetchList"
+          :total="total"
+          :pageSize="size"
+          :currentPage="current_page"
+          @pagination="fetchList"
         />
       </div>
     </div>

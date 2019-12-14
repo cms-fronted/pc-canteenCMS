@@ -207,9 +207,9 @@ export default {
             .format("YYYY-MM-DD"),
           moment().format("YYYY-MM-DD")
         ],
-        status: 0,
         time_begin: "",
         time_end: "",
+        status: 0,
         category_id: "",
         product_id: "",
         department_id: ""

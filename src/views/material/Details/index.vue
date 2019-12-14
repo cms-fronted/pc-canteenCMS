@@ -1,7 +1,7 @@
 <template>
   <div class="details">
     <div class="nav-title">菜品材料明细</div>
-    <el-divider></el-divider>
+    <el-divider />
     <div class="main">
       <div class="main-header">
         <el-form :inline="true" :model="queryForm">
@@ -17,7 +17,7 @@
                 :key="item.id"
                 :label="item.name"
                 :value="item.id"
-              ></el-option>
+              />
             </el-select>
           </el-form-item>
           <el-form-item label="消费地点" prop="canteen_id">
@@ -27,7 +27,7 @@
                 :key="item.id"
                 :value="item.id"
                 :label="item.name"
-              ></el-option>
+              />
             </el-select>
           </el-form-item>
           <el-button type="primary" @click="queryList(1)" plain>查询</el-button>
@@ -41,7 +41,7 @@
               <el-table :data="prop.row.material">
                 <el-table-column label="材料名称" prop="name">
                 </el-table-column>
-                <el-table-column label="数量" prop="count"></el-table-column>
+                <el-table-column label="数量" prop="count" />
                 <el-table-column label="操作">
                   <template slot-scope="scoped">
                     <span
@@ -67,10 +67,10 @@
             type="index"
             width="50"
           ></el-table-column>
-          <el-table-column label="公司" prop="company"> </el-table-column>
-          <el-table-column label="饭堂" prop="canteen"></el-table-column>
-          <el-table-column label="餐次" prop="dinner"></el-table-column>
-          <el-table-column label="菜品" prop="name"></el-table-column>
+          <el-table-column label="公司" prop="company" />
+          <el-table-column label="饭堂" prop="canteen" />
+          <el-table-column label="餐次" prop="dinner" />
+          <el-table-column label="菜品" prop="name" />
           <el-table-column label="操作">
             <template slot-scope="scoped">
               <span
@@ -88,7 +88,7 @@
           :currentPage="current_page"
           :pageSize="size"
           @pagination="queryList"
-        ></pagination>
+        />
       </div>
       <el-dialog
         :title="isEditMaterial ? '编辑材料' : '新增材料'"
@@ -149,11 +149,13 @@ export default {
       total: 0
     };
   },
-  created() {
+  async created() {
     if (this.companiesVisible) {
-      this.getCompanies();
+      await this.getCompanies();
+      await this.queryList(1);
     } else {
-      this.getCanteenOptions(0);
+      await this.getCanteenOptions(0);
+      await this.queryList(1);
     }
   },
   methods: {
@@ -163,18 +165,22 @@ export default {
       );
       if (res.msg === "ok") {
         this.companyOptions = getAllOptions(flatten(res.data));
+        this.queryForm.company_ids = this.companyOptions[0].id;
+        this.canteenOptions = [{ name: "全部", id: 0 }];
+        this.queryForm.canteen_ids = this.canteenOptions[0].id;
       }
     },
     async getCanteenOptions(c_id) {
       let company_id = c_id || "";
-      this.canteenOptions = [];
-      this.queryForm.canteen_ids = "";
+      this.canteenOptions = [{ name: "全部", id: 0 }];
+      this.queryForm.canteen_ids = 0;
       if (Number(company_id)) {
         const res = await $axios.get(
           `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
         );
         if (res.msg === "ok") {
           this.canteenOptions = getAllOptions(Array.from(res.data));
+          this.queryForm.canteen_ids = this.canteenOptions[0].id;
         }
         return res;
       }

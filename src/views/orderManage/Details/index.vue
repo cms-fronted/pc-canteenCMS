@@ -145,7 +145,7 @@ export default {
     } else {
       this.getLocationList();
     }
-      await this.queryList(1);
+    await this.queryList(1);
   },
   computed: {
     isDisabled() {

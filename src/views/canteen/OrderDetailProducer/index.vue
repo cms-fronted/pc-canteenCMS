@@ -100,7 +100,7 @@ export default {
             .format("YYYY-MM-DD"),
           moment().format("YYYY-MM-DD")
         ],
-        status:0,
+        status: 0,
         time_begin: "",
         time_end: "",
         category_id: "",
