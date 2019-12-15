@@ -1,10 +1,20 @@
 <template>
   <div class="order-material">
     <div class="nav-title">材料明细下单表</div>
-    <el-divider></el-divider>
+    <el-divider />
     <div class="main">
       <div class="main-header">
         <el-form :inline="true" :model="queryForm">
+          <el-form-item label="时间">
+            <el-date-picker
+              value-format="yyyy-MM-dd"
+              v-model="queryForm.date"
+              range-separator="~"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              type="daterange"
+            />
+          </el-form-item>
           <el-form-item label="公司" v-if="companiesVisible" prop="company_id">
             <el-select
               @change="getCanteenOptions"
@@ -17,7 +27,7 @@
                 :key="item.id"
                 :label="item.name"
                 :value="item.id"
-              ></el-option>
+              />
             </el-select>
           </el-form-item>
           <el-form-item label="消费地点" prop="canteen_id">
@@ -27,24 +37,8 @@
                 :key="item.id"
                 :value="item.id"
                 :label="item.name"
-              ></el-option>
+              />
             </el-select>
-          </el-form-item>
-          <el-form-item label="开始" prop="time_begin">
-            <el-date-picker
-              v-model="queryForm.time_begin"
-              value-format="yyyy-MM-dd HH:mm:ss"
-              format="yyyy-MM-dd"
-              type="datetime"
-            ></el-date-picker>
-          </el-form-item>
-          <el-form-item label="结束" prop="time_end">
-            <el-date-picker
-              v-model="queryForm.time_end"
-              value-format="yyyy-MM-dd HH:mm:ss"
-              format="yyyy-MM-dd"
-              type="datetime"
-            ></el-date-picker>
           </el-form-item>
           <el-button type="primary" @click="queryList(1)" plain>查询</el-button>
           <el-button type="primary">导出</el-button>
@@ -53,21 +47,18 @@
       </div>
       <div class="main-content">
         <el-table style="width:100%" :data="tableData">
-          <el-table-column type="index" width="50px"></el-table-column>
-          <el-table-column label="日期" prop="ordering_date"></el-table-column>
-          <el-table-column label="餐次" prop="dinner"></el-table-column>
-          <el-table-column label="材料名称" prop="material"></el-table-column>
-          <el-table-column
-            label="材料数量"
-            prop="order_count"
-          ></el-table-column>
+          <el-table-column type="index" width="50px" />
+          <el-table-column label="日期" prop="ordering_date" />
+          <el-table-column label="餐次" prop="dinner" />
+          <el-table-column label="材料名称" prop="material" />
+          <el-table-column label="材料数量" prop="order_count" />
           <el-table-column label="订货数量" prop="material_count">
             <template slot-scope="scoped">
               <el-input
                 size="mini"
                 width="50px"
                 v-model="scoped.row.material_count"
-              ></el-input>
+              />
             </template>
           </el-table-column>
           <el-table-column label="单价" prop="material_price">
@@ -76,7 +67,7 @@
                 size="mini"
                 width="50px"
                 v-model="scoped.row.material_price"
-              ></el-input>
+              />
             </template>
           </el-table-column>
           <el-table-column label="总价">
@@ -92,7 +83,7 @@
           :currentPage="current_page"
           :pageSize="size"
           @pagination="queryList"
-        ></pagination>
+        />
       </div>
     </div>
     <el-dialog
@@ -103,7 +94,7 @@
     >
       <el-form label-width="100px">
         <el-form-item label="报表名称">
-          <el-input v-model="updateForm.title"></el-input>
+          <el-input v-model="updateForm.title" />
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -119,12 +110,25 @@ import Pagination from "@/components/Pagination";
 import $axios from "@/api/index";
 import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
 import store from "@/store";
+import moment from "moment";
 
 export default {
   components: { Pagination },
   computed: {
     companiesVisible() {
       return this.grade !== 3;
+    }
+  },
+  watch: {
+    queryForm: {
+      handler: function(val, oldVal) {
+        if (val.date) {
+          this.queryForm.time_begin = this.queryForm.date[0];
+          this.queryForm.time_end = this.queryForm.date[1];
+        }
+      },
+      deep: true,
+      immediate: true
     }
   },
   data() {
@@ -136,6 +140,12 @@ export default {
       dinnerOptions: [],
       tableData: [],
       queryForm: {
+        date: [
+          moment()
+            .subtract(7, "d")
+            .format("YYYY-MM-DD"),
+          moment().format("YYYY-MM-DD")
+        ],
         company_id: "",
         canteen_id: ""
       },
@@ -145,11 +155,13 @@ export default {
       total: 0
     };
   },
-  created() {
+  async created() {
     if (this.companiesVisible) {
-      this.getCompanies();
+      await this.getCompanies();
+      await this.queryList(1);
     } else {
-      this.getCanteenOptions(0);
+      await this.getCanteenOptions(0);
+      await this.queryList(1);
     }
   },
   methods: {
@@ -159,6 +171,8 @@ export default {
       );
       if (res.msg === "ok") {
         this.companyOptions = flatten(res.data);
+        this.queryForm.company_id = this.companyOptions[0].id;
+        await this.getCanteenOptions(this.queryForm.company_id);
       }
     },
     async getCanteenOptions(c_id) {
@@ -171,6 +185,7 @@ export default {
         );
         if (res.msg === "ok") {
           this.canteenOptions = Array.from(res.data);
+          this.queryForm.canteen_id = this.canteenOptions[0].id;
         }
         return res;
       }

@@ -372,14 +372,7 @@ export const currencyRoutes = [
           title: "角色设置"
         }
       },
-      {
-        path: "QRcode",
-        name: "Settings-QRcode",
-        component: () => import("@/views/settings/QRcode"),
-        meta: {
-          title: "二维码设置"
-        }
-      },
+
       {
         path: "password",
         name: "Settings-password",

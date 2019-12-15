@@ -14,15 +14,15 @@ const $axios = axios.create({
 });
 Vue.prototype.$http = axios; // 并发请求
 // 在全局请求和响应拦截器中添加请求状态
-let loading = null;
+// let loading = null;
 
 // 请求拦截器
 $axios.interceptors.request.use(
   config => {
-    if (loading) {
+/*    if (loading) {
       loading.close();
     }
-    loading = Loading.service({ text: "拼命加载中" });
+    loading = Loading.service({ text: "拼命加载中" });*/
     const token = store.getters.token;
     if (token) {
       config.headers.token = token; // 请求头部添加token
@@ -36,9 +36,9 @@ $axios.interceptors.request.use(
 // 响应拦截器
 $axios.interceptors.response.use(
   response => {
-    if (loading) {
-      loading.close();
-    }
+    // if (loading) {
+    //   loading.close();
+    // }
     const code = response.status;
     if ((code >= 200 && code < 300) || code === 304) {
       if (response.data.errorCode === 10001) {
@@ -50,9 +50,9 @@ $axios.interceptors.response.use(
     }
   },
   error => {
-    if (loading) {
-      loading.close();
-    }
+    // if (loading) {
+    //   loading.close();
+    // }
     console.log(error);
     if (error.response) {
       switch (error.response.status) {

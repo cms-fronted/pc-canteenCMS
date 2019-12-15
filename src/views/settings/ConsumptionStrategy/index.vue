@@ -129,7 +129,7 @@
               :key="item.id"
               :label="item.name"
               :value="item.id"
-            ></el-option>
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="饭堂" prop="c_id">
@@ -139,7 +139,7 @@
               :key="item.id"
               :label="item.name"
               :value="item.id"
-            ></el-option>
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="人员类型" prop="t_id">
@@ -149,7 +149,7 @@
               :key="item.id"
               :label="item.name"
               :value="item.id"
-            ></el-option>
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="未订餐就餐" prop="unordered_meals">
@@ -189,7 +189,7 @@
                 size="mini"
                 type="number"
                 v-model="orderingMealForm.money"
-              ></el-input>
+              />
             </span>
             <span>
               附加金额
@@ -198,7 +198,7 @@
                 size="mini"
                 type="number"
                 v-model="orderingMealForm.sub_money"
-              ></el-input>
+              />
             </span>
           </el-form-item>
           <el-form-item label="订餐未就餐">
@@ -209,7 +209,7 @@
                 size="mini"
                 type="number"
                 v-model="noMealOrderedForm.money"
-              ></el-input>
+              />
             </span>
             <span>
               附加金额
@@ -218,7 +218,7 @@
                 size="mini"
                 type="number"
                 v-model="noMealOrderedForm.sub_money"
-              ></el-input>
+              />
             </span>
           </el-form-item>
           <el-form-item label="未订餐就餐">
@@ -229,7 +229,7 @@
                 size="mini"
                 type="number"
                 v-model="unOrderedMealForm.money"
-              ></el-input>
+              />
             </span>
             <span>
               附加金额
@@ -238,7 +238,7 @@
                 size="mini"
                 type="number"
                 v-model="unOrderedMealForm.sub_money"
-              ></el-input>
+              />
             </span>
           </el-form-item>
         </el-form>
@@ -264,7 +264,7 @@
             type="number"
             v-model="editSettingForm.ordered_count"
             style="width:100px"
-          ></el-input>
+          />
         </el-form-item>
       </el-form>
       <el-card class="box-card" body-style="paddingBottom: 5px">
@@ -361,10 +361,10 @@ export default {
       position: 0 //用于存储相同项的开始index
     };
   },
-  mounted() {
-    this.getCompanies();
-    this.getRoleType();
-  },
+  /*  async mounted() {
+    await this.getCompanies();
+    await this.getRoleType();
+  },*/
   filters: {
     consumptionType: function(str) {
       switch (str) {
@@ -382,11 +382,14 @@ export default {
       return this.grade !== 3;
     }
   },
-  created() {
+  async created() {
     if (this.companiesVisible) {
-      this.getCompanies();
+      await this.getCompanies();
+      await this.getRoleType();
+      await this.queryList(1);
     } else {
-      this.getCanteenList();
+      await this.getCanteenList();
+      await this.queryList(1);
     }
   },
   methods: {
@@ -396,8 +399,8 @@ export default {
         .then(res => {
           let arr = res.data;
           this.companiesList = flatten(arr);
-          this.queryForm.c_id = null;
-          this.canteenList = [];
+          this.queryForm.company_id = this.companiesList[0].id;
+          this.getCanteenList(this.queryForm.company_id);
         })
         .catch(err => console.log(err));
     },
@@ -409,6 +412,7 @@ export default {
           )
           .then(res => {
             this.canteenList = Array.from(res.data);
+            this.queryForm.c_id = this.canteenList[0].id;
           })
           .catch(err => console.log(err));
       } else {
@@ -416,6 +420,7 @@ export default {
           .get("http://canteen.tonglingok.com/api/v1/managerCanteens")
           .then(res => {
             this.canteenList = Array.from(res.data);
+            this.queryForm.c_id = this.canteenList[0].id;
           })
           .catch(err => console.log(err));
       }
@@ -432,14 +437,15 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    async queryList() {
+    async queryList(page) {
+      page = Number(page) || 1;
       let data = await $axios
         .get(
           "http://canteen.tonglingok.com/api/v1/canteen/consumptionStrategy",
           {
             c_id: this.queryForm.c_id,
-            page: this.current_page,
-            size: 3
+            page: page,
+            size: 10
           }
         )
         .then(res => {
