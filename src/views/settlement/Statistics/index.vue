@@ -105,7 +105,7 @@
               <el-table-column label="餐次信息">
                 <div
                   slot-scope="scoped"
-                  v-html="showCellData(scoped.row.dinner)"
+                  v-html= "showCellData(scoped.row.dinner)"
                 ></div>
               </el-table-column>
               <el-table-column label="订餐数量">
@@ -262,13 +262,14 @@ export default {
   async created() {
     if (this.companiesVisible) {
       await this.getCompanies();
+      await this.getRoleType();
       await this.queryList(1);
     } else {
       await this.getLocationList();
       await this.getDepartmentListWithoutCid();
+    await this.getRoleType();
       await this.queryList(1);
     }
-    this.getRoleType();
   },
   methods: {
     getList(val) {
@@ -354,9 +355,7 @@ export default {
         delete this.formdata.company_ids;
       }
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/consumptionStatistic?page=${page}&size=${
-          this.size
-        }`,
+        `http://canteen.tonglingok.com/api/v1/order/consumptionStatistic?page=${page}&size=${this.size}`,
         this.formdata
       );
       if (res.msg === "ok") {
@@ -365,7 +364,7 @@ export default {
           this.current_page = res.data.statistic.current_page;
           this.total = res.data.statistic.total;
         } else {
-          this.tableData = Array.from(res.data.data);
+          this.tableData = Array.from(res.data.statistic);
           this.current_page = res.data.current_page;
           this.total = res.data.total;
         }

@@ -31,7 +31,7 @@ export const currencyRoutes = [
     component: () => import("@/views/error"),
     hidden: true
   },
-  /*  {
+  {
     path: "/home",
     name: "Home",
     redirect: "/home/index",
@@ -47,7 +47,7 @@ export const currencyRoutes = [
         }
       }
     ]
-  },*/
+  },
   {
     path: "/login",
     name: "Login",
@@ -537,7 +537,7 @@ export const asyncRoutes = [
   // }
 ];
 
-const creatRouter = () => {
+const createRouter = () => {
   return new Router({
     routes: currencyRoutes,
     scrollBehavior() {
@@ -546,20 +546,18 @@ const creatRouter = () => {
   });
 };
 
-const router = creatRouter();
+const router = createRouter();
 
 // 解决addRoute不能删除动态路由问题
 export function resetRouter() {
-  const reset = creatRouter();
+  const reset = createRouter();
   router.matcher = reset.matcher;
 }
-
 router.beforeEach(async (to, from, next) => {
   document.title = getTitle(to.meta.title);
   if (to.path === "/login") {
     next();
   } else {
-    next();
     // let res = await store.dispatch('user/_getUserModules')
     if (store.getters.token) {
       const hasRoles = store.getters.roles.length > 0;
@@ -567,8 +565,7 @@ router.beforeEach(async (to, from, next) => {
         next();
       } else {
         try {
-          let data = await store.dispatch("user/_getUserModules");
-          let roles = data.roles;
+          const { roles } = await store.dispatch("user/_getUserModules");
           const addRoutes = await store.dispatch(
             "permission/getAsyncRoutes",
             roles
