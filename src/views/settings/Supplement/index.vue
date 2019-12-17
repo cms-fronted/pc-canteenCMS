@@ -5,7 +5,7 @@
       <el-divider></el-divider>
       <div class="main">
         <div class="main-header">
-          <div class="select-title">
+<!--          <div class="select-title">-->
             <span class="content-header">人员信息</span>
             <el-input
               class="filter-input"
@@ -28,7 +28,7 @@
             >
               <el-button type="primary">批量补录</el-button>
             </el-upload>
-          </div>
+<!--          </div>-->
         </div>
         <div class="main-content">
           <el-table
