@@ -91,8 +91,8 @@ export default {
       current_page: 1,
     }
   },
-  created(){
-    this.fetchDepartmentList();
+  async created(){
+    await this.fetchDepartmentList();
   },
   components:{Pagination},
   methods: {
@@ -109,10 +109,10 @@ export default {
         })
       }
     },
-    fetchDepartmentList(){
+    async fetchDepartmentList(){
       // 先默认获取 c_id为2的公司的部门列表 到时需要修改成 http://canteen.tonglingok.com/api/v1/departments/recharge
       // get("http://canteen.tonglingok.com/api/v1/departments?c_id=2") http://canteen.tonglingok.com/api/v1/departments/recharge
-      $axios
+     await $axios
         .get("http://canteen.tonglingok.com/api/v1/departments/recharge")
         .then(res => {
           // console.log(res)

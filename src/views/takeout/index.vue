@@ -1,18 +1,18 @@
 <template>
   <div class="takeout">
     <div class="nav-title">外卖管理</div>
-    <el-divider></el-divider>
+    <el-divider />
     <div class="main">
       <div class="main-header">
         <el-form :model="queryForm" :inline="true">
           <el-form-item label="日期">
             <el-date-picker
               v-model="queryForm.ordering_date"
-              value-format="yyyy-MM-dd HH:mm:ss"
+              value-format="yyyy-MM-dd"
               format="yyyy-MM-dd"
               type="datetime"
               style="width:140px"
-            ></el-date-picker>
+            />
           </el-form-item>
           <el-form-item label="公司" v-if="companiesVisible">
             <el-select
@@ -26,7 +26,7 @@
                 :key="item.id"
                 :label="item.name"
                 :value="item.id"
-              ></el-option>
+              />
             </el-select>
           </el-form-item>
           <el-form-item label="饭堂">
@@ -40,7 +40,7 @@
                 :key="item.id"
                 :label="item.name"
                 :value="item.id"
-              ></el-option>
+              />
             </el-select>
           </el-form-item>
           <el-form-item label="餐次">
@@ -50,14 +50,14 @@
                 :key="item.id"
                 :label="item.name"
                 :value="item.id"
-              ></el-option>
+              />
             </el-select>
           </el-form-item>
           <el-form-item label="状态" prop="used">
             <el-select v-model="queryForm.used">
-              <el-option label="全部" :value="3"></el-option>
-              <el-option label="已打印" :value="1"></el-option>
-              <el-option label="未打印" :value="2"></el-option>
+              <el-option label="全部" :value="3" />
+              <el-option label="已打印" :value="1" />
+              <el-option label="未打印" :value="2" />
             </el-select>
           </el-form-item>
           <el-button type="primary" @click="queryList" :disabled="isDisabled"
@@ -68,12 +68,12 @@
       </div>
       <div class="main-content">
         <el-table :data="tableData" border style="width:100%">
-          <el-table-column type="selection" width="55"></el-table-column>
-          <el-table-column label="订单ID" prop="order_id"></el-table-column>
-          <el-table-column label="日期" prop="ordering_date"></el-table-column>
-          <el-table-column label="消费地点" prop="canteen"></el-table-column>
-          <el-table-column label="用户名" prop="username"></el-table-column>
-          <el-table-column label="手机号码" prop="phone"></el-table-column>
+          <el-table-column type="selection" width="55" />
+          <el-table-column label="订单ID" prop="order_id" />
+          <el-table-column label="日期" prop="ordering_date" />
+          <el-table-column label="消费地点" prop="canteen" />
+          <el-table-column label="用户名" prop="username" />
+          <el-table-column label="手机号码" prop="phone" />
           <el-table-column label="餐次">
             <template slot-scope="scoped">
               <span>
@@ -85,7 +85,7 @@
               </span>
             </template>
           </el-table-column>
-          <el-table-column label="金额" prop="money"></el-table-column>
+          <el-table-column label="金额" prop="money" />
           <el-table-column label="送货地点" show-overflow-tooltip>
             <template slot-scope="scoped">
               <span>
@@ -108,7 +108,10 @@
           <el-table-column label="操作">
             <template slot-scope="scoped">
               <span v-if="scoped.row.used === 2">
-                <el-button type="success" @click="openDetailDialog(scoped.row)"
+                <el-button
+                  type="success"
+                  size="small"
+                  @click="openDetailDialog(scoped.row)"
                   >打印小票</el-button
                 >
               </span>
@@ -120,7 +123,7 @@
           :total="total"
           :page="current_page"
           @pagination="queryList"
-        ></pagination>
+        />
       </div>
     </div>
     <el-dialog
@@ -136,7 +139,7 @@
       <ul>
         <li>收货人：{{ detailForm.address.name }}</li>
         <li>手机号码：{{ detailForm.address.phone }}</li>
-        <li>送货时间：{{ detailForm.address.name }}</li>
+        <!--        <li>送货时间：{{ detailForm.address.name }}</li>-->
         <li>
           送货地址：{{
             detailForm.address.province +
@@ -164,6 +167,7 @@
 import $axios from "@/api/index";
 import Pagination from "@/components/Pagination";
 import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
+import moment from "moment";
 import store from "@/store";
 export default {
   data() {
@@ -171,7 +175,7 @@ export default {
       grade: store.getters.grade,
       detailDialogVisible: false,
       queryForm: {
-        ordering_date: "",
+        ordering_date: moment().format("YYYY-MM-DD"),
         company_ids: null,
         dinner_id: "",
         canteen_id: "",
@@ -236,13 +240,16 @@ export default {
       this.isDisabled = !val;
     }
   },
-  created() {
+  async created() {
     if (this.companiesVisible) {
-      this.getCompanyOptions();
+      await this.getCompanyOptions();
+      await this.queryList(1);
     } else {
-      this.getCanteenOptions();
+      await this.getCanteenOptions();
+      await this.queryList(1);
     }
   },
+  components: { Pagination },
   methods: {
     async getCompanyOptions() {
       const res = await $axios.get(
@@ -250,13 +257,18 @@ export default {
       );
       if (res.msg === "ok") {
         this.companyOptions = getAllOptions(flatten(res.data));
+        this.queryForm.company_ids = this.companyOptions[0].id;
+        this.canteenOptions = [{ name: "全部", id: 0 }];
+        this.dinnersOptions = [{ name: "全部", id: 0 }];
+        this.queryForm.dinner_id = 0;
+        this.queryForm.canteen_id = 0;
       }
     },
     async getCanteenOptions(company_ids) {
-      this.canteenOptions = [];
-      this.dinnersOptions = [];
-      this.queryForm.dinner_id = null;
-      this.queryForm.canteen_id = null;
+      this.canteenOptions = [{ name: "全部", id: 0 }];
+      this.dinnersOptions = [{ name: "全部", id: 0 }];
+      this.queryForm.dinner_id = 0;
+      this.queryForm.canteen_id = 0;
       let res;
       if (company_ids) {
         if (!Number(company_ids)) return;
@@ -270,6 +282,7 @@ export default {
       }
       if (res.msg === "ok") {
         this.canteenOptions = unshiftAllOptions(Array.from(res.data));
+        this.queryForm.canteen_id = this.canteenOptions[0].id;
       }
     },
     async getDinnersOptions(canteen_id) {
@@ -283,14 +296,15 @@ export default {
         }
       }
     },
-    async queryList() {
+    async queryList(page) {
+      page = typeof page == "number" ? page : 1;
       let queryForm = JSON.parse(JSON.stringify(this.queryForm));
       queryForm.canteen_id = queryForm.canteen_id ? queryForm.canteen_id : 0;
       queryForm.dinner_id = queryForm.dinner_id ? queryForm.dinner_id : 0;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/takeoutStatistic?page=${
-          this.current_page
-        }&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/order/takeoutStatistic?page=${page}&size=${
+          this.size
+        }`,
         queryForm
       );
       if (res.msg === "ok") {

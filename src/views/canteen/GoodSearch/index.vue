@@ -1,7 +1,7 @@
 <template>
   <div class="good-search">
     <div class="nav-title">商品查询</div>
-    <el-divider></el-divider>
+    <el-divider />
     <div class="main">
       <div class="main-header">
         <el-form :inline="true" ref="queryForm" :model="queryForm">
@@ -12,7 +12,7 @@
                 :key="item.id"
                 :label="item.name"
                 :value="item.id"
-              ></el-option>
+              />
             </el-select>
           </el-form-item>
           <el-form-item label="类型">
@@ -22,7 +22,7 @@
                 :label="item.name"
                 :key="item.id"
                 :value="item.id"
-              ></el-option>
+              />
             </el-select>
           </el-form-item>
           <el-button type="primary" @click="queryList(1)">查询</el-button>
@@ -42,19 +42,19 @@
               </div>
             </template>
           </el-table-column>
-          <el-table-column label="名称" prop="name"></el-table-column>
-          <el-table-column label="类型" prop="category"></el-table-column>
-          <el-table-column label="单位" prop="unit"></el-table-column>
-          <el-table-column label="单价" prop="price"></el-table-column>
-          <el-table-column label="库存量" prop="stock"></el-table-column>
-          <el-table-column label="供应商" prop="supplier"></el-table-column>
+          <el-table-column label="名称" prop="name" />
+          <el-table-column label="类型" prop="category" />
+          <el-table-column label="单位" prop="unit" />
+          <el-table-column label="单价" prop="price" />
+          <el-table-column label="库存量" prop="stock" />
+          <el-table-column label="供应商" prop="supplier" />
         </el-table>
         <pagination
           :total="total"
           :pageSize="size"
           @pagination="queryList"
           :currentPage="current_page"
-        ></pagination>
+        />
       </div>
     </div>
   </div>
@@ -82,17 +82,20 @@ export default {
       current_page: 1
     };
   },
-  created() {
-    this.getCategoryList();
-    this.getSupplierList();
+  async created() {
+    await this.getCategoryList();
+    await this.getSupplierList();
+    await this.queryList(1);
   },
   methods: {
     async getCategoryList(company_id) {
       const res = await $axios.get(
+        //原型没有选公司，不传company_id
         "http://canteen.tonglingok.com/api/v1/company/categories"
       );
       if (res.msg === "ok") {
         this.categoryOptions = unshiftAllOptions(Array.from(res.data));
+        this.queryForm.category_id = this.categoryOptions[0].id;
       }
     },
     async getSupplierList() {
@@ -101,10 +104,11 @@ export default {
       );
       if (res.msg === "ok") {
         this.supplierOptions = unshiftAllOptions(Array.from(res.data));
+        this.queryForm.supplier_id = this.supplierOptions[0].id;
       }
     },
     async queryList(page) {
-      page = page || 1;
+      page = Number(page) || 1;
       const res = await $axios.get(
         `http://canteen.tonglingok.com/api/v1/shop/cms/products?page=${page}&size=${
           this.size

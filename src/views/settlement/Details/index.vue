@@ -3,7 +3,7 @@
     <div class="settlement-details">
       <div class="main">
         <div class="nav-title">消费明细</div>
-        <el-divider></el-divider>
+        <el-divider />
         <div class="main-header">
           <div class="select-title">
             <el-form
@@ -12,21 +12,15 @@
               label-width="60px"
               label-position="left"
             >
-              <el-form-item label="开始">
+              <el-form-item label="时间">
                 <el-date-picker
-                  v-model="formdata.time_begin"
-                  value-format="yyyy-MM-dd HH:mm:ss"
-                  format="yyyy-MM-dd"
-                  type="datetime"
-                ></el-date-picker>
-              </el-form-item>
-              <el-form-item label="结束">
-                <el-date-picker
-                  v-model="formdata.time_end"
-                  value-format="yyyy-MM-dd HH:mm:ss"
-                  format="yyyy-MM-dd"
-                  type="datetime"
-                ></el-date-picker>
+                  value-format="yyyy-MM-dd"
+                  v-model="formdata.date"
+                  range-separator="~"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期"
+                  type="daterange"
+                />
               </el-form-item>
               <el-form-item label="公司" v-if="companiesVisible">
                 <el-select
@@ -40,7 +34,7 @@
                     :key="item.id"
                     :label="item.name"
                     :value="item.id"
-                  ></el-option>
+                  />
                 </el-select>
               </el-form-item>
 
@@ -55,7 +49,7 @@
                     :key="item.id"
                     :label="item.name"
                     :value="item.id"
-                  ></el-option>
+                  />
                 </el-select>
               </el-form-item>
               <el-form-item label="餐次">
@@ -68,7 +62,7 @@
                     :key="item.id"
                     :label="item.name"
                     :value="item.id"
-                  ></el-option>
+                  />
                 </el-select>
               </el-form-item>
               <el-form-item
@@ -85,21 +79,17 @@
                     :key="item.id"
                     :label="item.name"
                     :value="item.id"
-                  ></el-option>
+                  />
                 </el-select>
               </el-form-item>
               <el-form-item label="姓名">
-                <el-input
-                  placeholder="请输入姓名"
-                  style="80px"
-                  v-model="formdata.name"
-                ></el-input>
+                <el-input placeholder="请输入姓名" v-model="formdata.name" />
               </el-form-item>
               <el-form-item label="手机号码" label-width="80px">
                 <el-input
                   placeholder="请输入手机号码"
                   v-model="formdata.phone"
-                ></el-input>
+                />
               </el-form-item>
               <el-form-item
                 label="消费类型"
@@ -110,9 +100,9 @@
                   v-model="formdata.consumption_type"
                   placeholder="请选择类型"
                 >
-                  <el-option label="订餐就餐" :value="1"></el-option>
-                  <el-option label="订餐未就餐" :value="2"></el-option>
-                  <el-option label="未订餐就餐" :value="3"></el-option>
+                  <el-option label="订餐就餐" :value="1" />
+                  <el-option label="订餐未就餐" :value="2" />
+                  <el-option label="未订餐就餐" :value="3" />
                 </el-select>
               </el-form-item>
             </el-form>
@@ -129,28 +119,24 @@
         </div>
       </div>
       <el-table :data="tableData" style="width: 100%" border>
-        <el-table-column prop="id" label="序号" width="50"></el-table-column>
-        <el-table-column
-          prop="create_date"
-          label="下单时间"
-          width="180"
-        ></el-table-column>
-        <el-table-column prop="place" label="消费地点"></el-table-column>
-        <el-table-column prop="name" label="姓名"></el-table-column>
-        <el-table-column prop="phone" label="手机号码"></el-table-column>
-        <el-table-column prop="type" label="类型"></el-table-column>
-        <el-table-column prop="c_name" label="商品名称"></el-table-column>
-        <el-table-column prop="num" label="商品数量"></el-table-column>
-        <el-table-column prop="price" label="商品金额"></el-table-column>
-        <el-table-column prop="deliver_way" label="配送方式"></el-table-column>
-        <el-table-column prop="note" label="备注" width="300"></el-table-column>
+        <el-table-column prop="id" label="序号" width="50" />
+        <el-table-column prop="create_date" label="下单时间" width="180" />
+        <el-table-column prop="place" label="消费地点" />
+        <el-table-column prop="name" label="姓名" />
+        <el-table-column prop="phone" label="手机号码" />
+        <el-table-column prop="type" label="类型" />
+        <el-table-column prop="c_name" label="商品名称" />
+        <el-table-column prop="num" label="商品数量" />
+        <el-table-column prop="price" label="商品金额" />
+        <el-table-column prop="deliver_way" label="配送方式" />
+        <el-table-column prop="note" label="备注" width="300" />
       </el-table>
       <pagination
         :total="total"
         :pageSize="size"
         :currentPage="current_page"
         @pagination="queryList"
-      ></pagination>
+      />
     </div>
   </div>
 </template>
@@ -160,12 +146,19 @@ import $axios from "@/api/index";
 import Pagination from "@/components/Pagination";
 import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
 import store from "@/store";
+import moment from "moment";
 export default {
   components: { Pagination },
   data() {
     return {
       grade: store.getters.grade,
       formdata: {
+        date: [
+          moment()
+            .subtract(7, "d")
+            .format("YYYY-MM-DD"),
+          moment().format("YYYY-MM-DD")
+        ],
         company_ids: null,
         canteen_id: null,
         department_id: null,
@@ -183,15 +176,16 @@ export default {
       canteenOptions: [],
       companyOptions: [],
       departmentOptions: [],
-      dinnersOptions: [],
-      isDisabled: true
+      dinnersOptions: []
     };
   },
-  created() {
+  async created() {
     if (this.companiesVisible) {
-      this.getCompanyOptions();
+      await this.getCompanyOptions();
+      await this.queryList(1);
     } else {
-      this.getCanteenOptions();
+      await this.getCanteenOptions();
+      await this.queryList(1);
     }
   },
   methods: {
@@ -212,6 +206,7 @@ export default {
       );
       if (res.msg === "ok") {
         this.companyOptions = getAllOptions(flatten(res.data));
+        this.formdata.company_ids = this.companyOptions[0].id;
       }
     },
     async getCanteenOptions(company_ids) {
@@ -227,6 +222,7 @@ export default {
       }
       if (res.msg === "ok") {
         this.canteenOptions = unshiftAllOptions(Array.from(res.data)); //给数组添加一个全部option
+        this.formdata.canteen_id = this.canteenOptions[0].id;
       }
     },
     async getDepartmentOptions(company_ids) {
@@ -235,6 +231,7 @@ export default {
       );
       if (res.msg === "ok") {
         this.departmentOptions = unshiftAllOptions(flatten(res.data));
+        this.formdata.department_id = this.departmentOptions[0].id;
       }
     },
     async getDinnersOptions(canteen_id) {
@@ -245,13 +242,16 @@ export default {
         );
         if (res.msg === "ok") {
           this.dinnersOptions = unshiftAllOptions(Array.from(res.data));
+          this.formdata.dinner_id = this.dinnersOptions[0].id;
         }
       }
     },
     async queryList(page) {
-      page = page || 1;
+      page = typeof page == "number" ? page : 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/orderSettlement?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/order/orderSettlement?page=${page}&size=${
+          this.size
+        }`,
         this.formdata
       );
       if (res.msg === "ok") {
@@ -262,20 +262,23 @@ export default {
     }
   },
   computed: {
-    isAble() {
-      return (
-        !!this.formdata.time_end &&
-        !!this.formdata.time_begin &&
-        !!this.formdata.company_ids
-      );
+    isDisabled() {
+      return !!!this.formdata.date;
     },
     companiesVisible() {
       return this.grade !== 3;
     }
   },
   watch: {
-    isAble(val) {
-      this.isDisabled = !val;
+    formdata: {
+      handler: function(val, oldVal) {
+        if (val.date) {
+          this.formdata.time_begin = this.formdata.date[0];
+          this.formdata.time_end = this.formdata.date[1];
+        }
+      },
+      deep: true,
+      immediate: true
     }
   }
 };

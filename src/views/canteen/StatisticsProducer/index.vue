@@ -6,21 +6,15 @@
       <div class="main-header">
         <div class="select-title">
           <el-form :inline="true" :model="formdata" label-width="80px">
-            <el-form-item label="开始">
+            <el-form-item label="时间">
               <el-date-picker
-                v-model="formdata.time_begin"
-                value-format="yyyy-MM-dd HH:mm:ss"
-                format="yyyy-MM-dd"
-                type="datetime"
-              ></el-date-picker>
-            </el-form-item>
-            <el-form-item label="结束">
-              <el-date-picker
-                v-model="formdata.time_end"
-                value-format="yyyy-MM-dd HH:mm:ss"
-                format="yyyy-MM-dd"
-                type="datetime"
-              ></el-date-picker>
+                value-format="yyyy-MM-dd"
+                v-model="formdata.date"
+                range-separator="~"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                type="daterange"
+              />
             </el-form-item>
             <el-form-item label="商品类型">
               <el-select v-model="formdata.category_id">
@@ -163,6 +157,7 @@ import $axios from "@/api/index";
 import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
 import store from "@/store";
 import Pagination from "@/components/Pagination";
+import moment from "moment";
 const good_state = [
   { id: 0, name: "全部" },
   { id: 1, name: "已完成" },
@@ -178,31 +173,47 @@ export default {
       company_id: "",
       canteen_id: "",
       formdata: {
-        type: 1
+        type: 1,
+        date: [
+          moment()
+            .subtract(7, "d")
+            .format("YYYY-MM-DD"),
+          moment().format("YYYY-MM-DD")
+        ],
+        status: 0,
+        category_id: "",
+        product_id: ""
       },
       categoryOptions: [],
       productOptions: [],
       goodStateOptions: good_state,
       tableData: [],
-      isDisabled: true,
       current_page: 1,
       size: 10,
       total: 0
     };
   },
   computed: {
-    isAble() {
-      return !!this.formdata.time_end && !!this.formdata.time_begin;
+    isDisabled() {
+      return !!!this.formdata.date;
     }
   },
   watch: {
-    isAble(val) {
-      this.isDisabled = !val;
+    formdata: {
+      handler: function(val, oldVal) {
+        if (val.date) {
+          this.formdata.time_begin = this.formdata.date[0];
+          this.formdata.time_end = this.formdata.date[1];
+        }
+      },
+      deep: true,
+      immediate: true
     }
   },
-  created() {
-    this.getCategoryOptions();
-    this.getProductsId();
+  async created() {
+    await this.getCategoryOptions();
+    await this.getProductsId();
+    await this.queryList(1);
   },
   methods: {
     async getCategoryOptions() {
@@ -211,30 +222,26 @@ export default {
       );
       if (res.msg === "ok") {
         this.categoryOptions = unshiftAllOptions(Array.from(res.data));
+        this.formdata.category_id = this.categoryOptions[0].id;
       }
     },
     async getProductsId(id) {
-      const res = await this.$axios({
-        url: `http://canteen.tonglingok.com/api/v1/shop/supplierProducts/search`,
-        methods: "get",
-        headers: { token: store.getters.token }
-      });
-      if (res.data.msg === "ok") {
-        console.log(res.data.data);
-        this.productOptions = unshiftAllOptions(Array.from(res.data.data));
+      const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/shop/supplierProducts/search"
+      );
+      if (res.msg === "ok") {
+        this.productOptions = unshiftAllOptions(Array.from(res.data));
+        this.formdata.product_id = this.productOptions[0].id;
       }
     },
     async remoteMethod(query) {
       if (query != "") {
         this.loading = true;
-        const res = await this.$axios({
-          url: `http://canteen.tonglingok.com/api/v1/shop/supplierProducts/search?product=${query}`,
-          methods: "get",
-          headers: { token: store.getters.token }
-        });
-        if (res.data.msg === "ok") {
-          console.log(res.data.data);
-          this.productOptions = Array.from(res.data.data);
+        const res = await $axios.get(
+          "http://canteen.tonglingok.com/api/v1/shop/supplierProducts/search?product=${query}"
+        );
+        if (res.msg === "ok") {
+          this.productOptions = Array.from(res.data);
         }
         this.loading = false;
       } else {
@@ -242,7 +249,7 @@ export default {
       }
     },
     async queryList(page) {
-      page = page || 1;
+      page = Number(page) || 1;
       const res = await $axios.get(
         `http://canteen.tonglingok.com/api/v1/shop/orderConsumption?page=${page}&size=${
           this.size

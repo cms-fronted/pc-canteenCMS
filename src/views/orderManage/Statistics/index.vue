@@ -2,7 +2,7 @@
   <div>
     <div class="statistics">
       <div class="nav-title">订餐统计</div>
-      <el-divider></el-divider>
+      <el-divider />
       <div class="main">
         <div class="main-header" :class="{ active: !companiesVisible }">
           <div class="select-title">
@@ -12,23 +12,15 @@
               label-width="40px"
               label-position="left"
             >
-              <el-form-item label="开始">
+              <el-form-item label="时间">
                 <el-date-picker
-                  v-model="formdata.time_begin"
-                  value-format="yyyy-MM-dd HH:mm:ss"
-                  format="yyyy-MM-dd"
-                  style="width:180px"
-                  type="datetime"
-                ></el-date-picker>
-              </el-form-item>
-              <el-form-item label="结束">
-                <el-date-picker
-                  v-model="formdata.time_end"
-                  value-format="yyyy-MM-dd HH:mm:ss"
-                  format="yyyy-MM-dd"
-                  style="width:180px"
-                  type="datetime"
-                ></el-date-picker>
+                  value-format="yyyy-MM-dd"
+                  v-model="formdata.date"
+                  range-separator="~"
+                  start-placeholder="开始日期"
+                  end-placeholder="结束日期"
+                  type="daterange"
+                />
               </el-form-item>
               <el-form-item label="公司" v-if="companiesVisible">
                 <el-select
@@ -43,7 +35,7 @@
                     :key="item.id"
                     :label="item.name"
                     :value="item.id"
-                  ></el-option>
+                  />
                 </el-select>
               </el-form-item>
               <el-form-item label="消费地点" label-width="80px">
@@ -57,7 +49,7 @@
                     :key="item.id"
                     :label="item.name"
                     :value="item.id"
-                  ></el-option>
+                  />
                 </el-select>
               </el-form-item>
             </el-form>
@@ -74,10 +66,7 @@
         </div>
         <div class="main-content">
           <el-table style="width:100%" :data="tableData" border>
-            <el-table-column
-              label="日期"
-              prop="ordering_date"
-            ></el-table-column>
+            <el-table-column label="日期" prop="ordering_date"></el-table-column>
             <el-table-column label="公司" prop="company"></el-table-column>
             <el-table-column label="消费地点" prop="canteen"></el-table-column>
             <el-table-column label="餐次" prop="dinner"></el-table-column>
@@ -88,7 +77,7 @@
             :total="total"
             :pageSize="size"
             :currentPage="current_page"
-          ></pagination>
+          />
         </div>
       </div>
     </div>
@@ -100,6 +89,7 @@ import $axios from "@/api/index";
 import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
 import Pagination from "@/components/Pagination";
 import store from "@/store";
+import moment from "moment";
 export default {
   components: {
     Pagination
@@ -108,6 +98,12 @@ export default {
     return {
       grade: store.getters.grade,
       formdata: {
+        date: [
+          moment()
+            .subtract(7, "d")
+            .format("YYYY-MM-DD"),
+          moment().format("YYYY-MM-DD")
+        ],
         time_begin: "",
         time_end: "",
         company_ids: "",
@@ -120,30 +116,39 @@ export default {
       tableData: [],
       spanArr: [], //二维数组，用于存放单元格合并规则
       position: 0, //用于存储相同项的开始index
-      isDisabled: true,
+      // isDisabled: true,
       current_page: 1,
       size: 10,
       total: 0
     };
   },
-  created() {
+  async created() {
     if (this.companiesVisible) {
-      this.getCompanies();
+      await this.getCompanies();
+      await this.queryList(1);
     } else {
       this.getLocationList();
+      await this.queryList(1);
     }
   },
   computed: {
     companiesVisible() {
       return this.grade !== 3;
     },
-    isAble() {
-      return !!this.formdata.time_end && !!this.formdata.time_begin;
+    isDisabled() {
+      return !!!this.formdata.date;
     }
   },
   watch: {
-    isAble(val) {
-      this.isDisabled = !val;
+    formdata: {
+      handler: function(val, oldVal) {
+        if (val.date) {
+          this.formdata.time_begin = this.formdata.date[0];
+          this.formdata.time_end = this.formdata.date[1];
+        }
+      },
+      deep: true,
+      immediate: true
     }
   },
   methods: {
@@ -156,14 +161,18 @@ export default {
         this.getLocationList(val);
       }
     },
-    getCompanies() {
-      $axios
+    async getCompanies() {
+      await $axios
         .get("http://canteen.tonglingok.com/api/v1/admin/companies")
         .then(res => {
-          let arr = res.data;
-          let allCompanies = [];
-          let companiesList = getAllOptions(flatten(arr));
-          this.companyOptions = companiesList;
+          if (res.msg === "ok") {
+            let arr = res.data;
+            let companiesList = getAllOptions(flatten(arr));
+            this.companyOptions = companiesList;
+            this.formdata.company_ids = this.companyOptions[0].id;
+            this.canteenOptions = [{ name: "全部", id: 0 }];
+            this.formdata.canteen_id = 0;
+          }
         })
         .catch(err => console.log(err));
     },
@@ -180,10 +189,11 @@ export default {
       }
       if (res.msg === "ok") {
         this.canteenOptions = unshiftAllOptions(Array.from(res.data));
+        this.formdata.canteen_id = this.canteenOptions[0].id;
       }
     },
     async queryList(page) {
-      page = page || 1;
+      page = typeof page == "number" ? page : 1;
       const res = await $axios.get(
         `http://canteen.tonglingok.com/api/v1/order/orderStatistic?page=${page}&size=${
           this.size

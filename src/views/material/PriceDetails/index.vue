@@ -1,7 +1,7 @@
 <template>
   <div class="details">
     <div class="nav-title">材料价格明细</div>
-    <el-divider></el-divider>
+    <el-divider />
     <div class="main">
       <div class="main-header">
         <span class="content-header" v-if="companiesVisible">公司：</span>
@@ -18,7 +18,7 @@
             :key="item.id"
             :label="item.name"
             :value="item.id"
-          ></el-option>
+          />
         </el-select>
         <span class="content-header">消费地点：</span>
         <el-select
@@ -31,7 +31,7 @@
             :key="item.id"
             :label="item.name"
             :value="item.id"
-          ></el-option>
+          />
         </el-select>
         <el-input
           placeholder="请输入内容"
@@ -39,7 +39,7 @@
           :clearable="true"
           v-model="keyword"
           style="width:180px;margin: 0 15px;"
-        ></el-input>
+        />
         <el-button
           type="primary"
           plain
@@ -77,12 +77,8 @@
       </div>
       <div class="main-content">
         <el-table style="width:100%; font-size:14px" :data="tableData" border>
-          <el-table-column
-            prop="id"
-            label="序号"
-            width="200px"
-          ></el-table-column>
-          <el-table-column prop="name" label="材料名称"></el-table-column>
+          <el-table-column prop="id" label="序号" width="200px" />
+          <el-table-column prop="name" label="材料名称" />
           <el-table-column label="单价/元">
             <template slot-scope="scope"
               >{{ scope.row.price }}元/kg</template
@@ -104,9 +100,9 @@
         <pagination
           v-show="total > 10"
           :total="total"
-          :page.sync="page"
+          :currentPage="current_page"
           @pagination="getList"
-        ></pagination>
+        />
       </div>
     </div>
     <handle-dialog
@@ -126,6 +122,8 @@ import HandleDialog from "./dialog";
 import $axios from "@/api/index";
 import Pagination from "@/components/Pagination";
 import store from "@/store";
+import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
+
 export default {
   data() {
     return {
@@ -146,14 +144,17 @@ export default {
       result: [],
       total: 0,
       page: 1,
-      limit: 1
+      limit: 1,
+      current_page: 1
     };
   },
-  created() {
+  async created() {
     if (this.companiesVisible) {
-      this.fetchCompanyList();
+      await this.fetchCompanyList();
+      await this.fetchTableList(1);
     } else {
-      this.fetchCanteenList(0);
+      await this.fetchCanteenList(0);
+      await this.fetchTableList(1);
     }
   },
   computed: {
@@ -175,70 +176,56 @@ export default {
         });
       }
     },
-    // 数组扁平化
-    flatten(arr) {
-      for (var i = 0, len = arr.length; i < len; i++) {
-        this.companyList.push({ id: arr[i].id, name: arr[i].name });
-        if (typeof arr[i].items !== "undefined") {
-          this.flatten(arr[i].items);
-        }
-      }
-    },
-    fetchCompanyList() {
-      $axios
+    async fetchCompanyList() {
+      await $axios
         .get("http://canteen.tonglingok.com/api/v1/admin/companies")
         .then(res => {
-          this.flatten(res.data);
-          let temp = "";
-          this.companyList.forEach((item, index) => {
-            if (index <= this.companyList.length) {
-              temp += item.id + ",";
-            }
-          });
-          temp = temp.slice(0, -1);
-          this.companyList.unshift({ id: temp, name: "全部" });
+          this.companyList = getAllOptions(flatten(res.data));
+          this.company_id = this.companyList[0].id;
+          this.canteenList.unshift({ id: "", name: "全部" });
         })
-        .catch(error => console.log(err));
+        .catch(error => console.log(error));
     },
-    fetchCanteenList(id) {
+    async fetchCanteenList(id) {
       this.canteen_id = "";
-      this.canteenList = [];
       if (this.companiesVisible) {
         if (typeof id === "string" && id.indexOf(",")) {
           this.canteenList.unshift({ id: "", name: "全部" });
         } else {
-          $axios
+          await $axios
             .get(
               `http://canteen.tonglingok.com/api/v1/canteens?company_id=${id}`
             )
             .then(res => {
-              this.canteenList = Array.from(res.data);
+              this.canteenList = getAllOptions(flatten(res.data));
+              this.canteen_id = this.canteenList[0].id;
             })
             .catch(err => console.log(err));
         }
       } else {
-        $axios
+        await $axios
           .get("http://canteen.tonglingok.com/api/v1/managerCanteens")
           .then(res => {
             this.canteenList = Array.from(res.data);
+            this.canteen_id = this.canteenList[0].id;
           })
           .catch(err => console.log(err));
       }
     },
-    fetchTableList() {
-      $axios
+    async fetchTableList(page) {
+      page = Number(page) || 1;
+      await $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/materials?page=${
-            this.page
-          }&size=10&key=${this.keyword}&canteen_ids=${
-            this.canteen_id
-          }&company_ids=${this.company_id}`
+          `http://canteen.tonglingok.com/api/v1/materials?page=${page}&size=10&key=${
+            this.keyword
+          }&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
         )
         .then(res => {
           this.tableData = res.data.data;
           this.total = res.data.total;
+          this.current_page = res.data.current_page;
         })
-        .catch(error => console.log(err));
+        .catch(error => console.log(error));
     },
     handleClick(row = {}, type, title) {
       this.visible = true;
@@ -273,16 +260,16 @@ export default {
           .catch(err => console.log(err));
       });
     },
-    getList(val) {
+    async getList(val) {
       this.page = val;
-      this.fetchTableList();
+      await this.fetchTableList(val);
     },
     closeDialog(val) {
       this.visible = val;
       this.editFormdata = {};
     },
-    deriveData() {
-      $axios
+    async deriveData() {
+      await $axios
         .get(
           `http://canteen.tonglingok.com/api/v1/material/export?key=${
             this.keyword
@@ -298,14 +285,14 @@ export default {
         })
         .catch(error => console.log(err));
     },
-    confirmUpdate(val) {
+    async confirmUpdate(val) {
       if (val === "ok") {
-        this.fetchTableList();
+        await this.fetchTableList(this.current_page);
       }
     },
     handleSuccess(res, file, fileList) {
       this.sendMessage(res.msg);
-      this.fetchTableList();
+      this.fetchTableList(this.current_page);
     }
   },
   components: {

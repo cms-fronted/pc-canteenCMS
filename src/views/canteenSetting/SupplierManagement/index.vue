@@ -115,8 +115,9 @@ export default {
     };
   },
   components: { AddDialog, Pagination },
-  created() {
-    this.fetchCompanyList();
+  async created() {
+    await this.fetchCompanyList();
+    await this.fetchSupplierList();
   },
   computed: {
     companiesVisible() {
@@ -124,18 +125,19 @@ export default {
     }
   },
   methods: {
-    fetchCompanyList() {
-      $axios
+    async fetchCompanyList() {
+      await $axios
         .get("http://canteen.tonglingok.com/api/v1/admin/companies")
         .then(res => {
           let arr = res.data;
           this.companyList = flatten(arr);
+          this.company_id = this.companyList[0].id;
         })
         .catch(err => console.log(err));
     },
-    fetchSupplierList() {
+    async fetchSupplierList() {
       if (this.companiesVisible) {
-        $axios
+        await $axios
           .get(
             `http://canteen.tonglingok.com/api/v1/suppliers?c_id=${
               this.company_id
@@ -147,7 +149,7 @@ export default {
           })
           .catch(err => console.log(err));
       } else {
-        $axios
+        await $axios
           .get(
             `http://canteen.tonglingok.com/api/v1/suppliers?page=${
               this.page

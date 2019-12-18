@@ -342,7 +342,7 @@ import { mapState } from "vuex";
 import store from "@/store";
 import Pagination from "@/components/Pagination";
 import $axios from "@/api/index";
-import { flatten } from "@/utils/flatternArr";
+import { flatten, unshiftAllOptions } from "@/utils/flatternArr";
 export default {
   components: { Pagination },
   data() {
@@ -567,6 +567,8 @@ export default {
       );
       if (res.msg === "ok") {
         this.companyOptions = flatten(res.data);
+        this.queryForm.c_id = this.companyOptions[0].id;
+        this.fetchDepartmentTreeData();
       }
     },
     async getDepartmentListWithoutCid() {
@@ -574,7 +576,7 @@ export default {
         "http://canteen.tonglingok.com/api/v1/admin/departments"
       );
       if (res.msg === "ok") {
-        this.departmentList = unshiftAllOptions(Aarray.from(res.data));
+        this.departmentList = unshiftAllOptions(Array.from(res.data));
       }
     },
     async getRoleType() {

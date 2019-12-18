@@ -1,28 +1,20 @@
 <template>
   <div class="shop-order-detail-manager">
     <div class="nav-title">订单明细查询</div>
-    <el-divider></el-divider>
+    <el-divider />
     <div class="main">
       <div class="main-header">
         <div class="select-title">
           <el-form :model="formdata" :inline="true">
-            <el-form-item label="开始">
+            <el-form-item label="时间">
               <el-date-picker
-                value-format="yyyy-MM-dd HH:mm:ss"
-                format="yyyy-MM-dd"
-                v-model="formdata.time_begin"
-                style="width:220px"
-                type="datetime"
-              ></el-date-picker>
-            </el-form-item>
-            <el-form-item label="结束">
-              <el-date-picker
-                value-format="yyyy-MM-dd HH:mm:ss"
-                format="yyyy-MM-dd"
-                v-model="formdata.time_end"
-                style="width:220px"
-                type="datetime"
-              ></el-date-picker>
+                value-format="yyyy-MM-dd"
+                v-model="formdata.date"
+                range-separator="~"
+                start-placeholder="开始日期"
+                end-placeholder="结束日期"
+                type="daterange"
+              />
             </el-form-item>
             <el-form-item label="公司" v-if="companiesVisible">
               <el-select
@@ -36,7 +28,7 @@
                   :key="item.id"
                   :label="item.name"
                   :value="item.id"
-                ></el-option>
+                />
               </el-select>
             </el-form-item>
             <el-form-item label="部门">
@@ -49,7 +41,7 @@
                   :key="item.id"
                   :label="item.name"
                   :value="item.id"
-                ></el-option>
+                />
               </el-select>
             </el-form-item>
 
@@ -60,7 +52,7 @@
                   :key="item.id"
                   :label="item.name"
                   :value="item.id"
-                ></el-option>
+                />
               </el-select>
             </el-form-item>
           </el-form>
@@ -74,11 +66,7 @@
       </div>
       <div class="main-content">
         <el-table style="width:100%" :data="tableData" border>
-          <el-table-column
-            label="序号"
-            type="index"
-            width="50px"
-          ></el-table-column>
+          <el-table-column label="序号" type="index" width="50px" />
           <el-table-column label="下单时间">
             <div
               slot-scope="scoped"
@@ -142,7 +130,7 @@
           :pageSize="size"
           @pagination="fetchList"
           :currentPage="current_page"
-        ></pagination>
+        />
       </div>
     </div>
     <el-dialog
@@ -175,10 +163,10 @@
         :cell-class-name="tableRowClassName"
         :header-cell-class-name="tableRowClassName"
       >
-        <el-table-column label="类型" prop="category"></el-table-column>
-        <el-table-column label="名称" prop="name"></el-table-column>
-        <el-table-column label="单位" prop="unit"></el-table-column>
-        <el-table-column label="数量" prop="count"></el-table-column>
+        <el-table-column label="类型" prop="category" />
+        <el-table-column label="名称" prop="name" />
+        <el-table-column label="单位" prop="unit" />
+        <el-table-column label="数量" prop="count" />
         <el-table-column label="金额" prop="price">
           <div
             slot-scope="scoped"
@@ -200,6 +188,7 @@ import $axios from "@/api/index";
 import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
 import store from "@/store";
 import Pagination from "@/components/Pagination";
+import moment from "moment";
 const good_state = [
   { id: 0, name: "全部" },
   { id: 1, name: "已完成" },
@@ -218,9 +207,18 @@ export default {
       companyList: [],
       departmentList: [],
       goodStateOptions: good_state,
-      formdata: {},
+      formdata: {
+        date: [
+          moment()
+            .subtract(7, "d")
+            .format("YYYY-MM-DD"),
+          moment().format("YYYY-MM-DD")
+        ],
+        department_id: "",
+        company_id: ""
+      },
       tableData: [
-        {
+        /*        {
           order_id: 6,
           create_time: "2019-09-28 08:14:10",
           used_time: null,
@@ -233,70 +231,78 @@ export default {
             id: 1,
             address: "江门市白石大道东4号路3栋"
           }
-        }
+        }*/
       ],
       detailForm: {
         products: [
-          {
+          /*      {
             category: "111",
             name: "11111",
             price: "1111",
             unit: "11111",
             count: "111"
-          }
+          }*/
         ]
       },
-      isDisabled: true,
       current_page: 1,
       size: 10,
       total: 0
     };
   },
   watch: {
-    isAble(val) {
-      this.isDisabled = !val;
+    formdata: {
+      handler: function(val, oldVal) {
+        if (val.date) {
+          this.formdata.time_begin = this.formdata.date[0];
+          this.formdata.time_end = this.formdata.date[1];
+        }
+      },
+      deep: true,
+      immediate: true
     }
   },
   computed: {
     companiesVisible() {
       return this.grade !== 3;
     },
-    isAble() {
-      return !!this.formdata.time_end && !!this.formdata.time_begin;
+    isDisabled() {
+      return !!!this.formdata.date;
     },
     dialogTitle() {
       return !this.isPrint ? "订单明细" : "小票";
     }
   },
-  created() {
+  async created() {
     if (this.companiesVisible) {
-      this.getCompanies();
+      await this.getCompanies();
     } else {
-      this.getDepartmentListWithoutCid();
+      await this.getDepartmentListWithoutCid();
     }
-    $axios
-      .get("http://canteen.tonglingok.com/api/v1/order/detail?id=8&type=1")
-      .then(res => console.log(res));
+    await this.fetchList(1);
   },
   methods: {
     tableRowClassName({ row, column, rowIndex, columnIndex }) {
       return "table-border";
     },
-    getCompanies() {
-      $axios
+    async getCompanies() {
+      await $axios
         .get("http://canteen.tonglingok.com/api/v1/admin/companies")
-        .then(res => {
+        .then(async res => {
           let arr = res.data;
-          let allCompanies = [];
           let companiesList = flatten(arr);
           this.companyList = companiesList;
+          this.formdata.company_id = companiesList[0].id;
+          await this.getDepartmentList(companiesList[0].id);
         })
         .catch(err => console.log(err));
     },
     async getDepartmentList(company_id) {
-      const res = await $axios.get(`v1/departments?c_id=${company_id}`);
+      const res = await $axios.get(
+        `http://canteen.tonglingok.com/api/v1/departments?c_id=${company_id}`
+      );
       if (res.msg === "ok") {
         this.departmentList = unshiftAllOptions(Array.from(flatten(res.data)));
+        this.formdata.department_id = this.departmentList[0].id;
       }
     },
     async getDepartmentListWithoutCid() {
@@ -304,16 +310,15 @@ export default {
         "http://canteen.tonglingok.com/api/v1/admin/departments"
       );
       if (res.msg === "ok") {
-        this.departmentList = unshiftAllOptions(Aarray.from(res.data));
+        this.departmentList = unshiftAllOptions(Array.from(res.data));
+        this.formdata.department_id = this.departmentList[0].id;
       }
     },
     async fetchList(page) {
       page = typeof page === Number ? page : 1;
       // page = page || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/shop/order/statistic/manager?page=${page}&size=${
-          this.size
-        }`,
+        `http://canteen.tonglingok.com/api/v1/shop/order/statistic/manager?page=${page}&size=${this.size}`,
         this.formdata
       );
       if (res.msg === "ok") {

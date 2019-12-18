@@ -1,7 +1,7 @@
 <template>
   <div class="setting">
     <div class="nav-title">菜单设置</div>
-    <el-divider></el-divider>
+    <el-divider />
     <div class="main">
       <div class="main-header">
         <span class="content-header" v-if="companiesVisible">公司：</span>
@@ -18,7 +18,7 @@
             :key="item.id"
             :label="item.name"
             :value="item.id"
-          ></el-option>
+          />
         </el-select>
         <span class="content-header">消费地点：</span>
         <el-select
@@ -31,7 +31,7 @@
             :key="item.id"
             :label="item.name"
             :value="item.id"
-          ></el-option>
+          />
         </el-select>
         <el-button @click="AddVisible = true">新增</el-button>
         <el-button @click="fetchTableList(1)">查询</el-button>
@@ -42,17 +42,11 @@
           :data="tableList"
           :span-method="objectSpanMethod"
         >
-          <el-table-column label="公司级别" prop="grade"></el-table-column>
-          <el-table-column
-            label="公司名称"
-            prop="company_name"
-          ></el-table-column>
-          <el-table-column
-            label="消费地点"
-            prop="canteen_name"
-          ></el-table-column>
-          <el-table-column label="餐类" prop="category_name"></el-table-column>
-          <el-table-column label="菜类明细" prop="category"></el-table-column>
+          <el-table-column label="公司级别" prop="grade" />
+          <el-table-column label="公司名称" prop="company_name" />
+          <el-table-column label="消费地点" prop="canteen_name" />
+          <el-table-column label="餐类" prop="category_name" />
+          <el-table-column label="菜类明细" prop="category" />
           <el-table-column label="状态">
             <template slot-scope="scope">
               <el-radio-group v-model="scope.row.status" disabled>
@@ -61,7 +55,7 @@
               </el-radio-group>
             </template>
           </el-table-column>
-          <el-table-column label="可选菜品" prop="number"></el-table-column>
+          <el-table-column label="可选菜品" prop="number" />
           <el-table-column label="操作">
             <template slot-scope="scope">
               <el-button
@@ -85,7 +79,7 @@
           :pageSize="size"
           :currentPage="current_page"
           @pagination="fetchTableList"
-        ></pagination>
+        />
       </div>
     </div>
     <el-dialog
@@ -105,7 +99,7 @@
               :key="item.id"
               :label="item.name"
               :value="item.id"
-            ></el-option>
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="餐次">
@@ -115,7 +109,7 @@
               :value="item.id"
               :label="item.name"
               :key="item.id"
-            ></el-option>
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="菜类">
@@ -128,12 +122,12 @@
               v-model="item.category"
               :disabled="item.disabled"
               style="width:150px"
-            ></el-input>
+            />
             <el-button
               @click.prevent="removeInput(item)"
               icon="el-icon-delete"
               style="marginLeft:5px"
-            ></el-button>
+            />
           </div>
           <el-button @click="addListObjItem">添加</el-button>
         </el-form-item>
@@ -144,7 +138,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="数量" v-if="menuForm.status === 1">
-          <el-input v-model="menuForm.number"></el-input>
+          <el-input v-model="menuForm.number" />
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -156,7 +150,7 @@
     <el-dialog :visible.sync="editVisible" width="30%" title="编辑菜单" center>
       <el-form :model="editForm" label-width="60px">
         <el-form-item label="菜类" prop="category">
-          <el-input v-model="editForm.category"></el-input>
+          <el-input v-model="editForm.category" />
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="editForm.status">
@@ -165,7 +159,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="数量" prop="number" v-if="editForm.status === 1">
-          <el-input v-model="editForm.number"></el-input>
+          <el-input v-model="editForm.number" />
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -213,18 +207,20 @@ export default {
       spanArr: [], //二维数组，用于存放单元格合并规则
       position: 0, //用于存储相同项的开始index
       current_page: 1,
-      size: 2,
+      size: 3,
       total: 10
     };
   },
   watch: {
     listObj: function() {}
   },
-  created() {
+  async created() {
     if (this.companiesVisible) {
-      this.getCompanies();
+      await this.getCompanies();
+      await this.fetchTableList(1);
     } else {
-      this.getLocationList(0);
+      await this.getLocationList(0);
+      await this.fetchTableList(1);
     }
   },
   computed: {
@@ -233,8 +229,8 @@ export default {
     }
   },
   methods: {
-    getCompanies() {
-      $axios
+    async getCompanies() {
+      await $axios
         .get("http://canteen.tonglingok.com/api/v1/admin/companies")
         .then(res => {
           let arr = res.data;
@@ -250,6 +246,9 @@ export default {
             id: allCompanies
           });
           this.companyList = companiesList;
+          this.company_id = this.companyList[0].id;
+          this.locationList = [{ name: "全部", id: 0 }];
+          this.canteen_id = 0;
         })
         .catch(err => console.log(err));
     },
@@ -257,7 +256,8 @@ export default {
       this.menuForm.c_id = "";
       this.menuForm.dinner_id = "";
       this.menuForm.m_id = "";
-      this.canteen_id = "";
+      this.locationList = [{ name: "全部", id: 0 }];
+      this.canteen_id = 0;
       if (!isNaN(company_id)) {
         if (company_id) {
           $axios
@@ -266,6 +266,7 @@ export default {
             )
             .then(res => {
               this.locationList = unshiftAllOptions(Array.from(res.data));
+              this.canteen_id = this.locationList[0].id;
             })
             .catch(err => console.log(err));
         } else {
@@ -273,11 +274,13 @@ export default {
             .get("http://canteen.tonglingok.com/api/v1/managerCanteens")
             .then(res => {
               this.locationList = unshiftAllOptions(Array.from(res.data));
+              this.canteen_id = this.locationList[0].id;
             })
             .catch(err => console.log(err));
         }
       } else {
-        this.locationList = [];
+        this.locationList = [{ name: "全部", id: 0 }];
+        this.canteen_id = 0;
         this.categoryList = [];
         this.dinnersList = [];
       }
@@ -349,9 +352,9 @@ export default {
       // this.isMoving = !this.isMoving;
       // this.menuForm.number = this.isMoving == 1 ? 0 : "";
     },
-    fetchTableList(page) {
-      page = page || 1;
-      $axios
+    async fetchTableList(page) {
+      page = typeof page == "number" ? page : 1;
+      await $axios
         .get(
           `http://canteen.tonglingok.com/api/v1/menus/company?company_id=${
             this.company_id

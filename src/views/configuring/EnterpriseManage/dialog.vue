@@ -16,16 +16,16 @@
         @close="_closeDinnerForm"
       >
         <el-form ref="dinnerForm" :model="dinnerForm" label-width="120px">
-          <el-form-item label="餐次名称" prop="name">
-            <el-input v-model="dinnerForm.name" style="width:150px;"></el-input>
+          <el-form-item label="餐次名称">
+            <el-input v-model="dinnerForm.name" style="width:150px;" />
           </el-form-item>
-          <el-form-item label="消费状态" prop="fixed">
+          <el-form-item label="消费状态">
             <el-radio-group v-model="dinnerForm.fixed">
               <el-radio :label="1">固定</el-radio>
               <el-radio :label="2">动态</el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item label="订餐截止日期" label-width="120px" prop="type">
+          <el-form-item label="订餐截止日期" label-width="120px">
             <el-radio-group
               v-model="dinnerForm.type"
               @change="dinnerForm.type_number = ''"
@@ -37,8 +37,7 @@
                   <el-input
                     v-model="dinnerForm.type_number"
                     style="width:50px"
-                  ></el-input
-                  >天
+                  />天
                 </span>
               </el-radio>
               <el-radio label="week">
@@ -55,13 +54,13 @@
                       :key="item.value"
                       :value="item.value"
                       :label="item.label"
-                    ></el-option>
+                    />
                   </el-select>
                 </span>
               </el-radio>
             </el-radio-group>
           </el-form-item>
-          <el-form-item label prop="limit_time">
+          <el-form-item label>
             <el-time-select
               v-model="dinnerForm.limit_time"
               :picker-options="{
@@ -71,9 +70,9 @@
               }"
               placeholder="请选择时间"
               style="marginTop: 5px; marginLeft: 5px; "
-            ></el-time-select>
+            />
           </el-form-item>
-          <el-form-item label="就餐时间" prop="meal_time">
+          <el-form-item label="就餐时间">
             <el-time-select
               style="width:100px"
               placeholder="起始"
@@ -83,7 +82,7 @@
                 step: '00:01',
                 end: '23:59'
               }"
-            ></el-time-select>
+            />
             <span style="margin: 0 10px;">——</span>
             <el-time-select
               style="width:100px"
@@ -95,7 +94,7 @@
                 end: '23:59',
                 minTime: dinnerForm.meal_time_begin
               }"
-            ></el-time-select>
+            />
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -114,16 +113,16 @@
       >
         <el-form ref="machineForm" :model="machineForm" label-width="80px">
           <el-form-item label="设备名称" prop="name">
-            <el-input v-model="machineForm.name"></el-input>
+            <el-input v-model="machineForm.name" />
           </el-form-item>
           <el-form-item label="设备号" prop="code">
-            <el-input v-model="machineForm.code"></el-input>
+            <el-input v-model="machineForm.code" />
           </el-form-item>
           <el-form-item label="编号" prop="number">
-            <el-input v-model="machineForm.number"></el-input>
+            <el-input v-model="machineForm.number" />
           </el-form-item>
           <el-form-item label="密码" prop="pwd" v-if="!isEditMachine">
-            <el-input v-model="machineForm.pwd" show-password></el-input>
+            <el-input v-model="machineForm.pwd" show-password />
           </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
@@ -198,7 +197,7 @@
             size="small"
             style="width:200px;"
             :disabled="isEdit"
-          ></el-input>
+          />
         </span>
         <el-button
           type="primary"
@@ -211,11 +210,7 @@
           >添加餐次</el-button
         >
         <el-table style="width:100%" :data="dataTable" size="small">
-          <el-table-column
-            label="餐次"
-            width="60px"
-            prop="name"
-          ></el-table-column>
+          <el-table-column label="餐次" width="60px" prop="name" />
           <!-- <el-table-column label="订餐单位" width="80px" prop="" ></el-table-column> -->
           <el-table-column label="订餐截止时间">
             <span slot-scope="scoped">
@@ -278,8 +273,7 @@
                 size="small"
                 type="number"
                 min="0"
-              ></el-input
-              >元
+              />元
             </span>
           </el-form-item>
         </el-form>
@@ -296,9 +290,9 @@
           >
         </div>
         <el-table :data="machineTable" style="width:100%" size="mini">
-          <el-table-column label="编号" prop="number"></el-table-column>
-          <el-table-column label="设备名称" prop="name"></el-table-column>
-          <el-table-column label="设备号" prop="code"></el-table-column>
+          <el-table-column label="编号" prop="number" />
+          <el-table-column label="设备名称" prop="name" />
+          <el-table-column label="设备号" prop="code" />
           <!-- <el-table-column label="密码" prop="pwd"></el-table-column> -->
           <el-table-column label="状态">
             <template slot-scope="scoped">
@@ -456,12 +450,16 @@ export default {
         this.$message.error("请正确填写餐次信息");
         return;
       }
+      console.log(this.dataTable);
+      let table = JSON.parse(JSON.stringify(this.dataTable));
       if (this.isEditDinner) {
+        console.log(this.dinnerForm);
         this.$set(this.dataTable, this.editedDinnerIndex, this.dinnerForm);
+        this._closeDinnerForm();
       } else {
         this.dataTable.push({ ...this.dinnerForm });
+        this._closeDinnerForm();
       }
-      this._closeDinnerForm();
     },
     _editDinner(row) {
       this.dinnerForm = Object.assign({}, row);
@@ -471,14 +469,14 @@ export default {
     },
     _deleteDinner(row) {
       if (row.id) {
-        this.$confirm("此操作将永久删除该文件, 是否继续?", "提示", {
+        this.$confirm("此操作将删除该餐次, 是否继续?", "提示", {
           confirmButtonText: "确定",
           cancelButtonText: "取消",
           type: "warning"
         })
           .then(async () => {
             this.dataTable = this.dataTable.filter(item => item !== row);
-            const res = await this.$axios.post(
+            const res = await $axios.post(
               "http://canteen.tonglingok.com/api/v1/canteen/dinner/delete",
               {
                 dinner_id: row.id
@@ -503,7 +501,15 @@ export default {
       }
     },
     _closeDinnerForm() {
-      this.$refs.dinnerForm.resetFields();
+      this.dinnerForm = {
+        name: "",
+        type: "day",
+        type_number: "",
+        limit_time: "",
+        meal_time_begin: "",
+        meal_time_end: "",
+        fixed: 1
+      };
       this.editedDinnerIndex = null;
       this.dinnersVisible = false;
       this.isEditDinner = false;
@@ -593,13 +599,15 @@ export default {
         $axios
           .post("v1/canteen/saveMachine", this.machineForm)
           .then(res => {
-            this.$emit(
-              "updateMachineTable",
-              { id: this.canteen_id || this.formdata.id },
-              "canteen"
-            );
+            if (res.msg === "ok") {
+              this.$emit(
+                "updateMachineTable",
+                { id: this.canteen_id || this.formdata.id },
+                "canteen"
+              );
+              this.$message.success("添加成功");
+            }
             this.closeMachineDialog();
-            this.$message.success("添加成功");
           })
           .catch(err => console.log(err));
       } else {

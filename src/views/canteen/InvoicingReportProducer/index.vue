@@ -6,21 +6,15 @@
     <div class="main">
       <div class="main-header">
         <el-form :model="formdata" label-width="60px" :inline="true">
-          <el-form-item label="开始">
+          <el-form-item label="时间">
             <el-date-picker
-              v-model="formdata.time_begin"
-              value-format="yyyy-MM-dd HH:mm:ss"
-              format="yyyy-MM-dd"
-              type="datetime"
-            ></el-date-picker>
-          </el-form-item>
-          <el-form-item label="结束">
-            <el-date-picker
-              v-model="formdata.time_end"
-              value-format="yyyy-MM-dd HH:mm:ss"
-              format="yyyy-MM-dd"
-              type="datetime"
-            ></el-date-picker>
+              value-format="yyyy-MM-dd"
+              v-model="formdata.date"
+              range-separator="~"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期"
+              type="daterange"
+            />
           </el-form-item>
           <el-button type="primary" @click="queryList">查询</el-button>
           <el-button>导出</el-button>
@@ -70,27 +64,43 @@ import $axios from "@/api/index";
 import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
 import store from "@/store";
 import Pagination from "@/components/Pagination";
+import moment from "moment";
 export default {
   components: { Pagination },
   data() {
     return {
       tableData: [],
-      formdata: {},
+      formdata: {
+        date: [
+          moment()
+            .subtract(7, "d")
+            .format("YYYY-MM-DD"),
+          moment().format("YYYY-MM-DD")
+        ]
+      },
       current_page: 1,
       size: 10,
-      total: 0,
-      isDisabled: true
+      total: 0
     };
   },
-  created() {},
+  async created() {
+    await this.queryList(1);
+  },
   computed: {
-    isAble() {
-      return !!this.formdata.time_end && !!this.formdata.time_begin;
+    isDisabled() {
+      return !!!this.formdata.date;
     }
   },
   watch: {
-    isAble(val) {
-      this.isDisabled = !val;
+    formdata: {
+      handler: function(val, oldVal) {
+        if (val.date) {
+          this.formdata.time_begin = this.formdata.date[0];
+          this.formdata.time_end = this.formdata.date[1];
+        }
+      },
+      deep: true,
+      immediate: true
     }
   },
   methods: {

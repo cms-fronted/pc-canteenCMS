@@ -107,7 +107,7 @@ export default {
             this.refresh();
           } else {
             console.log(this.$route.query.route);
-            this.$router.push("/");
+            this.$router.push("/order");
             if (this.notifyObj) {
               this.notifyObj.close();
             }

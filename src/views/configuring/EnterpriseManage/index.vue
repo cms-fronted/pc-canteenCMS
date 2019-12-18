@@ -1,7 +1,7 @@
 <template>
   <div class="enterprise-manage">
     <div class="nav-title">企业管理</div>
-    <el-divider></el-divider>
+    <el-divider />
     <div class="main">
       <div class="main-header">
         <el-button type="primary" @click="() => addEnterprise({}, {})"
@@ -17,7 +17,7 @@
                   v-model="filterText"
                   placeholder="关键字查询"
                   size="small"
-                ></el-input>
+                />
                 <el-tree
                   :data="companyList"
                   :props="defaultProps"
@@ -59,7 +59,7 @@
           <el-col :span="16">
             <el-card>
               <div slot="header" class="clearfix">
-                <span>{{this.parent.name||"云饭堂"}}</span>
+                <span>{{ this.parent.name || "云饭堂" }}</span>
               </div>
               <div class="card-content">
                 <el-button @click="addCanteen" :disabled="!company_id"
@@ -78,10 +78,7 @@
                   :data="canteensLocData"
                 >
                   <div slot="empty">暂无饭堂</div>
-                  <el-table-column
-                    label="消费地点"
-                    prop="name"
-                  ></el-table-column>
+                  <el-table-column label="消费地点" prop="name" />
                   <el-table-column label="操作">
                     <template slot-scope="scoped">
                       <span>
@@ -103,7 +100,7 @@
                   :show-header="false"
                 >
                   <div slot="empty">暂无小卖部</div>
-                  <el-table-column prop="name"></el-table-column>
+                  <el-table-column prop="name" />
                   <el-table-column>
                     <template slot-scope="scoped">
                       <span>
@@ -132,10 +129,10 @@
     >
       <el-form ref="newEnterprise" :model="enterpriseForm" label-width="80px">
         <el-form-item label="企业名称" prop="name">
-          <el-input v-model="enterpriseForm.name"></el-input>
+          <el-input v-model="enterpriseForm.name" />
         </el-form-item>
         <el-form-item label="上级企业">
-          <el-input :disabled="true" :value="parent.name"></el-input>
+          <el-input :disabled="true" :value="parent.name" />
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -151,10 +148,10 @@
     >
       <el-form ref="newPayConfig" :model="payConfigForm" label-width="120px">
         <el-form-item label="公众号appId">
-          <el-input v-model="payConfigForm.app_id"></el-input>
+          <el-input v-model="payConfigForm.app_id" />
         </el-form-item>
         <el-form-item label="支付商户id">
-          <el-input v-model="payConfigForm.mch_id"></el-input>
+          <el-input v-model="payConfigForm.mch_id" />
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
@@ -175,7 +172,7 @@
       :modules="modules"
       @updateMachineTable="(val, type) => getMachineList(val, type)"
       @updateCanteenList="getComsumptionLoc"
-    ></add-canteen-dialog>
+    />
     <add-shop-dialog
       :visible="addShopVisible"
       :dialogTitle="shopDialogTitle"
@@ -186,13 +183,13 @@
       :machineList="machineList"
       @updateCanteenList="getComsumptionLoc"
       @updateMachineTable="(val, type) => getMachineList(val, type)"
-    ></add-shop-dialog>
+    />
     <edit-enterprise-dialog
       :visible="editEnterpriseDialogVisible"
       :modules="modules"
       :company_id="company_id"
       @closeDialog="closeEditEnterprise"
-    ></edit-enterprise-dialog>
+    />
   </div>
 </template>
 

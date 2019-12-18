@@ -30,7 +30,7 @@ export const currencyRoutes = [
   {
     path: "/404",
     name: "404",
-    componet: () => import("error-page/404.vue"),
+    componet: () => import("@/views/error"),
     hidden: true
   },
   {
@@ -47,12 +47,12 @@ export const currencyRoutes = [
       }
     ]
   },
-  {
-    path: "*",
-    name: "*404",
-    redirect: "/404",
-    hidden: true
-  }
+  // {
+  //   path: "*",
+  //   name: "*404",
+  //   redirect: "/404",
+  //   hidden: true
+  // }
 ];
 export const asyncRoutes = [
   {
@@ -380,6 +380,7 @@ const creatRouter = () => {
     }
   });
 };
+const router = creatRouter()
 // 解决addRoute不能删除动态路由问题
 export function resetRouter() {
   const reset = creatRouter();
@@ -398,14 +399,12 @@ router.beforeEach(async (to, from, next) => {
         next();
       } else {
         try {
-          const { roles } = await store.dispatch("user/_getInfo");
+          const  {roles}  = await store.dispatch("user/_getUserModules");
           const addRoutes = await store.dispatch(
             "permission/getAsyncRoutes",
             roles
           );
-          console.log(addRoutes);
           router.addRoutes(addRoutes);
-
           // hack method to ensure that addRoutes is complete
           // set the replace: true, so the navigation will not leave a history record
           next({ ...to, replace: true });
@@ -423,6 +422,4 @@ router.beforeEach(async (to, from, next) => {
     }
   }
 });
-const router = creatRouter();
-
 export default router;

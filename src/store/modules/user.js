@@ -55,7 +55,6 @@ const actions = {
     return new Promise((resolve, reject) => {
       login(formdatas)
         .then(res => {
-          console.log(res);
           if (res.code == "200") {
             commit("SET_TOKEN", res.data.token);
             commit("SET_ROLE", res.data.role);
@@ -79,6 +78,7 @@ const actions = {
             commit("SET_GRADE", res.data.grade);
             commit("SET_NAME", res.data.userName);
             commit("SET_PRODUCER", 1);
+            localStorage.setItem("isProducer", 1);
             resolve(res);
           }
         })
@@ -93,7 +93,7 @@ const actions = {
     commit("DEL_GRADE");
     commit("DEL_PRODUCER");
     // resetRouter();
-    if (state.isProducer) {
+    if (localStorage.getItem("isProducer")) {
       router.push({
         path: "/producerLogin",
         query: {
@@ -112,6 +112,10 @@ const actions = {
   _getUserModules({ commit }) {
     let roles = null;
     return new Promise((resolve, reject) => {
+      if (localStorage.getItem("isProducer"))
+       {
+        return resolve({roles});
+      };
       getUserModules()
         .then(res => {
           if (res.msg === "ok") {
