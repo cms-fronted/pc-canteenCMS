@@ -90,6 +90,7 @@ export default {
   methods: {
     async getCategoryList(company_id) {
       const res = await $axios.get(
+        //原型没有选公司，不传company_id
         "http://canteen.tonglingok.com/api/v1/company/categories"
       );
       if (res.msg === "ok") {

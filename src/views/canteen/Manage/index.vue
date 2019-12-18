@@ -230,7 +230,7 @@ export default {
       this.category_id = "";
       $axios
         .get(
-          "http://canteen.tonglingok.com/api/v1/company/categories?&page=1&size=10"
+          "http://canteen.tonglingok.com/api/v1/company/categories"
         )
         .then(res => {
           this.categoryList = res.data;

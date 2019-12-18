@@ -100,14 +100,14 @@ export default {
       });
     },
     _login() {
+      return alert("有bug，维护中")
       this.$store
         .dispatch("user/_producerLogin", this.ruleForm)
         .then(res => {
           if (!res.code == "200") {
             this.refresh();
           } else {
-            console.log(this.$route.query.route);
-            this.$router.push("/");
+            this.$router.push("/manage/manage");
             if (this.notifyObj) {
               this.notifyObj.close();
             }

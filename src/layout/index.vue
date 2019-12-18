@@ -1,12 +1,12 @@
 <template>
   <div class="wrapper" :class="{ closeBar: opened }">
     <m-header></m-header>
-    <transition
+    <!-- <transition
       enter-active-class="animated bounceInRight"
       leave-active-class="animated bounceOutRight"
     >
       <notificat-bar v-show="msgIsShow"></notificat-bar>
-    </transition>
+    </transition> -->
     <div class="wrapper_con">
       <side-bar></side-bar>
       <page-main></page-main>

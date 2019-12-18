@@ -20,7 +20,7 @@
               <el-select
                 v-model="formdata.company_id"
                 placeholder="请选择企业"
-                @change="getDepartmentList"
+                @change="getList"
                 filterable
               >
                 <el-option
@@ -246,12 +246,12 @@ export default {
     }
   },
   async created() {
-    await this.getCategoryOptions();
     await this.getProductsId();
     if (this.companiesVisible) {
       await this.getCompanies();
     } else {
       await this.getDepartmentListWithoutCid();
+      await this.getCategoryOptions();
     }
     await this.queryList(1);
   },
@@ -265,6 +265,7 @@ export default {
           this.companyList = companiesList;
           this.formdata.company_id = companiesList[0].id;
           await this.getDepartmentList(companiesList[0].id);
+          await this.getCategoryOptions(companiesList[0].id);
         })
         .catch(err => console.log(err));
     },
@@ -282,6 +283,10 @@ export default {
           }
         });
     },
+    async getList(company_id) {
+      await this.getCategoryOptions(company_id);
+      await this.getDepartmentList(company_id);
+    },
     async getDepartmentListWithoutCid() {
       const res = await $axios.get(
         "http://canteen.tonglingok.com/api/v1/admin/departments"
@@ -291,9 +296,13 @@ export default {
         this.formdata.department_id = this.departmentList[0].id;
       }
     },
-    async getCategoryOptions() {
+    async getCategoryOptions(company_id) {
+      company_id = company_id || "";
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/company/categories"
+        "http://canteen.tonglingok.com/api/v1/company/categories",
+        {
+          company_id: company_id
+        }
       );
       if (res.msg === "ok") {
         this.categoryOptions = unshiftAllOptions(Array.from(res.data));
@@ -327,9 +336,7 @@ export default {
     async queryList(page) {
       page = typeof page == Number ? page : 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/shop/orderConsumption?page=${page}&size=${
-          this.size
-        }`,
+        `http://canteen.tonglingok.com/api/v1/shop/orderConsumption?page=${page}&size=${this.size}`,
         this.formdata
       );
       if (res.msg === "ok") {

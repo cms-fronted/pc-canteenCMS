@@ -122,7 +122,7 @@ export default {
         "http://canteen.tonglingok.com/api/v1/company/suppliers"
       );
       if (res.msg === "ok") {
-        this.supplierOptions = Array.from(res.data);
+        this.supplierOptions = unshiftAllOptions(Array.from(res.data));
         this.formdata.supplier_id = this.supplierOptions[0].id;
       }
     },

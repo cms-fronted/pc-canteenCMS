@@ -213,7 +213,9 @@ export default {
             .subtract(7, "d")
             .format("YYYY-MM-DD"),
           moment().format("YYYY-MM-DD")
-        ]
+        ],
+        department_id: "",
+        company_id: ""
       },
       tableData: [
         /*        {
@@ -285,12 +287,12 @@ export default {
     async getCompanies() {
       await $axios
         .get("http://canteen.tonglingok.com/api/v1/admin/companies")
-        .then(res => {
+        .then(async res => {
           let arr = res.data;
           let companiesList = flatten(arr);
           this.companyList = companiesList;
           this.formdata.company_id = companiesList[0].id;
-          this.getDepartmentList(companiesList[0].id);
+          await this.getDepartmentList(companiesList[0].id);
         })
         .catch(err => console.log(err));
     },
@@ -316,9 +318,7 @@ export default {
       page = typeof page === Number ? page : 1;
       // page = page || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/shop/order/statistic/manager?page=${page}&size=${
-          this.size
-        }`,
+        `http://canteen.tonglingok.com/api/v1/shop/order/statistic/manager?page=${page}&size=${this.size}`,
         this.formdata
       );
       if (res.msg === "ok") {

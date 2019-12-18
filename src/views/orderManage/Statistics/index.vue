@@ -66,11 +66,11 @@
         </div>
         <div class="main-content">
           <el-table style="width:100%" :data="tableData" border>
-            <el-table-column label="日期" prop="ordering_date" />
-            <el-table-column label="公司" prop="company" />
-            <el-table-column label="消费地点" prop="canteen" />
-            <el-table-column label="餐次" prop="dinner" />
-            <el-table-column label="消费人数" prop="count" />
+            <el-table-column label="日期" prop="ordering_date"></el-table-column>
+            <el-table-column label="公司" prop="company"></el-table-column>
+            <el-table-column label="消费地点" prop="canteen"></el-table-column>
+            <el-table-column label="餐次" prop="dinner"></el-table-column>
+            <el-table-column label="消费人数" prop="count"></el-table-column>
           </el-table>
           <pagination
             @pagination="queryList"
