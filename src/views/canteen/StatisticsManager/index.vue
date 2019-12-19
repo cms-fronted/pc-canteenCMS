@@ -45,7 +45,10 @@
               </el-select>
             </el-form-item>
             <el-form-item label="商品类型">
-              <el-select v-model="formdata.category_id">
+              <el-select
+                v-model="formdata.category_id"
+                @change="changeCategory"
+              >
                 <el-option
                   v-for="item in categoryOptions"
                   :key="item.id"
@@ -61,6 +64,7 @@
                 filterable
                 :remote-method="remoteMethod"
                 :loading="loading"
+                @change="changeProduct"
                 placeholder="请选择商品名称"
                 style="width:200px"
               >
@@ -104,12 +108,17 @@
         </div>
       </div>
       <div class="main-content">
-        <el-table border :data="tableData">
+        <el-table
+          border
+          :data="tableData"
+          show-summary
+          :summary-method="getSummary"
+        >
           <el-table-column label="序号" type="index" width="50px" />
           <el-table-column label="统计变量">
             <div
               slot-scope="scoped"
-              v-html="showCellData(scoped.row.statistic)"
+              v-html="showCellData(scoped.row.statistic, formdata.type)"
             ></div>
           </el-table-column>
           <el-table-column label="下单时间">
@@ -191,6 +200,8 @@ const good_state = [
   { id: 3, name: "待取货" },
   { id: 4, name: "已取货" }
 ];
+const static_type=['','种类型','种商品','种状态', '个人员', '个部门']
+
 export default {
   components: { Pagination },
   data() {
@@ -218,6 +229,7 @@ export default {
       departmentList: [],
       categoryOptions: [],
       productOptions: [],
+      statistic: {},
       goodStateOptions: good_state,
       tableData: [],
       current_page: 1,
@@ -246,12 +258,12 @@ export default {
     }
   },
   async created() {
-    await this.getProductsId();
     if (this.companiesVisible) {
       await this.getCompanies();
     } else {
       await this.getDepartmentListWithoutCid();
       await this.getCategoryOptions();
+      await this.getProductsId();
     }
     await this.queryList(1);
   },
@@ -266,6 +278,7 @@ export default {
           this.formdata.company_id = companiesList[0].id;
           await this.getDepartmentList(companiesList[0].id);
           await this.getCategoryOptions(companiesList[0].id);
+          await this.getProductsId(companiesList[0].id);
         })
         .catch(err => console.log(err));
     },
@@ -286,6 +299,7 @@ export default {
     async getList(company_id) {
       await this.getCategoryOptions(company_id);
       await this.getDepartmentList(company_id);
+      await this.getProductsId(company_id);
     },
     async getDepartmentListWithoutCid() {
       const res = await $axios.get(
@@ -309,23 +323,33 @@ export default {
         this.formdata.category_id = this.categoryOptions[0].id;
       }
     },
-    async getProductsId() {
+    changeCategory() {
+      this.formdata.product_id = "";
+    },
+    async getProductsId(company_id) {
+      company_id = company_id || "";
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/shop/supplierProducts/search`
+        `http://canteen.tonglingok.com/api/v1/shop/companyProducts/search?company_id=${company_id}`
       );
       if (res.msg === "ok") {
         this.productOptions = unshiftAllOptions(Array.from(res.data));
         this.formdata.product_id = this.productOptions[0].id;
       }
     },
+
+    changeProduct() {
+      this.formdata.category_id = this.categoryOptions[0].id;
+    },
     async remoteMethod(query) {
       if (query != "") {
         this.loading = true;
         const res = await $axios.get(
-          `http://canteen.tonglingok.com/api/v1/shop/supplierProducts/search?product=${query}`
+          `http://canteen.tonglingok.com/api/v1/shop/companyProducts/search?product=${query}`,
+          {
+            company_id: this.formdata.company_id || ""
+          }
         );
         if (res.msg === "ok") {
-          console.log(res.data.data);
           this.productOptions = Array.from(res.data);
         }
         this.loading = false;
@@ -343,7 +367,16 @@ export default {
         this.tableData = Array.from(res.data.data);
         this.total = res.data.total;
         this.current_page = res.data.current_page;
+        this.statistic = res.data.statistic;
       }
+    },
+    getSummary(params) {
+      const { columns, data } = params;
+      const sums = ["合计"];
+      sums[1] = this.tableData.length + static_type[this.formdata.type]
+      sums[9] = "总订单：" + this.statistic.statisticCount
+      sums[10] = "总金额：" + this.statistic.statisticMoney
+      return sums;
     }
   }
 };

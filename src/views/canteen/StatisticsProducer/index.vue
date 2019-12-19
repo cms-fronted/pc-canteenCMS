@@ -74,7 +74,12 @@
         </div>
       </div>
       <div class="main-content">
-        <el-table border :data="tableData">
+        <el-table
+          border
+          :data="tableData"
+          show-summary
+          :summary-method="getSummary"
+        >
           <el-table-column
             label="序号"
             type="index"
@@ -83,7 +88,7 @@
           <el-table-column label="统计变量">
             <div
               slot-scope="scoped"
-              v-html="showCellData(scoped.row.statistic)"
+              v-html="showCellData(scoped.row.statistic, formdata.type)"
             ></div>
           </el-table-column>
           <el-table-column label="下单时间">
@@ -165,6 +170,8 @@ const good_state = [
   { id: 3, name: "待取货" },
   { id: 4, name: "已取货" }
 ];
+const static_type = ["", "种类型", "种商品", "种状态"];
+
 export default {
   components: { Pagination },
   data() {
@@ -186,6 +193,7 @@ export default {
       },
       categoryOptions: [],
       productOptions: [],
+      statistic: {},
       goodStateOptions: good_state,
       tableData: [],
       current_page: 1,
@@ -251,16 +259,23 @@ export default {
     async queryList(page) {
       page = Number(page) || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/shop/orderConsumption?page=${page}&size=${
-          this.size
-        }`,
+        `http://canteen.tonglingok.com/api/v1/shop/orderConsumption?page=${page}&size=${this.size}`,
         this.formdata
       );
       if (res.msg === "ok") {
         this.tableData = Array.from(res.data.data);
         this.total = res.data.total;
         this.current_page = res.data.current_page;
+        this.statistic = res.data.statistic;
       }
+    },
+    getSummary(params) {
+      const { columns, data } = params;
+      const sums = ["合计"];
+      sums[1] = this.tableData.length + static_type[this.formdata.type];
+      sums[9] = "总订单：" + this.statistic.statisticCount;
+      sums[10] = "总金额：" + this.statistic.statisticMoney;
+      return sums;
     }
   }
 };

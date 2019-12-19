@@ -110,6 +110,17 @@
               }}</span>
             </template>
           </el-table-column>
+          <el-table-column label="状态">
+            <div
+              slot-scope="scoped"
+              v-html="
+                showCellStatus(
+                  scoped.row.status,
+                  orderStatus[scoped.row.status]
+                )
+              "
+            ></div>
+          </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scoped">
               <span
@@ -196,10 +207,12 @@ const good_state = [
   { id: 3, name: "待取货" },
   { id: 4, name: "已取货" }
 ];
+const order_status = ["", "已完成", "已取消", "待取货", "待送货"];
 export default {
   components: { Pagination },
   data() {
     return {
+      orderStatus: order_status,
       fullscreenLoading: false,
       grade: store.getters.grade,
       isPrint: false,

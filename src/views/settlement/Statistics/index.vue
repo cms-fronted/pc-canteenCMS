@@ -99,28 +99,43 @@
         </div>
       </div>
       <div class="main-content">
-        <el-table :data="tableData" border>
-          <el-table-column type="expand" v-if="formdata.type === 2">
-            <el-table size="mini" :data="tableData.dinner_statstic">
-              <el-table-column label="餐次信息">
-                <div
-                  slot-scope="scoped"
-                  v-html= "showCellData(scoped.row.dinner)"
-                ></div>
-              </el-table-column>
-              <el-table-column label="订餐数量">
-                <div
-                  slot-scope="scoped"
-                  v-html="showCellData(scoped.row.order_count)"
-                ></div
-              ></el-table-column>
-              <el-table-column label="金额">
-                <div
-                  slot-scope="scoped"
-                  v-html="showCellData(scoped.row.order_money)"
-                ></div
-              ></el-table-column>
-            </el-table>
+        <el-table
+          :data="tableData"
+          border
+          show-summary
+          :summary-method="getOuterSum"
+        >
+          <el-table-column type="expand" width="60px">
+            <template slot-scope="tableScoped">
+              <el-table
+                size="mini"
+                :data="
+                  tableScoped.row.dinnerStatistic ||
+                    tableScoped.row.dinner_statistic
+                "
+                show-summary
+                :summary-method="getInnerSum"
+              >
+                <el-table-column prop="dinner" label="餐次信息">
+                  <div
+                    slot-scope="scoped"
+                    v-html="showCellData(scoped.row.dinner)"
+                  ></div>
+                </el-table-column>
+                <el-table-column label="订餐数量" prop="order_count">
+                  <div
+                    slot-scope="scoped"
+                    v-html="showCellData(scoped.row.order_count)"
+                  ></div
+                ></el-table-column>
+                <el-table-column label="金额" prop="order_money">
+                  <div
+                    slot-scope="scoped"
+                    v-html="showCellData(scoped.row.order_money)"
+                  ></div
+                ></el-table-column>
+              </el-table>
+            </template>
           </el-table-column>
           <el-table-column label="统计变量">
             <div
@@ -154,6 +169,7 @@
           ></el-table-column>
         </el-table>
         <pagination
+          v-if="formdata.type === 2 && total > 10"
           :total="total"
           :pageSize="size"
           :currentPage="current_page"
@@ -233,6 +249,10 @@ export default {
           ]
         }*/
       ],
+      summary: {
+        allMoney: 0,
+        allCount: 0
+      },
       consumptionOptions: consumption_options,
       current_page: 1,
       size: 10,
@@ -267,7 +287,7 @@ export default {
     } else {
       await this.getLocationList();
       await this.getDepartmentListWithoutCid();
-    await this.getRoleType();
+      await this.getRoleType();
       await this.queryList(1);
     }
   },
@@ -360,15 +380,52 @@ export default {
       );
       if (res.msg === "ok") {
         if (type === 2) {
-          this.tableData = Array.from(res.data.statistic.data);
-          this.current_page = res.data.statistic.current_page;
-          this.total = res.data.statistic.total;
+          this.tableData = Array.from(res.data.data);
+          this.current_page = res.data.current_page;
+          this.total = res.data.total;
         } else {
           this.tableData = Array.from(res.data.statistic);
           this.current_page = res.data.current_page;
           this.total = res.data.total;
+          this.summary.allMoney = res.data.allMoney;
+          this.summary.allCount = res.data.allCount;
         }
       }
+    },
+    getInnerSum(params) {
+      const { columns, data } = params;
+      const sums = [];
+
+      columns.forEach((column, index) => {
+        if (index === 0) {
+          sums[0] = "合计";
+          return;
+        }
+        const values = data.map(item => {
+          return Number(item[column.property]); // property为el-table标签钟的prop属性值
+        });
+        if (!values.every(value => isNaN(value))) {
+          sums[index] = values.reduce((prev, curr) => {
+            const value = Number(curr);
+            if (!isNaN(value)) {
+              return prev + curr;
+            } else {
+              return prev;
+            }
+          }, 0);
+          index == 1 ? (sums[index] += "次") : (sums[index] += "元");
+        } else {
+          sums[index] = "N/A";
+        }
+      });
+      return sums;
+    },
+    getOuterSum(params) {
+      const { columns, data } = params;
+      const sums = ["合计", "/", "/", "/"];
+      sums[4] = "总金额：" + this.summary.allMoney + "元";
+      sums[5] = "总订餐：" + this.summary.allCount + "次";
+      return sums;
     }
   }
 };

@@ -95,7 +95,7 @@ const actions = {
     // resetRouter();
     if (localStorage.getItem("isProducer")) {
       router.push({
-        path: "/producerLogin",
+        path: "/producer",
         query: {
           redirect: router.currentRoute.fullPath
         }
@@ -112,10 +112,6 @@ const actions = {
   _getUserModules({ commit }) {
     let roles = null;
     return new Promise((resolve, reject) => {
-      if (localStorage.getItem("isProducer"))
-       {
-        return resolve({roles});
-      };
       getUserModules()
         .then(res => {
           if (res.msg === "ok") {
