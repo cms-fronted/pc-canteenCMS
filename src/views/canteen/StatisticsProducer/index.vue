@@ -273,7 +273,6 @@ export default {
       const { columns, data } = params;
       const sums = ["合计"];
       sums[1] = this.tableData.length + static_type[this.formdata.type];
-      sums[9] = "总订单：" + this.statistic.statisticCount;
       sums[10] = "总金额：" + this.statistic.statisticMoney;
       return sums;
     }
