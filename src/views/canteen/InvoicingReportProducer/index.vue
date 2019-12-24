@@ -21,7 +21,12 @@
         </el-form>
       </div>
       <div class="main-content">
-        <el-table :data="tableData" style="width:100%">
+        <el-table
+          :data="tableData"
+          style="width:100%"
+          show-summary
+          :summary-method="getSummary"
+        >
           <el-table-column
             label="序号"
             type="index"
@@ -46,6 +51,13 @@
               slot-scope="scoped"
               v-html="showCellData(scoped.row.sale_sum)"
             ></div>
+          </el-table-column>
+          <el-table-column label="总销售额">
+            <template slot-scope="scoped">
+              <span>
+                {{ scoped.row.sale_sum * scoped.row.purchase_sum }}
+              </span>
+            </template>
           </el-table-column>
         </el-table>
         <pagination
@@ -107,16 +119,21 @@ export default {
     async queryList(page) {
       page = typeof page == Number ? page : 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/shop/salesReport/supplier?page=${page}&size=${
-          this.size
-        }`,
+        `http://canteen.tonglingok.com/api/v1/shop/salesReport/supplier?page=${page}&size=${this.size}`,
         this.formdata
       );
       if (res.msg === "ok") {
         this.tableData = Array.from(res.data.data);
         this.total = res.data.total;
         this.current_page = res.data.current_page;
+        this.allMoney = res.data.money;
       }
+    },
+    getSummary(params) {
+      const { columns, data } = params;
+      const sums = ["合计（元）"];
+      sums[6] = "总金额：" + this.allMoney;
+      return sums;
     }
   }
 };

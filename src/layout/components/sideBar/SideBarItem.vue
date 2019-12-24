@@ -46,8 +46,10 @@ export default {
     }
   },
   data() {
+    //To fix 当设置多层路由时， 设置 hidden: true ，出现死循环
+    this.childItem = null;
     return {
-      childItem: null,
+      // childItem: null,
     };
   },
   methods: {

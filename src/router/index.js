@@ -31,7 +31,7 @@ export const currencyRoutes = [
     component: () => import("@/views/error"),
     hidden: true
   },
-  {
+ /*  {
     path: "/home",
     name: "Home",
     component: Layout,
@@ -46,7 +46,7 @@ export const currencyRoutes = [
         }
       }
     ]
-  },
+  }, */
   {
     path: "/login",
     name: "Login",
