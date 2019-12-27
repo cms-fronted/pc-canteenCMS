@@ -63,7 +63,7 @@
           <el-button type="primary" @click="queryList" :disabled="isDisabled"
             >查询</el-button
           >
-          <el-button type="primary">导出</el-button>
+          <el-button type="primary" @click="exportFile">导出</el-button>
         </el-form>
       </div>
       <div class="main-content">
@@ -186,7 +186,7 @@ export default {
       companyOptions: [],
       dinnersOptions: [],
       detailForm: {
-        id: 8,
+          id: 8,
         address_id: 1,
         d_id: 6,
         type: 2,
@@ -296,15 +296,22 @@ export default {
         }
       }
     },
+    async exportFile() {
+      let queryForm = JSON.parse(JSON.stringify(this.queryForm));
+      queryForm.canteen_id = queryForm.canteen_id ? queryForm.canteen_id : 0;
+      queryForm.dinner_id = queryForm.dinner_id ? queryForm.dinner_id : 0;
+      await this.$exportExcel(
+        "http://canteen.tonglingok.com/api/v1/order/takeoutStatistic/export",
+        queryForm
+      );
+    },
     async queryList(page) {
       page = typeof page == "number" ? page : 1;
       let queryForm = JSON.parse(JSON.stringify(this.queryForm));
       queryForm.canteen_id = queryForm.canteen_id ? queryForm.canteen_id : 0;
       queryForm.dinner_id = queryForm.dinner_id ? queryForm.dinner_id : 0;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/takeoutStatistic?page=${page}&size=${
-          this.size
-        }`,
+        `http://canteen.tonglingok.com/api/v1/order/takeoutStatistic?page=${page}&size=${this.size}`,
         queryForm
       );
       if (res.msg === "ok") {
@@ -325,6 +332,13 @@ export default {
           this.$print(this.$refs.print);
         }, 1000);
       }
+      await $axios.post("http://canteen.tonglingok.com/api/v1/order/used",{ids: id}).then(res=> {
+        if(res.msg === 'ok'){
+          this.$message.success("外卖订单完成")
+        } else {
+          this.$message.error(res.msg)
+        }
+      })
     },
     async closeDetailDialog() {
       this.detailDialogVisible = false;

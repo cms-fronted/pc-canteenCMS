@@ -95,7 +95,7 @@
           <el-button type="primary" @click="queryList" :disabled="isDisabled"
             >查询</el-button
           >
-          <el-button type="primary">导出</el-button>
+          <el-button type="primary" @click="exportFile">导出</el-button>
         </div>
       </div>
       <div class="main-content">
@@ -368,7 +368,19 @@ export default {
         this.formdata.staff_type_id = this.roleOptions[0].id;
       }
     },
+    async exportFile() {
+         if (this.formdata.canteen_id) {
+        delete this.formdata.company_ids;
+      }
+      await this.$exportExcel(
+        "http://canteen.tonglingok.com/api/v1/order/consumptionStatistic/export",
+        this.formdata
+      );
+    },
     async queryList(page) {
+      if (this.formdata.canteen_id) {
+        delete this.formdata.company_ids;
+      }
       page = typeof page == "number" ? page : 1;
       const type = this.formdata.type;
       if (this.formdata.canteen_id) {
@@ -383,6 +395,8 @@ export default {
           this.tableData = Array.from(res.data.data);
           this.current_page = res.data.current_page;
           this.total = res.data.total;
+          this.summary.allMoney = "";
+          this.summary.allCount = "/";
         } else {
           this.tableData = Array.from(res.data.statistic);
           this.current_page = res.data.current_page;
@@ -395,7 +409,6 @@ export default {
     getInnerSum(params) {
       const { columns, data } = params;
       const sums = [];
-
       columns.forEach((column, index) => {
         if (index === 0) {
           sums[0] = "合计";
@@ -423,8 +436,8 @@ export default {
     getOuterSum(params) {
       const { columns, data } = params;
       const sums = ["合计", "/", "/", "/"];
-      sums[4] = "总金额：" + this.summary.allMoney + "元";
-      sums[5] = "总订餐：" + this.summary.allCount + "次";
+      sums[1] = this.summary.allCount + "个";
+      sums[5] = "总金额：" + this.summary.allMoney + "元";
       return sums;
     }
   }

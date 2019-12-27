@@ -42,7 +42,7 @@
               >一键清零</el-button
             >
             <el-button type="primary" @click="fetchTableList">查询</el-button>
-            <el-button type="primary" @click="deriveData">导出</el-button>
+            <el-button type="primary" @click="exportFile">导出</el-button>
           </div>
         </div>
         <div class="total" v-show="total > 0">
@@ -103,36 +103,44 @@ export default {
       current_page: 1
     };
   },
-  created() {
-    this.fetchDepartmentList();
+async  created() {
+   await this.fetchDepartmentList();
+   await this.fetchTableList();
   },
   methods: {
-    fetchDepartmentList() {
+    async fetchDepartmentList() {
       // 正确接口，没数据：http://canteen.tonglingok.com/api/v1/departments/recharge 测试接口：http://canteen.tonglingok.com/api/v1/departments?c_id=2
-      $axios
+      await $axios
         .get("http://canteen.tonglingok.com/api/v1/departments/recharge")
         .then(res => {
           console.log(res);
           this.departmentList = res.data;
           if (this.departmentList.length > 1) {
             this.departmentList.unshift({ id: 0, name: "全部" });
+            this.formdata.department_id = 0;
           }
         })
         .catch(err => console.log(err));
     },
-    handleClear() {
-      $axios
+    async handleClear() {
+      await $axios
         .post("http://canteen.tonglingok.com/api/v1/wallet/clearBalance")
         .then(res => {
           this.fetchTableList();
         })
         .catch(err => console.log(err));
     },
-    fetchTableList() {
+    async exportFile() {
+      await this.$exportExcel(
+        "http://canteen.tonglingok.com/api/v1/wallet/users/balance/export",
+        this.formdata
+      );
+    },
+    async fetchTableList() {
       // page size user phone  department_id 部门id，全部传0
       // 返回的数据 res.data.data username code card_num phone department balance
       let { user, phone, department_id } = this.formdata;
-      $axios
+      await $axios
         .get("http://canteen.tonglingok.com/api/v1/wallet/users/balance", {
           page: this.current_page,
           size: 10,

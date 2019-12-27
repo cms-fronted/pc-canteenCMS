@@ -61,7 +61,7 @@
           <el-button type="primary" @click="fetchList" :disabled="isDisabled"
             >查询</el-button
           >
-          <el-button type="primary" @click="deriveData">导出</el-button>
+          <el-button type="primary" @click="exportFile">导出</el-button>
         </div>
       </div>
       <div class="main-content">
@@ -372,9 +372,9 @@ export default {
         this.$print(this.$refs.detail, { noPrint: ".el-button" });
       }, 1000);
     },
-    deriveData() {
-      console.log("点击导出表格");
-    }
+   async exportFile() {
+      await this.$exportExcel('http://canteen.tonglingok.com/api/v1/shop/order/exportOrderStatistic/manager',this.formdata)
+    },
   }
 };
 </script>

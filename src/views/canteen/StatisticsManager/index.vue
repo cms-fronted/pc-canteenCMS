@@ -104,7 +104,7 @@
           <el-button type="primary" @click="queryList" :disabled="isDisabled"
             >查询</el-button
           >
-          <el-button type="primary">导出</el-button>
+          <el-button type="primary" @click="exportFile">导出</el-button>
         </div>
       </div>
       <div class="main-content">
@@ -200,7 +200,7 @@ const good_state = [
   { id: 3, name: "待取货" },
   { id: 4, name: "已取货" }
 ];
-const static_type=['','种类型','种商品','种状态', '个人员', '个部门']
+const static_type = ["", "种类型", "种商品", "种状态", "个人员", "个部门"];
 
 export default {
   components: { Pagination },
@@ -357,6 +357,12 @@ export default {
         await this.getProductsId();
       }
     },
+    async exportFile() {
+      await this.$exportExcel(
+        "http://canteen.tonglingok.com/api/v1/shop/order/exportConsumptionStatistic",
+        this.formdata
+      );
+    },
     async queryList(page) {
       page = typeof page == Number ? page : 1;
       const res = await $axios.get(
@@ -373,8 +379,8 @@ export default {
     getSummary(params) {
       const { columns, data } = params;
       const sums = ["合计"];
-      sums[1] = this.tableData.length + static_type[this.formdata.type]
-      sums[10] = "总金额：" + this.statistic.statisticMoney
+      sums[1] = this.tableData.length + static_type[this.formdata.type];
+      sums[10] = "总金额：" + this.statistic.statisticMoney;
       return sums;
     }
   }

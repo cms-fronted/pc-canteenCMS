@@ -40,7 +40,6 @@
               ></el-option>
             </el-select>
           </el-form-item>
-
           <el-button @click="queryList(1)">查询</el-button>
         </el-form>
       </div>
@@ -63,6 +62,9 @@
               <span>
                 <el-button type="text" @click="showDetail(scoped.row)"
                   >查询</el-button
+                >
+                <el-button type="text" @click="exportFile(scoped.row)"
+                  >导出</el-button
                 >
                 <el-button type="text" @click="deleteDetail(scoped.row)"
                   >作废</el-button
@@ -212,6 +214,10 @@ export default {
         this.queryForm.canteen_id = this.canteenOptions[0].id;
       }
       return res;
+    },
+    async exportFile(row) {
+      let id = row.id
+      this.$exportExcel('http://canteen.tonglingok.com/api/v1/material/exportMaterialReports',{report_id: id})
     },
     async queryList(page) {
       page = page || 1;

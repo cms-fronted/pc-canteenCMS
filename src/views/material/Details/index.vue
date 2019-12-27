@@ -31,7 +31,7 @@
             </el-select>
           </el-form-item>
           <el-button type="primary" @click="queryList(1)" plain>查询</el-button>
-          <el-button type="primary">导出</el-button>
+          <el-button type="primary" @click="exportFile">导出</el-button>
         </el-form>
       </div>
       <div class="main-content">
@@ -62,11 +62,7 @@
               </el-table>
             </template>
           </el-table-column>
-          <el-table-column
-            label="序号"
-            type="index"
-            width="50"
-          />
+          <el-table-column label="序号" type="index" width="50" />
           <el-table-column label="公司" prop="company" />
           <el-table-column label="饭堂" prop="canteen" />
           <el-table-column label="餐次" prop="dinner" />
@@ -193,6 +189,19 @@ export default {
         this.dinnerOptions = getAllOptions(Array.from(res.data));
       }
     },
+    async exportFile() {
+      let form = {};
+      form = JSON.parse(JSON.stringify(this.queryForm));
+      if (String(form.canteen_ids).includes(",")) {
+        delete form.company_ids;
+      } else if (String(form.company_ids).includes(",")) {
+        delete form.canteen_ids;
+      }
+      this.$exportExcel(
+        "http://canteen.tonglingok.com/api/v1/material/exportFoodMaterials",
+        form
+      );
+    },
     async queryList(page) {
       page = page || 1;
       let form = {};
@@ -203,9 +212,7 @@ export default {
         delete form.canteen_ids;
       }
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/materials/food?page=${page}&size=${
-          this.size
-        }`,
+        `http://canteen.tonglingok.com/api/v1/materials/food?page=${page}&size=${this.size}`,
         form
       );
       if (res.msg === "ok") {

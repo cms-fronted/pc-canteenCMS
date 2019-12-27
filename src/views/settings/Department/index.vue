@@ -51,6 +51,7 @@
           <el-button type="primary" @click="openRoleTypeDialog"
             >新增类型</el-button
           >
+          <el-button @click="exportFile">导出</el-button>
         </el-form>
         <div class="main-content">
           <el-row :gutter="10">
@@ -597,12 +598,19 @@ export default {
         this.departmentOptions = flatten(res.data);
       }
     },
+    async exportFile() {
+      await this.$exportExcel(
+        "http://canteen.tonglingok.com/api/v1/export/staffs",
+        {
+          company_id: this.c_id,
+          department_id: this.d_id
+        }
+      );
+    },
     async fetchList(page) {
       page = page || this.current_page;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/staffs?page=${page}&size=${
-          this.size
-        }`,
+        `http://canteen.tonglingok.com/api/v1/staffs?page=${page}&size=${this.size}`,
         {
           c_id: this.c_id, //company_id,
           d_id: this.d_id //d_id,

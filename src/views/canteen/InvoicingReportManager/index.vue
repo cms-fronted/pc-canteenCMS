@@ -27,7 +27,7 @@
             </el-select>
           </el-form-item>
           <el-button type="primary" @click="queryList">查询</el-button>
-          <el-button>导出</el-button>
+          <el-button @click="exportFile">导出</el-button>
         </el-form>
       </div>
       <div class="main-content">
@@ -138,6 +138,9 @@ export default {
         this.supplierOptions = unshiftAllOptions(Array.from(res.data));
         this.formdata.supplier_id = this.supplierOptions[0].id;
       }
+    },
+    async exportFile() {
+      await this.$exportExcel('http://canteen.tonglingok.com/api/v1/shop/order/exportSalesReport/manager',this.formdata)
     },
     async queryList(page) {
       page = typeof page == Number ? page : 1;

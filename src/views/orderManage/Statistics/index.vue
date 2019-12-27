@@ -61,12 +61,15 @@
               :disabled="isDisabled"
               >查询</el-button
             >
-            <el-button type="primary">导出</el-button>
+            <el-button type="primary" @click="exportFile">导出</el-button>
           </div>
         </div>
         <div class="main-content">
           <el-table style="width:100%" :data="tableData" border>
-            <el-table-column label="日期" prop="ordering_date"></el-table-column>
+            <el-table-column
+              label="日期"
+              prop="ordering_date"
+            ></el-table-column>
             <el-table-column label="公司" prop="company"></el-table-column>
             <el-table-column label="消费地点" prop="canteen"></el-table-column>
             <el-table-column label="餐次" prop="dinner"></el-table-column>
@@ -192,12 +195,16 @@ export default {
         this.formdata.canteen_id = this.canteenOptions[0].id;
       }
     },
+    async exportFile() {
+      await this.$exportExcel(
+        "http://canteen.tonglingok.com/api/v1/order/orderStatistic/export",
+        this.formdata
+      );
+    },
     async queryList(page) {
       page = typeof page == "number" ? page : 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/orderStatistic?page=${page}&size=${
-          this.size
-        }`,
+        `http://canteen.tonglingok.com/api/v1/order/orderStatistic?page=${page}&size=${this.size}`,
         this.formdata
       );
       if (res.msg === "ok") {

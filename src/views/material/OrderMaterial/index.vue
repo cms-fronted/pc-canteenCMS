@@ -41,7 +41,7 @@
             </el-select>
           </el-form-item>
           <el-button type="primary" @click="queryList(1)" plain>查询</el-button>
-          <el-button type="primary">导出</el-button>
+          <el-button type="primary" @click="exportFile">导出</el-button>
           <el-button type="primary" @click="createCell">提交</el-button>
         </el-form>
       </div>
@@ -198,12 +198,25 @@ export default {
         this.dinnerOptions = Array.from(res.data);
       }
     },
+    async exportFile() {
+      this.$exportExcel(
+        "http://canteen.tonglingok.com/api/v1/material/exportOrderMaterials",
+        this.queryForm
+      );
+      /*   const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/material/exportOrderMaterials",
+        this.queryForm
+      );
+      if (res.msg === "ok") {
+        this.$exportFiles(res.data.url);
+      } else {
+        this.$message.error(res.msg);
+      } */
+    },
     async queryList(page) {
       page = page || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/materialsStatistic?page=${page}&size=${
-          this.size
-        }`,
+        `http://canteen.tonglingok.com/api/v1/order/materialsStatistic?page=${page}&size=${this.size}`,
         this.queryForm
       );
       if (res.msg === "ok") {

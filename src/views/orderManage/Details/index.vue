@@ -80,7 +80,7 @@
           <el-button type="primary" @click="queryList" :disabled="isDisabled"
             >查询</el-button
           >
-          <el-button type="primary">导出</el-button>
+          <el-button type="primary" @click="exportFile">导出</el-button>
         </div>
       </div>
       <div class="main-content">
@@ -246,6 +246,12 @@ export default {
           })
           .catch(err => console.log(err));
       }
+    },
+    async exportFile() {
+      this.$exportExcel(
+        "http://canteen.tonglingok.com/api/v1/order/orderStatistic/detail/export",
+        this.formdata
+      );
     },
     async queryList(page) {
       page = typeof page == "number" ? page : 1;

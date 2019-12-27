@@ -65,10 +65,10 @@
           </div>
           <div class="btn-area">
             <el-button type="primary" @click="fetchTableList">查询</el-button>
-            <el-button type="primary">导出</el-button>
+            <el-button type="primary" @click="exportFile">导出</el-button>
           </div>
         </div>
-        <div class="total" v-show="total > 0">
+        <div class="total" v-show="total!=0">
           <span>
             共有
             <strong>{{ total }}</strong> 条记录
@@ -115,7 +115,7 @@ export default {
         time_begin: "",
         time_end: "",
         admin_id: "",
-        type: "",
+        type: "all",
         username: "",
         page: 1,
         size: 10
@@ -150,8 +150,9 @@ export default {
       current_page: 1
     };
   },
-  created() {
-    this.fetchAdminList();
+  async created() {
+    await this.fetchAdminList();
+    await this.fetchTableList();
     // this.getCompanies();
   },
   computed: {
@@ -173,8 +174,8 @@ export default {
   },
   components: { Pagination },
   methods: {
-    getCompanies() {
-      $axios
+   async getCompanies() {
+     await $axios
         .get("http://canteen.tonglingok.com/api/v1/admin/companies")
         .then(res => {
           let arr = res.data;
@@ -195,9 +196,9 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    fetchAdminList() {
+    async fetchAdminList() {
       // module_id 暂时固定为14
-      $axios
+      await $axios
         .get(
           "http://canteen.tonglingok.com/api/v1/wallet/recharge/admins?module_id=14"
         )
@@ -211,11 +212,15 @@ export default {
             });
           }
         })
+        this.formdata.admin_id = this.adminList[0].id
         .catch(err => console.log(err));
     },
-    fetchTableList() {
+    async exportFile() {
+      await this.$exportExcel('http://canteen.tonglingok.com/api/v1/wallet/recharges/export', this.formdata)
+    },
+    async fetchTableList() {
       this.formdata.page = this.current_page;
-      $axios
+      await $axios
         .get(
           "http://canteen.tonglingok.com/api/v1/wallet/recharges",
           this.formdata

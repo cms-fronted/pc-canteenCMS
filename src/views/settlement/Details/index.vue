@@ -103,6 +103,7 @@
                   <el-option label="订餐就餐" :value="1" />
                   <el-option label="订餐未就餐" :value="2" />
                   <el-option label="未订餐就餐" :value="3" />
+                  <el-option label="补录" :value="4" />
                 </el-select>
               </el-form-item>
             </el-form>
@@ -114,22 +115,24 @@
               :disabled="isDisabled"
               >查询</el-button
             >
-            <el-button type="primary">导出</el-button>
+            <el-button type="primary" @click="exportFile">导出</el-button>
           </div>
         </div>
       </div>
       <el-table :data="tableData" style="width: 100%" border>
-        <el-table-column prop="id" label="序号" width="50" />
-        <el-table-column prop="create_date" label="下单时间" width="180" />
-        <el-table-column prop="place" label="消费地点" />
-        <el-table-column prop="name" label="姓名" />
+        <el-table-column type="index" label="序号" width="50" />
+        <el-table-column prop="used_time" label="消费时间" width="180" />
+        <el-table-column prop="department" label="部门" />
+        <el-table-column prop="username" label="姓名" />
         <el-table-column prop="phone" label="手机号码" />
-        <el-table-column prop="type" label="类型" />
-        <el-table-column prop="c_name" label="商品名称" />
+        <el-table-column prop="canteen" label="消费地点" />
+        <el-table-column prop="consumption_type" label="类型" />
+        <el-table-column prop="dinner" label="餐次"></el-table-column>
+        <!-- <el-table-column prop="c_name" label="商品名称" />
         <el-table-column prop="num" label="商品数量" />
         <el-table-column prop="price" label="商品金额" />
         <el-table-column prop="deliver_way" label="配送方式" />
-        <el-table-column prop="note" label="备注" width="300" />
+        <el-table-column prop="note" label="备注" width="300" /> -->
       </el-table>
       <pagination
         :total="total"
@@ -246,12 +249,16 @@ export default {
         }
       }
     },
+    async exportFile() {
+      await this.$exportExcel(
+        "http://canteen.tonglingok.com/api/v1/order/orderSettlement/export",
+        this.formdata
+      );
+    },
     async queryList(page) {
       page = typeof page == "number" ? page : 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/orderSettlement?page=${page}&size=${
-          this.size
-        }`,
+        `http://canteen.tonglingok.com/api/v1/order/orderSettlement?page=${page}&size=${this.size}`,
         this.formdata
       );
       if (res.msg === "ok") {

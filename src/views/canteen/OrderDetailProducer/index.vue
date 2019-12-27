@@ -164,8 +164,8 @@ export default {
       console.log(row);
       console.log("打印按钮被你点击啦！");
     },
-    deriveData() {
-      console.log("点击导出表格");
+    async exportFile() {
+      await this.$exportExcel('http://canteen.tonglingok.com/api/v1/shop/order/exportOrderStatistic/supplier',this.queryform)
     },
     async getProductsId() {
       const res = await $axios.get(

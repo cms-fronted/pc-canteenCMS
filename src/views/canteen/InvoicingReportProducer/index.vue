@@ -17,7 +17,7 @@
             />
           </el-form-item>
           <el-button type="primary" @click="queryList">查询</el-button>
-          <el-button>导出</el-button>
+          <el-button @click="exportFile">导出</el-button>
         </el-form>
       </div>
       <div class="main-content">
@@ -128,6 +128,9 @@ export default {
         this.current_page = res.data.current_page;
         this.allMoney = res.data.money;
       }
+    },
+    async exportFile() {
+      await this.$exportExcel('http://canteen.tonglingok.com/api/v1/shop/order/exportSalesReport/supplier',this.formdata)
     },
     getSummary(params) {
       const { columns, data } = params;
