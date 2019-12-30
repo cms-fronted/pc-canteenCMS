@@ -337,6 +337,7 @@ export default {
     },
     async addNewMenu() {
       console.log(this.menuForm);
+      return ;
       const res = await $axios.post(
         "http://canteen.tonglingok.com/api/v1/menu/save",
         this.menuForm
@@ -356,9 +357,7 @@ export default {
       page = typeof page == "number" ? page : 1;
       await $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/menus/company?company_id=${
-            this.company_id
-          }&canteen_id=${this.canteen_id}&size=${this.size}&page=${page}`
+          `http://canteen.tonglingok.com/api/v1/menus/company?company_id=${this.company_id}&canteen_id=${this.canteen_id}&size=${this.size}&page=${page}`
         )
         .then(res => {
           let _data = Array.from(res.data.data);
@@ -425,6 +424,41 @@ export default {
     _edit(val) {
       this.editForm = Object.assign({}, val);
       this.editVisible = true;
+    },
+    _delete(row) {
+      console.log(row);
+      let detail = [{ id: row.menu_id, state: 2 }];
+      detail = JSON.stringify(detail);
+      let formdata = {
+        c_id: row.canteen_id,
+        d_id: row.dinner_id,
+        detail: detail
+      };
+      console.log(formdata);
+      this.$confirm("此操作将永久删除该配置, 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(async () => {
+          const res = $axios.post(
+            "http://canteen.tonglingok.com/api/v1/menu/save",
+            formdata
+          );
+          if (res.msg === "ok") {
+            this.$message({
+              type: "success",
+              message: "删除成功!"
+            });
+            this.fetchTableList();
+          }
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
     },
     async _editConfirm() {
       //修改餐次配置信息

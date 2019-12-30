@@ -280,12 +280,13 @@ export default {
       await this.getCanteenModules(id);
     },
     async _confirm() {
+      let canteens = [];
+      let res = null;
+      let newCanteen = [];
       if (!this.isConfirmRules) {
         this.$message.warning("请先确定角色模块");
         return;
       }
-      let canteens = [];
-      let newCanteen = [];
       canteens = this.roleForm.canteens ? this.roleForm.canteens : [];
       canteens.forEach(item => {
         newCanteen.push({
@@ -297,20 +298,20 @@ export default {
       this.roleForm.rules = this.roleForm.rules.toString();
       if (this.isEdit) {
         this.roleForm.canteen = []; //没有字段不传
-        const res = await $axios.post(
+        res = await $axios.post(
           "http://canteen.tonglingok.com/api/v1/role/update",
           this.roleForm
         );
       } else {
-        const res = await $axios.post(
+        res = await $axios.post(
           "http://canteen.tonglingok.com/api/v1/role/save",
           this.roleForm
         );
-        if (res.msg === "ok") {
-          this.$message.success("新增角色成功");
-          await this.fetchList();
-          this.newRoleDialogVisible = false;
-        }
+      }
+      if (res.msg === "ok") {
+        this.$message.success("新增角色成功");
+        await this.fetchList();
+        this.newRoleDialogVisible = false;
       }
     },
     async _edit(row) {
