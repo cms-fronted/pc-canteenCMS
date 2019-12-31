@@ -430,13 +430,17 @@ export default {
           c_id: this.company_id
         })
         .then(res => {
-          this.canteens = "";
-          this.canteen_id = res.data.canteen_id;
-          this.$message.success("饭堂创建成功，请继续操作");
-          this.$emit("updateCanteenList", this.company_id);
+          if (res.msg === "ok") {
+            this.canteens = "";
+            this.canteen_id = res.data.canteen_id;
+            this.$message.success("饭堂创建成功，请继续操作");
+            this.$emit("updateCanteenList", this.company_id);
+          } else {
+            this.$message.error(res.msg);
+          }
         })
         .catch(err => {
-          this.$message.error("饭堂名称不能为空!");
+          console.log(err);
         });
     },
     _addDinner() {
