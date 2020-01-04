@@ -472,6 +472,8 @@ export default {
           .then(res => {
             if (res.msg === "ok") {
               this.closeSettingDialog();
+            } else {
+              this.$message.error(res.msg);
             }
           })
           .catch(err => console.log(err));
@@ -485,6 +487,8 @@ export default {
             if (res.msg === "ok") {
               this.$message.success("添加成功");
               this.queryList();
+            } else {
+              this.$message.error(res.msg);
             }
             this.closeSettingDialog();
           })
@@ -575,6 +579,8 @@ export default {
           if (res.msg === "ok") {
             this.$message.success("修改成功");
             this.queryList();
+          } else {
+            this.$message.error(res.msg);
           }
           this._closeEditSettingDialog();
         })
