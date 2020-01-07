@@ -13,7 +13,7 @@
               placeholder="输入人员信息"
               style="width:200px"
             ></el-input>
-            <el-button type="primary" @click="queryList">查询</el-button>
+            <el-button type="primary" @click="queryList" style="margin-left:10px">查询</el-button>
             <el-upload
               class="upload-excel upload"
               ref="upload"
@@ -26,7 +26,7 @@
               :on-error="handleError"
               name="supplement"
             >
-              <el-button type="primary">批量补录</el-button>
+              <el-button type="primary" style="margin-left:10px">批量补录</el-button>
             </el-upload>
 <!--          </div>-->
         </div>

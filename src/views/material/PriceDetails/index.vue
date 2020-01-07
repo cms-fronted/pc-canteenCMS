@@ -40,13 +40,7 @@
           v-model="keyword"
           style="width:180px;margin: 0 15px;"
         />
-        <el-button
-          type="primary"
-          plain
-          style="margin-left:0"
-          @click="fetchTableList"
-          >查询</el-button
-        >
+        <el-button type="primary" plain @click="fetchTableList">查询</el-button>
         <el-button type="primary" @click="deriveData">导出</el-button>
         <el-upload
           class="upload-excel"
@@ -60,11 +54,14 @@
           :data="{ c_id: canteen_id }"
           name="materials"
         >
-          <el-button type="primary">批量导入</el-button>
+          <el-button type="primary" style="margin-left:10px"
+            >批量导入</el-button
+          >
         </el-upload>
         <el-button
           type="primary"
           @click="handleClick({ c_id: canteen_id }, '_add', '新增材料')"
+          style="margin-left:10px"
           >添加</el-button
         >
       </div>
@@ -80,9 +77,7 @@
           <el-table-column prop="id" label="序号" width="200px" />
           <el-table-column prop="name" label="材料名称" />
           <el-table-column label="单价/元">
-            <template slot-scope="scope"
-              >{{ scope.row.price }}元/kg</template
-            >
+            <template slot-scope="scope">{{ scope.row.price }}元/kg</template>
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
@@ -216,9 +211,7 @@ export default {
       page = Number(page) || 1;
       await $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/materials?page=${page}&size=10&key=${
-            this.keyword
-          }&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
+          `http://canteen.tonglingok.com/api/v1/materials?page=${page}&size=10&key=${this.keyword}&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
         )
         .then(res => {
           this.tableData = res.data.data;
@@ -271,9 +264,7 @@ export default {
     async deriveData() {
       await $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/material/export?key=${
-            this.keyword
-          }&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
+          `http://canteen.tonglingok.com/api/v1/material/export?key=${this.keyword}&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
         )
         .then(res => {
           if (this.tableData.length > 0) {

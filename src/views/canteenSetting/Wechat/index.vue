@@ -11,6 +11,7 @@
             placeholder="请选择"
             v-if="companiesVisible"
             filterable
+            style="width:250px"
           >
             <el-option
               v-for="item in companyList"
@@ -19,7 +20,7 @@
               :value="item.id"
             ></el-option>
           </el-select>
-          <el-button type="primary" @click="fetchTableList"
+          <el-button type="primary" @click="fetchTableList" style="margin-left:10px"
             >查询商品类型</el-button
           >
           <el-button

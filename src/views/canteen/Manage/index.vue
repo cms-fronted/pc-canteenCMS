@@ -31,7 +31,12 @@
               :value="item.id"
             ></el-option>
           </el-select>
-          <el-button type="primary" @click="fetchTableList">查询</el-button>
+          <el-button
+            type="primary"
+            @click="fetchTableList"
+            style="margin-left:10px"
+            >查询</el-button
+          >
           <el-button type="primary" @click="handleAdd">增加</el-button>
         </div>
         <div class="main-content">
@@ -229,9 +234,7 @@ export default {
     getCategoryList() {
       this.category_id = "";
       $axios
-        .get(
-          "http://canteen.tonglingok.com/api/v1/company/categories"
-        )
+        .get("http://canteen.tonglingok.com/api/v1/company/categories")
         .then(res => {
           this.categoryList = res.data;
           this.categoryList.unshift({
@@ -245,9 +248,7 @@ export default {
     fetchTableList() {
       $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/shop/cms/products?supplier_id=${
-            this.supplier_id
-          }&category_id=${this.category_id}&page=1&size=10`
+          `http://canteen.tonglingok.com/api/v1/shop/cms/products?supplier_id=${this.supplier_id}&category_id=${this.category_id}&page=1&size=10`
         )
         .then(res => {
           this.tabledata = Array.from(res.data.data);

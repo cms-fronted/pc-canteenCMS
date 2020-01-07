@@ -147,12 +147,28 @@ body {
 .content-header:not(:first-child) {
   margin-left: 10px;
 }
-.main-header {
+/*.main-header {
   margin-right: 10px;
   font-size: 16px;
   color: #666;
   .el-button {
     margin-left: 15px;
+  }
+}*/
+/*.main-header {
+  .el-form{
+    .el-form-item {
+      width: 350px;
+    }
+  }
+}
+.main-header> .el-input .el-select {
+  width:250px;
+}*/
+.main-header {
+  .el-input,
+  .el-select {
+    width: 100%;
   }
 }
 .main-content {
@@ -172,4 +188,13 @@ body {
 }
 .hide .el-upload--picture-card {
   display: none;
+}
+.btn-area {
+  float: right;
+}
+.clearfix {
+  clear: both;
+}
+.date-picker {
+  width: 100% !important;
 }

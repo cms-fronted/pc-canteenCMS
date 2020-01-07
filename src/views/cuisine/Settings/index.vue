@@ -33,7 +33,7 @@
             :value="item.id"
           />
         </el-select>
-        <el-button @click="AddVisible = true">新增</el-button>
+        <el-button @click="AddVisible = true" style="margin-left:10px">新增</el-button>
         <el-button @click="fetchTableList(1)">查询</el-button>
       </div>
       <div class="main-content">

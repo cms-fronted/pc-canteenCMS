@@ -5,78 +5,99 @@
     <div class="main">
       <div class="main-header">
         <div class="select-title">
-          <el-form :inline="true" :model="formdata" label-width="80px">
-            <el-form-item label="时间">
-              <el-date-picker
-                value-format="yyyy-MM-dd"
-                v-model="formdata.date"
-                range-separator="~"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                type="daterange"
-              />
-            </el-form-item>
-            <el-form-item label="公司" v-if="companiesVisible">
-              <el-select
-                placeholder="请选择企业"
-                filterable
-                v-model="formdata.company_ids"
-                @change="getList"
-              >
-                <el-option
-                  v-for="item in companiesList"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="消费地点">
-              <el-select v-model="formdata.canteen_id" placeholder="请选择饭堂">
-                <el-option
-                  v-for="item in locationList"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="部门" v-if="companiesVisible">
-              <el-select
-                v-model="formdata.department_id"
-                placeholder="请选择部门"
-              >
-                <el-option
-                  v-for="item in departmentList"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="姓名">
-              <el-input v-model="formdata.username" placeholder="请输入姓名" />
-            </el-form-item>
-            <el-form-item label="消费类型">
-              <el-select v-model="formdata.status">
-                <el-option
-                  v-for="item in consumptionOptions"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="人员类型">
-              <el-select v-model="formdata.staff_type_id">
-                <el-option
-                  v-for="item in roleOptions"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
-              </el-select>
-            </el-form-item>
+          <el-form :model="formdata" label-width="70px">
+            <el-row>
+              <el-col :span="6">
+                <el-form-item label="时间">
+                  <el-date-picker
+                    class="date-picker"
+                    value-format="yyyy-MM-dd"
+                    v-model="formdata.date"
+                    range-separator="~"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    type="daterange"
+                  /> </el-form-item
+              ></el-col>
+              <el-col :span="6">
+                <el-form-item label="公司" v-if="companiesVisible">
+                  <el-select
+                    placeholder="请选择企业"
+                    filterable
+                    v-model="formdata.company_ids"
+                    @change="getList"
+                  >
+                    <el-option
+                      v-for="item in companiesList"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    />
+                  </el-select> </el-form-item
+              ></el-col>
+              <el-col :span="6">
+                <el-form-item label="消费地点">
+                  <el-select
+                    v-model="formdata.canteen_id"
+                    placeholder="请选择饭堂"
+                  >
+                    <el-option
+                      v-for="item in locationList"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    />
+                  </el-select> </el-form-item
+              ></el-col>
+              <el-col :span="6">
+                <el-form-item label="部门" v-if="companiesVisible">
+                  <el-select
+                    v-model="formdata.department_id"
+                    placeholder="请选择部门"
+                  >
+                    <el-option
+                      v-for="item in departmentList"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    />
+                  </el-select> </el-form-item
+              ></el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="6">
+                <el-form-item label="姓名">
+                  <el-input
+                    v-model="formdata.username"
+                    placeholder="请输入姓名"
+                  />
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="消费类型">
+                  <el-select v-model="formdata.status">
+                    <el-option
+                      v-for="item in consumptionOptions"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="人员类型">
+                  <el-select v-model="formdata.staff_type_id">
+                    <el-option
+                      v-for="item in roleOptions"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    />
+                  </el-select> </el-form-item
+              ></el-col>
+            </el-row>
+
             <el-form-item class="types-radio">
               <el-radio-group
                 v-model="formdata.type"
@@ -97,6 +118,7 @@
           >
           <el-button type="primary" @click="exportFile">导出</el-button>
         </div>
+        <div class="clearfix"></div>
       </div>
       <div class="main-content">
         <el-table
@@ -369,7 +391,7 @@ export default {
       }
     },
     async exportFile() {
-         if (this.formdata.canteen_id) {
+      if (this.formdata.canteen_id) {
         delete this.formdata.company_ids;
       }
       await this.$exportExcel(
@@ -446,18 +468,18 @@ export default {
 
 <style lang="scss" scoped>
 .order-statistics {
-  .main-header {
-    .select-title {
-      float: left;
-      width: 90%;
-      display: flex;
-      flex-wrap: wrap;
-      .el-input {
-        width: 200px;
-      }
-      .el-select {
-        width: 200px;
-      }
+  // .main-header {
+  //   .select-title {
+  //     float: left;
+  //     width: 90%;
+  //     display: flex;
+  //     flex-wrap: wrap;
+  //     .el-input {
+  //       width: 200px;
+  //     }
+  //     .el-select {
+  //       width: 200px;
+  //     }
       .types-radio {
         display: flex;
         justify-content: space-between;
@@ -465,17 +487,17 @@ export default {
           display: block;
         }
       }
-    }
-    .btn-area {
-      float: right;
-      width: 10%;
-      display: flex;
-      flex-direction: column;
-      display: block;
-      .el-button {
-        margin-bottom: 20px;
-      }
-    }
-  }
+  //   }
+  //   .btn-area {
+  //     float: right;
+  //     width: 10%;
+  //     display: flex;
+  //     flex-direction: column;
+  //     display: block;
+  //     .el-button {
+  //       margin-bottom: 20px;
+  //     }
+  //   }
+  // }
 }
 </style>

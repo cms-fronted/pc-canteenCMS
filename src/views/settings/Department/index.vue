@@ -41,11 +41,18 @@
             :data="{ c_id: c_id }"
             name="staffs"
           >
-            <el-button type="primary" :disabled="!!!c_id"
+            <el-button
+              type="primary"
+              :disabled="!!!c_id"
+              style="margin-left:10px"
               >批量导入人员</el-button
             >
           </el-upload>
-          <el-button type="danger" :disabled="!!!d_id" @click="deleteDepartment"
+          <el-button
+            type="danger"
+            style="margin-left:10px"
+            :disabled="!!!d_id"
+            @click="deleteDepartment"
             >删除部门</el-button
           >
           <el-button type="primary" @click="openRoleTypeDialog"
