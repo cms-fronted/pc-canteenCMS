@@ -7,7 +7,7 @@
         <div class="main-header">
           <div class="select-title">
             <el-form label-width="70px" :model="formdata">
-              <el-row>
+              <el-row :gutter="10">
                 <el-col :span="6">
                   <el-form-item label="时间">
                     <el-date-picker
@@ -38,7 +38,7 @@
                     </el-select> </el-form-item
                 ></el-col>
                 <el-col :span="6">
-                  <el-form-item label="消费地点" >
+                  <el-form-item label="消费地点">
                     <el-select
                       v-model="formdata.canteen_id"
                       placeholder="请选择消费地点"
@@ -59,6 +59,7 @@
               type="primary"
               @click="queryList(1)"
               :disabled="isDisabled"
+              plain
               >查询</el-button
             >
             <el-button type="primary" @click="exportFile">导出</el-button>
@@ -67,14 +68,11 @@
         </div>
         <div class="main-content">
           <el-table style="width:100%" :data="tableData" border>
-            <el-table-column
-              label="日期"
-              prop="ordering_date"
-            ></el-table-column>
-            <el-table-column label="公司" prop="company"></el-table-column>
-            <el-table-column label="消费地点" prop="canteen"></el-table-column>
-            <el-table-column label="餐次" prop="dinner"></el-table-column>
-            <el-table-column label="消费人数" prop="count"></el-table-column>
+            <el-table-column label="日期" prop="ordering_date" />
+            <el-table-column label="公司" prop="company" />
+            <el-table-column label="消费地点" prop="canteen" />
+            <el-table-column label="餐次" prop="dinner" />
+            <el-table-column label="消费人数" prop="count" />
           </el-table>
           <pagination
             @pagination="queryList"
