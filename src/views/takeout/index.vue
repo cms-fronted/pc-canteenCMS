@@ -4,67 +4,86 @@
     <el-divider />
     <div class="main">
       <div class="main-header">
-        <el-form :model="queryForm" :inline="true">
-          <el-form-item label="日期">
-            <el-date-picker
-              v-model="queryForm.ordering_date"
-              value-format="yyyy-MM-dd"
-              format="yyyy-MM-dd"
-              type="datetime"
-              style="width:140px"
-            />
-          </el-form-item>
-          <el-form-item label="公司" v-if="companiesVisible">
-            <el-select
-              filterable
-              v-model="queryForm.company_ids"
-              @change="getCanteenOptions"
-              placeholder="请选择公司"
-            >
-              <el-option
-                v-for="item in companyOptions"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="饭堂">
-            <el-select
-              v-model="queryForm.canteen_id"
-              @change="getDinnersOptions"
-              placeholder="请选择饭堂"
-            >
-              <el-option
-                v-for="item in canteenOptions"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="餐次">
-            <el-select v-model="queryForm.dinner_id" placeholder="请选择餐次">
-              <el-option
-                v-for="item in dinnersOptions"
-                :key="item.id"
-                :label="item.name"
-                :value="item.id"
-              />
-            </el-select>
-          </el-form-item>
-          <el-form-item label="状态" prop="used">
-            <el-select v-model="queryForm.used">
-              <el-option label="全部" :value="3" />
-              <el-option label="已打印" :value="1" />
-              <el-option label="未打印" :value="2" />
-            </el-select>
-          </el-form-item>
+        <el-form :model="queryForm" label-width="70px">
+          <el-row>
+            <el-col :span="6">
+              <el-form-item label="日期">
+                <el-date-picker
+                  v-model="queryForm.ordering_date"
+                  value-format="yyyy-MM-dd"
+                  format="yyyy-MM-dd"
+                  type="datetime"
+                />
+              </el-form-item>
+            </el-col>
+            <el-col :span="6">
+              <el-form-item label="公司" v-if="companiesVisible">
+                <el-select
+                  filterable
+                  v-model="queryForm.company_ids"
+                  @change="getCanteenOptions"
+                  placeholder="请选择公司"
+                >
+                  <el-option
+                    v-for="item in companyOptions"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  />
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="6">
+              <el-form-item label="饭堂">
+                <el-select
+                  v-model="queryForm.canteen_id"
+                  @change="getDinnersOptions"
+                  placeholder="请选择饭堂"
+                >
+                  <el-option
+                    v-for="item in canteenOptions"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  />
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="6">
+              <el-form-item label="餐次">
+                <el-select
+                  v-model="queryForm.dinner_id"
+                  placeholder="请选择餐次"
+                >
+                  <el-option
+                    v-for="item in dinnersOptions"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  />
+                </el-select>
+              </el-form-item>
+            </el-col>
+          </el-row>
+
+          <el-row>
+            <el-col :span="6">
+              <el-form-item label="状态" prop="used">
+                <el-select v-model="queryForm.used">
+                  <el-option label="全部" :value="3" />
+                  <el-option label="已打印" :value="1" />
+                  <el-option label="未打印" :value="2" />
+                </el-select> </el-form-item
+            ></el-col>
+          </el-row>
+        </el-form>
+        <div class="btn-area">
           <el-button type="primary" @click="queryList" :disabled="isDisabled"
             >查询</el-button
           >
-          <el-button type="primary">导出</el-button>
-        </el-form>
+          <el-button type="primary" @click="exportFile">导出</el-button>
+        </div>
+        <div class="clearfix"></div>
       </div>
       <div class="main-content">
         <el-table :data="tableData" border style="width:100%">
@@ -296,6 +315,15 @@ export default {
         }
       }
     },
+    async exportFile() {
+      let queryForm = JSON.parse(JSON.stringify(this.queryForm));
+      queryForm.canteen_id = queryForm.canteen_id ? queryForm.canteen_id : 0;
+      queryForm.dinner_id = queryForm.dinner_id ? queryForm.dinner_id : 0;
+      await this.$exportExcel(
+        "http://canteen.tonglingok.com/api/v1/order/takeoutStatistic/export",
+        queryForm
+      );
+    },
     async queryList(page) {
       page = typeof page == "number" ? page : 1;
       let queryForm = JSON.parse(JSON.stringify(this.queryForm));
@@ -325,6 +353,15 @@ export default {
           this.$print(this.$refs.print);
         }, 1000);
       }
+      await $axios
+        .post("http://canteen.tonglingok.com/api/v1/order/used", { ids: id })
+        .then(res => {
+          if (res.msg === "ok") {
+            this.$message.success("外卖订单完成");
+          } else {
+            this.$message.error(res.msg);
+          }
+        });
     },
     async closeDetailDialog() {
       this.detailDialogVisible = false;
@@ -335,9 +372,5 @@ export default {
 
 <style lang="scss" scoped>
 .takeout {
-  .el-select,
-  .el-input {
-    width: 120px;
-  }
 }
 </style>

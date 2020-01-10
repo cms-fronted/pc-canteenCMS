@@ -6,105 +6,120 @@
         <el-divider />
         <div class="main-header">
           <div class="select-title">
-            <el-form
-              :inline="true"
-              :model="formdata"
-              label-width="60px"
-              label-position="left"
-            >
-              <el-form-item label="时间">
-                <el-date-picker
-                  value-format="yyyy-MM-dd"
-                  v-model="formdata.date"
-                  range-separator="~"
-                  start-placeholder="开始日期"
-                  end-placeholder="结束日期"
-                  type="daterange"
-                />
-              </el-form-item>
-              <el-form-item label="公司" v-if="companiesVisible">
-                <el-select
-                  v-model="formdata.company_ids"
-                  filterable
-                  @change="getOptions"
-                  placeholder="请选择公司"
-                >
-                  <el-option
-                    v-for="item in companyOptions"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id"
-                  />
-                </el-select>
-              </el-form-item>
-
-              <el-form-item label="消费地点" label-width="80px">
-                <el-select
-                  v-model="formdata.canteen_id"
-                  @change="getDinnersOptions"
-                  placeholder="请选择饭堂"
-                >
-                  <el-option
-                    v-for="item in canteenOptions"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id"
-                  />
-                </el-select>
-              </el-form-item>
-              <el-form-item label="餐次">
-                <el-select
-                  v-model="formdata.dinner_id"
-                  placeholder="请选择餐次"
-                >
-                  <el-option
-                    v-for="item in dinnersOptions"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id"
-                  />
-                </el-select>
-              </el-form-item>
-              <el-form-item
-                label="部门"
-                prop="department_id"
-                v-if="companiesVisible"
-              >
-                <el-select
-                  v-model="formdata.department_id"
-                  placeholder="请选择部门"
-                >
-                  <el-option
-                    v-for="item in departmentOptions"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id"
-                  />
-                </el-select>
-              </el-form-item>
-              <el-form-item label="姓名">
-                <el-input placeholder="请输入姓名" v-model="formdata.name" />
-              </el-form-item>
-              <el-form-item label="手机号码" label-width="80px">
-                <el-input
-                  placeholder="请输入手机号码"
-                  v-model="formdata.phone"
-                />
-              </el-form-item>
-              <el-form-item
-                label="消费类型"
-                label-width="80px"
-                prop="consumption_type"
-              >
-                <el-select
-                  v-model="formdata.consumption_type"
-                  placeholder="请选择类型"
-                >
-                  <el-option label="订餐就餐" :value="1" />
-                  <el-option label="订餐未就餐" :value="2" />
-                  <el-option label="未订餐就餐" :value="3" />
-                </el-select>
-              </el-form-item>
+            <el-form :model="formdata" label-width="70px">
+              <el-row>
+                <el-col :span="6">
+                  <el-form-item label="时间">
+                    <el-date-picker
+                      class="date-picker"
+                      value-format="yyyy-MM-dd"
+                      v-model="formdata.date"
+                      range-separator="~"
+                      start-placeholder="开始日期"
+                      end-placeholder="结束日期"
+                      type="daterange"
+                    />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="6">
+                  <el-form-item label="公司" v-if="companiesVisible">
+                    <el-select
+                      v-model="formdata.company_ids"
+                      filterable
+                      @change="getOptions"
+                      placeholder="请选择公司"
+                    >
+                      <el-option
+                        v-for="item in companyOptions"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id"
+                      />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="6">
+                  <el-form-item label="消费地点" label-width="80px">
+                    <el-select
+                      v-model="formdata.canteen_id"
+                      @change="getDinnersOptions"
+                      placeholder="请选择饭堂"
+                    >
+                      <el-option
+                        v-for="item in canteenOptions"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id"
+                      />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="6">
+                  <el-form-item label="餐次">
+                    <el-select
+                      v-model="formdata.dinner_id"
+                      placeholder="请选择餐次"
+                    >
+                      <el-option
+                        v-for="item in dinnersOptions"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id"
+                      />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+              <el-row>
+                <el-col :span="6">
+                  <el-form-item
+                    label="部门"
+                    prop="department_id"
+                    v-if="companiesVisible"
+                  >
+                    <el-select
+                      v-model="formdata.department_id"
+                      placeholder="请选择部门"
+                    >
+                      <el-option
+                        v-for="item in departmentOptions"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id"
+                      />
+                    </el-select> </el-form-item
+                ></el-col>
+                <el-col :span="6">
+                  <el-form-item label="姓名">
+                    <el-input
+                      placeholder="请输入姓名"
+                      v-model="formdata.name"
+                    /> </el-form-item
+                ></el-col>
+                <el-col :span="6">
+                  <el-form-item label="手机号码" label-width="80px">
+                    <el-input
+                      placeholder="请输入手机号码"
+                      v-model="formdata.phone"
+                    /> </el-form-item
+                ></el-col>
+                <el-col :span="6">
+                  <el-form-item
+                    label="消费类型"
+                    label-width="80px"
+                    prop="consumption_type"
+                  >
+                    <el-select
+                      v-model="formdata.consumption_type"
+                      placeholder="请选择类型"
+                    >
+                      <el-option label="订餐就餐" :value="1" />
+                      <el-option label="订餐未就餐" :value="2" />
+                      <el-option label="未订餐就餐" :value="3" />
+                      <el-option label="补录" :value="4" />
+                    </el-select> </el-form-item
+                ></el-col>
+              </el-row>
             </el-form>
           </div>
           <div class="btn-area">
@@ -114,29 +129,34 @@
               :disabled="isDisabled"
               >查询</el-button
             >
-            <el-button type="primary">导出</el-button>
+            <el-button type="primary" @click="exportFile">导出</el-button>
           </div>
+          <div class="clearfix"></div>
         </div>
       </div>
-      <el-table :data="tableData" style="width: 100%" border>
-        <el-table-column prop="id" label="序号" width="50" />
-        <el-table-column prop="create_date" label="下单时间" width="180" />
-        <el-table-column prop="place" label="消费地点" />
-        <el-table-column prop="name" label="姓名" />
-        <el-table-column prop="phone" label="手机号码" />
-        <el-table-column prop="type" label="类型" />
-        <el-table-column prop="c_name" label="商品名称" />
+      <div class="main-content">
+        <el-table :data="tableData" style="width: 100%" border>
+          <el-table-column type="index" label="序号" width="50" />
+          <el-table-column prop="used_time" label="消费时间" width="180" />
+          <el-table-column prop="department" label="部门" />
+          <el-table-column prop="username" label="姓名" />
+          <el-table-column prop="phone" label="手机号码" />
+          <el-table-column prop="canteen" label="消费地点" />
+          <el-table-column prop="consumption_type" label="类型" />
+          <el-table-column prop="dinner" label="餐次"></el-table-column>
+          <!-- <el-table-column prop="c_name" label="商品名称" />
         <el-table-column prop="num" label="商品数量" />
         <el-table-column prop="price" label="商品金额" />
         <el-table-column prop="deliver_way" label="配送方式" />
-        <el-table-column prop="note" label="备注" width="300" />
-      </el-table>
-      <pagination
-        :total="total"
-        :pageSize="size"
-        :currentPage="current_page"
-        @pagination="queryList"
-      />
+        <el-table-column prop="note" label="备注" width="300" /> -->
+        </el-table>
+        <pagination
+          :total="total"
+          :pageSize="size"
+          :currentPage="current_page"
+          @pagination="queryList"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -246,6 +266,12 @@ export default {
         }
       }
     },
+    async exportFile() {
+      await this.$exportExcel(
+        "http://canteen.tonglingok.com/api/v1/order/orderSettlement/export",
+        this.formdata
+      );
+    },
     async queryList(page) {
       page = typeof page == "number" ? page : 1;
       const res = await $axios.get(
@@ -286,30 +312,30 @@ export default {
 
 <style lang="scss" scoped>
 .settlement-details {
-  .main-header {
-    .select-title {
-      float: left;
-      width: 90%;
-      display: flex;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      .el-input {
-        width: 160px;
-      }
-      .el-select {
-        width: 160px;
-      }
-    }
-  }
-  .btn-area {
-    float: right;
-    width: 10%;
-    display: flex;
-    flex-direction: column;
-    display: block;
-    .el-button {
-      margin-bottom: 20px;
-    }
-  }
+  // .main-header {
+  //   .select-title {
+  //     float: left;
+  //     width: 90%;
+  //     display: flex;
+  //     justify-content: space-between;
+  //     flex-wrap: wrap;
+  //     .el-input {
+  //       width: 160px;
+  //     }
+  //     .el-select {
+  //       width: 160px;
+  //     }
+  //   }
+  // }
+  // .btn-area {
+  //   float: right;
+  //   width: 10%;
+  //   display: flex;
+  //   flex-direction: column;
+  //   display: block;
+  //   .el-button {
+  //     margin-bottom: 20px;
+  //   }
+  // }
 }
 </style>

@@ -5,33 +5,42 @@
       <el-divider></el-divider>
       <div class="main">
         <div class="main-header clearfix">
-          <div class="select-title" :class="{ grade: grade === 2 }">
-            <el-form :inline="true" :model="formdata" label-width="80px">
-              <el-form-item label="部门">
-                <el-select
-                  v-model="formdata.department_id"
-                  placeholder="请选择部门"
-                >
-                  <el-option
-                    v-for="item in departmentList"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id"
-                  ></el-option>
-                </el-select>
-              </el-form-item>
-              <el-form-item label="人员信息">
-                <el-input
-                  placeholder="请输入信息"
-                  v-model="formdata.user"
-                ></el-input>
-              </el-form-item>
-              <el-form-item label="手机号码">
-                <el-input
-                  placeholder="请输入手机号"
-                  v-model="formdata.phone"
-                ></el-input>
-              </el-form-item>
+          <div class="select-title">
+            <el-form :model="formdata" label-width="70px">
+              <el-row>
+                <el-col :span="6">
+                  <el-form-item label="部门">
+                    <el-select
+                      v-model="formdata.department_id"
+                      placeholder="请选择部门"
+                    >
+                      <el-option
+                        v-for="item in departmentList"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id"
+                      ></el-option>
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="6">
+                  <el-form-item label="人员信息">
+                    <el-input
+                      placeholder="请输入信息"
+                      v-model="formdata.user"
+                    ></el-input>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="6">
+                  <el-form-item label="手机号码">
+                    <el-input
+                      placeholder="请输入手机号"
+                      v-model="formdata.phone"
+                    ></el-input>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+
               <!-- <el-form-item label="余额">
                 <el-input placeholder="请输入余额" v-model="formdata.balance"></el-input>
               </el-form-item> -->
@@ -42,8 +51,9 @@
               >一键清零</el-button
             >
             <el-button type="primary" @click="fetchTableList">查询</el-button>
-            <el-button type="primary" @click="deriveData">导出</el-button>
+            <el-button type="primary" @click="exportFile">导出</el-button>
           </div>
+          <div class="clearfix"></div>
         </div>
         <div class="total" v-show="total > 0">
           <span
@@ -103,36 +113,44 @@ export default {
       current_page: 1
     };
   },
-  created() {
-    this.fetchDepartmentList();
+  async created() {
+    await this.fetchDepartmentList();
+    await this.fetchTableList();
   },
   methods: {
-    fetchDepartmentList() {
+    async fetchDepartmentList() {
       // 正确接口，没数据：http://canteen.tonglingok.com/api/v1/departments/recharge 测试接口：http://canteen.tonglingok.com/api/v1/departments?c_id=2
-      $axios
+      await $axios
         .get("http://canteen.tonglingok.com/api/v1/departments/recharge")
         .then(res => {
           console.log(res);
           this.departmentList = res.data;
           if (this.departmentList.length > 1) {
             this.departmentList.unshift({ id: 0, name: "全部" });
+            this.formdata.department_id = 0;
           }
         })
         .catch(err => console.log(err));
     },
-    handleClear() {
-      $axios
+    async handleClear() {
+      await $axios
         .post("http://canteen.tonglingok.com/api/v1/wallet/clearBalance")
         .then(res => {
           this.fetchTableList();
         })
         .catch(err => console.log(err));
     },
-    fetchTableList() {
+    async exportFile() {
+      await this.$exportExcel(
+        "http://canteen.tonglingok.com/api/v1/wallet/users/balance/export",
+        this.formdata
+      );
+    },
+    async fetchTableList() {
       // page size user phone  department_id 部门id，全部传0
       // 返回的数据 res.data.data username code card_num phone department balance
       let { user, phone, department_id } = this.formdata;
-      $axios
+      await $axios
         .get("http://canteen.tonglingok.com/api/v1/wallet/users/balance", {
           page: this.current_page,
           size: 10,
@@ -161,33 +179,33 @@ export default {
   display: block;
   clear: both;
 }
-.main-header {
-  .select-title {
-    float: left;
-    width: 84%;
-    display: flex;
-    flex-wrap: wrap;
-    .el-select {
-      width: 200px;
-    }
-  }
-  .btn-area {
-    float: right;
-    width: 16%;
-    display: flex;
-    flex-direction: column;
-    display: block;
-    .el-button {
-      margin-bottom: 20px;
-    }
-  }
-  .select-title.grade {
-    width: 73%;
-  }
-  .btn-area.grade {
-    width: 27%;
-  }
-}
+// .main-header {
+//   .select-title {
+//     float: left;
+//     width: 84%;
+//     display: flex;
+//     flex-wrap: wrap;
+//     .el-select {
+//       width: 200px;
+//     }
+//   }
+//   .btn-area {
+//     float: right;
+//     width: 16%;
+//     display: flex;
+//     flex-direction: column;
+//     display: block;
+//     .el-button {
+//       margin-bottom: 20px;
+//     }
+//   }
+//   .select-title.grade {
+//     width: 73%;
+//   }
+//   .btn-area.grade {
+//     width: 27%;
+//   }
+// }
 .main-content {
   .el-table {
     th,

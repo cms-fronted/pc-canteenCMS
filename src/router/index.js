@@ -31,7 +31,7 @@ export const currencyRoutes = [
     component: () => import("@/views/error"),
     hidden: true
   },
-  {
+  /*  {
     path: "/home",
     name: "Home",
     component: Layout,
@@ -46,7 +46,7 @@ export const currencyRoutes = [
         }
       }
     ]
-  },
+  }, */
   {
     path: "/login",
     name: "Login",
@@ -554,13 +554,18 @@ export function resetRouter() {
 }
 router.beforeEach(async (to, from, next) => {
   document.title = getTitle(to.meta.title);
-  if (to.path === "/login" || to.path === "/Producer") {
+
+  if (to.path === "/login" || to.path === "/producer") {
     next();
   } else {
     // let res = await store.dispatch('user/_getUserModules')
     if (store.getters.token) {
       const hasRoles = store.getters.roles.length > 0;
       if (hasRoles) {
+        next();
+      } else if (localStorage.isProducer) {
+        const addRoutes = await store.dispatch("permission/getAsyncRoutes", []);
+        router.addRoutes(addRoutes);
         next();
       } else {
         try {

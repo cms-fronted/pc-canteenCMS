@@ -31,7 +31,7 @@
             </el-select>
           </el-form-item>
           <el-button type="primary" @click="queryList(1)" plain>查询</el-button>
-          <el-button type="primary">导出</el-button>
+          <el-button type="primary" @click="exportFile">导出</el-button>
         </el-form>
       </div>
       <div class="main-content">
@@ -188,6 +188,19 @@ export default {
       if (res.msg === "ok") {
         this.dinnerOptions = getAllOptions(Array.from(res.data));
       }
+    },
+    async exportFile() {
+      let form = {};
+      form = JSON.parse(JSON.stringify(this.queryForm));
+      if (String(form.canteen_ids).includes(",")) {
+        delete form.company_ids;
+      } else if (String(form.company_ids).includes(",")) {
+        delete form.canteen_ids;
+      }
+      this.$exportExcel(
+        "http://canteen.tonglingok.com/api/v1/material/exportFoodMaterials",
+        form
+      );
     },
     async queryList(page) {
       page = page || 1;

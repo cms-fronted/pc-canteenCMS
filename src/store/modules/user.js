@@ -95,7 +95,7 @@ const actions = {
     // resetRouter();
     if (localStorage.getItem("isProducer")) {
       router.push({
-        path: "/producerLogin",
+        path: "/producer",
         query: {
           redirect: router.currentRoute.fullPath
         }

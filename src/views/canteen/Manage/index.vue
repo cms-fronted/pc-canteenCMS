@@ -31,7 +31,12 @@
               :value="item.id"
             ></el-option>
           </el-select>
-          <el-button type="primary" @click="fetchTableList">查询</el-button>
+          <el-button
+            type="primary"
+            @click="fetchTableList"
+            style="margin-left:10px"
+            >查询</el-button
+          >
           <el-button type="primary" @click="handleAdd">增加</el-button>
         </div>
         <div class="main-content">

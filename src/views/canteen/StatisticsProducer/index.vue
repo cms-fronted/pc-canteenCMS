@@ -5,55 +5,62 @@
     <div class="main">
       <div class="main-header">
         <div class="select-title">
-          <el-form :inline="true" :model="formdata" label-width="80px">
-            <el-form-item label="时间">
-              <el-date-picker
-                value-format="yyyy-MM-dd"
-                v-model="formdata.date"
-                range-separator="~"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                type="daterange"
-              />
-            </el-form-item>
-            <el-form-item label="商品类型">
-              <el-select v-model="formdata.category_id">
-                <el-option
-                  v-for="item in categoryOptions"
-                  :key="item.id"
-                  :value="item.id"
-                  :label="item.name"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="商品名称">
-              <el-select
-                v-model="formdata.product_id"
-                remote
-                filterable
-                :remote-method="remoteMethod"
-                :loading="loading"
-                placeholder="请选择商品名称"
-                style="width:200px"
-              >
-                <el-option
-                  v-for="item in productOptions"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item label="状态">
-              <el-select v-model="formdata.status">
-                <el-option
-                  v-for="item in goodStateOptions"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                ></el-option>
-              </el-select>
-            </el-form-item>
+          <el-form :model="formdata" label-width="70px">
+            <el-row>
+              <el-col :span="6"
+                ><el-form-item label="时间">
+                  <el-date-picker
+                    class="date-picker"
+                    value-format="yyyy-MM-dd"
+                    v-model="formdata.date"
+                    range-separator="~"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    type="daterange"
+                  /> </el-form-item
+              ></el-col>
+              <el-col :span="6">
+                <el-form-item label="商品类型">
+                  <el-select v-model="formdata.category_id">
+                    <el-option
+                      v-for="item in categoryOptions"
+                      :key="item.id"
+                      :value="item.id"
+                      :label="item.name"
+                    ></el-option>
+                  </el-select> </el-form-item
+              ></el-col>
+              <el-col :span="6">
+                <el-form-item label="商品名称">
+                  <el-select
+                    v-model="formdata.product_id"
+                    remote
+                    filterable
+                    :remote-method="remoteMethod"
+                    :loading="loading"
+                    placeholder="请选择商品名称"
+                  >
+                    <el-option
+                      v-for="item in productOptions"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    ></el-option>
+                  </el-select> </el-form-item
+              ></el-col>
+              <el-col :span="6"
+                ><el-form-item label="状态">
+                  <el-select v-model="formdata.status">
+                    <el-option
+                      v-for="item in goodStateOptions"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    ></el-option>
+                  </el-select> </el-form-item
+              ></el-col>
+            </el-row>
+
             <el-form-item class="types-radio">
               <el-radio-group
                 v-model="formdata.type"
@@ -70,11 +77,17 @@
           <el-button type="primary" @click="queryList" :disabled="isDisabled"
             >查询</el-button
           >
-          <el-button type="primary">导出</el-button>
+          <el-button type="primary" @click="exportFile">导出</el-button>
         </div>
+        <div class="clearfix"></div>
       </div>
       <div class="main-content">
-        <el-table border :data="tableData">
+        <el-table
+          border
+          :data="tableData"
+          show-summary
+          :summary-method="getSummary"
+        >
           <el-table-column
             label="序号"
             type="index"
@@ -83,7 +96,7 @@
           <el-table-column label="统计变量">
             <div
               slot-scope="scoped"
-              v-html="showCellData(scoped.row.statistic)"
+              v-html="showCellData(scoped.row.statistic, formdata.type)"
             ></div>
           </el-table-column>
           <el-table-column label="下单时间">
@@ -165,6 +178,8 @@ const good_state = [
   { id: 3, name: "待取货" },
   { id: 4, name: "已取货" }
 ];
+const static_type = ["", "种类型", "种商品", "种状态"];
+
 export default {
   components: { Pagination },
   data() {
@@ -186,6 +201,7 @@ export default {
       },
       categoryOptions: [],
       productOptions: [],
+      statistic: {},
       goodStateOptions: good_state,
       tableData: [],
       current_page: 1,
@@ -248,6 +264,12 @@ export default {
         await this.getProductsId();
       }
     },
+    async exportFile() {
+      await this.$exportExcel(
+        "http://canteen.tonglingok.com/api/v1/shop/order/exportConsumptionStatistic",
+        this.formdata
+      );
+    },
     async queryList(page) {
       page = Number(page) || 1;
       const res = await $axios.get(
@@ -260,7 +282,15 @@ export default {
         this.tableData = Array.from(res.data.data);
         this.total = res.data.total;
         this.current_page = res.data.current_page;
+        this.statistic = res.data.statistic;
       }
+    },
+    getSummary(params) {
+      const { columns, data } = params;
+      const sums = ["合计"];
+      sums[1] = this.tableData.length + static_type[this.formdata.type];
+      sums[10] = "总金额：" + this.statistic.statisticMoney;
+      return sums;
     }
   }
 };
@@ -268,33 +298,11 @@ export default {
 
 <style lang="scss" scoped>
 .canteen-statistics {
-  .select-title {
-    float: left;
-    width: 90%;
+  .types-radio {
     display: flex;
-    flex-wrap: wrap;
-    .el-input {
-      width: 250px;
-    }
-    .el-select {
-      width: 250px;
-    }
-    .types-radio {
-      display: flex;
-      justify-content: space-between;
-      .el-radio-group {
-        display: block;
-      }
-    }
-  }
-  .btn-area {
-    float: right;
-    width: 10%;
-    display: flex;
-    flex-direction: column;
-    display: block;
-    .el-button {
-      margin-bottom: 20px;
+    justify-content: space-between;
+    .el-radio-group {
+      display: block;
     }
   }
 }

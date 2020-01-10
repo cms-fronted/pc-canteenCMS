@@ -5,83 +5,109 @@
     <div class="main">
       <div class="main-header">
         <div class="select-title">
-          <el-form :inline="true" :model="formdata" label-width="80px">
-            <el-form-item label="时间">
-              <el-date-picker
-                value-format="yyyy-MM-dd"
-                v-model="formdata.date"
-                range-separator="~"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                type="daterange"
-              />
-            </el-form-item>
-            <el-form-item label="公司" v-if="companiesVisible">
-              <el-select
-                v-model="formdata.company_ids"
-                filterable
-                @change="getList"
-                placeholder="请选择公司"
-              >
-                <el-option
-                  v-for="item in companiesList"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="消费地点">
-              <el-select
-                v-model="formdata.canteen_id"
-                @change="getDinnersList"
-                placeholder="请选择饭堂"
-              >
-                <el-option
-                  v-for="item in locationList"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="部门" v-if="companiesVisible">
-              <el-select
-                v-model="formdata.department_id"
-                placeholder="请选择部门"
-              >
-                <el-option
-                  v-for="item in departmentList"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="姓名">
-              <el-input placeholder="请输入姓名" v-model="formdata.name" />
-            </el-form-item>
-            <el-form-item label="手机号码">
-              <el-input placeholder="请输入手机号码" v-model="formdata.phone" />
-            </el-form-item>
-            <el-form-item label="餐次">
-              <el-select v-model="formdata.dinner_id" placeholder="请选择餐次">
-                <el-option
-                  v-for="item in dinnersList"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
-              </el-select>
-            </el-form-item>
+          <el-form :model="formdata" label-width="70px">
+            <el-row>
+              <el-col :span="6">
+                <el-form-item label="时间">
+                  <el-date-picker
+                    class="date-picker"
+                    value-format="yyyy-MM-dd"
+                    v-model="formdata.date"
+                    range-separator="~"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    type="daterange"
+                  />
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="公司" v-if="companiesVisible">
+                  <el-select
+                    v-model="formdata.company_ids"
+                    filterable
+                    @change="getList"
+                    placeholder="请选择公司"
+                  >
+                    <el-option
+                      v-for="item in companiesList"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="消费地点">
+                  <el-select
+                    v-model="formdata.canteen_id"
+                    @change="getDinnersList"
+                    placeholder="请选择饭堂"
+                  >
+                    <el-option
+                      v-for="item in locationList"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="部门" v-if="companiesVisible">
+                  <el-select
+                    v-model="formdata.department_id"
+                    placeholder="请选择部门"
+                  >
+                    <el-option
+                      v-for="item in departmentList"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="6">
+                <el-form-item label="姓名">
+                  <el-input placeholder="请输入姓名" v-model="formdata.name" />
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="餐次">
+                  <el-select
+                    v-model="formdata.dinner_id"
+                    placeholder="请选择餐次"
+                  >
+                    <el-option
+                      v-for="item in dinnersList"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="手机号码">
+                  <el-input
+                    placeholder="请输入手机号码"
+                    v-model="formdata.phone"
+                  />
+                </el-form-item>
+              </el-col>
+            </el-row>
           </el-form>
         </div>
         <div class="btn-area">
           <el-button type="primary" @click="queryList" :disabled="isDisabled"
             >查询</el-button
           >
-          <el-button type="primary">导出</el-button>
+          <el-button type="primary" @click="exportFile">导出</el-button>
         </div>
+        <div class="clearfix"></div>
       </div>
       <div class="main-content">
         <el-table style="width:100%" :data="tableData" border>
@@ -247,6 +273,12 @@ export default {
           .catch(err => console.log(err));
       }
     },
+    async exportFile() {
+      this.$exportExcel(
+        "http://canteen.tonglingok.com/api/v1/order/orderStatistic/detail/export",
+        this.formdata
+      );
+    },
     async queryList(page) {
       page = typeof page == "number" ? page : 1;
       let { pageSize, sum } = this;
@@ -290,29 +322,5 @@ export default {
 
 <style lang="scss" scpoed>
 .order-manage-details {
-  .main-header {
-    .select-title {
-      float: left;
-      width: 90%;
-      display: flex;
-      flex-wrap: wrap;
-      .el-input {
-        width: 180px;
-      }
-      .el-select {
-        width: 180px;
-      }
-    }
-    .btn-area {
-      float: right;
-      width: 10%;
-      display: flex;
-      flex-direction: column;
-      display: block;
-      .el-button {
-        margin-bottom: 20px;
-      }
-    }
-  }
 }
 </style>

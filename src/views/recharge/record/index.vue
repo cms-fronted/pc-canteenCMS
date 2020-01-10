@@ -6,17 +6,55 @@
       <div class="main">
         <div class="main-header clearfix">
           <div class="select-title">
-            <el-form :inline="true" :model="formdata" label-width="80px">
-              <el-form-item label="时间">
-                <el-date-picker
-                  value-format="yyyy-MM-dd"
-                  v-model="formdata.date"
-                  range-separator="~"
-                  start-placeholder="开始日期"
-                  end-placeholder="结束日期"
-                  type="daterange"
-                />
-              </el-form-item>
+            <el-form label-width="70px" :model="formdata">
+              <el-row>
+                <el-col :span="6">
+                  <el-form-item label="时间">
+                    <el-date-picker
+                      class="date-picker"
+                      value-format="yyyy-MM-dd"
+                      v-model="formdata.date"
+                      range-separator="~"
+                      start-placeholder="开始日期"
+                      end-placeholder="结束日期"
+                      type="daterange"
+                    />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="6">
+                  <el-form-item label="姓名">
+                    <el-input
+                      placeholder="请输入姓名"
+                      v-model="formdata.username"
+                    />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="6">
+                  <el-form-item label="充值途径">
+                    <el-select v-model="formdata.type" placeholder="请选择">
+                      <el-option
+                        v-for="item in recharge_wayList"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.type"
+                      />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+                <el-col :span="6">
+                  <el-form-item label="充值人员">
+                    <el-select v-model="formdata.admin_id" placeholder="请选择">
+                      <el-option
+                        v-for="item in adminList"
+                        :key="item.id"
+                        :label="item.role"
+                        :value="item.id"
+                      />
+                    </el-select>
+                  </el-form-item>
+                </el-col>
+              </el-row>
+
               <!-- <el-form-item label="公司"  v-if="companiesVisible">
                 <el-select v-model="formdata.company_ids" placeholder="请选择公司" style="width:200px">
                   <el-option
@@ -27,48 +65,15 @@
                   ></el-option>
                 </el-select>
               </el-form-item>-->
-              <el-form-item label="姓名">
-                <el-input
-                  placeholder="请输入姓名"
-                  v-model="formdata.username"
-                />
-              </el-form-item>
-              <el-form-item label="充值途径">
-                <el-select
-                  v-model="formdata.type"
-                  placeholder="请选择"
-                  style="width:200px"
-                >
-                  <el-option
-                    v-for="item in recharge_wayList"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.type"
-                  />
-                </el-select>
-              </el-form-item>
-              <el-form-item label="充值人员">
-                <el-select
-                  v-model="formdata.admin_id"
-                  placeholder="请选择"
-                  style="width:200px"
-                >
-                  <el-option
-                    v-for="item in adminList"
-                    :key="item.id"
-                    :label="item.role"
-                    :value="item.id"
-                  />
-                </el-select>
-              </el-form-item>
             </el-form>
           </div>
           <div class="btn-area">
             <el-button type="primary" @click="fetchTableList">查询</el-button>
-            <el-button type="primary">导出</el-button>
+            <el-button type="primary" @click="exportFile">导出</el-button>
           </div>
+          <div class="clearfix"></div>
         </div>
-        <div class="total" v-show="total > 0">
+        <div class="total" v-show="total != 0">
           <span>
             共有
             <strong>{{ total }}</strong> 条记录
@@ -115,7 +120,7 @@ export default {
         time_begin: "",
         time_end: "",
         admin_id: "",
-        type: "",
+        type: "all",
         username: "",
         page: 1,
         size: 10
@@ -150,8 +155,9 @@ export default {
       current_page: 1
     };
   },
-  created() {
-    this.fetchAdminList();
+  async created() {
+    await this.fetchAdminList();
+    await this.fetchTableList();
     // this.getCompanies();
   },
   computed: {
@@ -173,8 +179,8 @@ export default {
   },
   components: { Pagination },
   methods: {
-    getCompanies() {
-      $axios
+    async getCompanies() {
+      await $axios
         .get("http://canteen.tonglingok.com/api/v1/admin/companies")
         .then(res => {
           let arr = res.data;
@@ -195,9 +201,9 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    fetchAdminList() {
+    async fetchAdminList() {
       // module_id 暂时固定为14
-      $axios
+      await $axios
         .get(
           "http://canteen.tonglingok.com/api/v1/wallet/recharge/admins?module_id=14"
         )
@@ -210,12 +216,20 @@ export default {
               role: "全部"
             });
           }
-        })
-        .catch(err => console.log(err));
+        });
+      this.formdata.admin_id = this.adminList[0].id.catch(err =>
+        console.log(err)
+      );
     },
-    fetchTableList() {
+    async exportFile() {
+      await this.$exportExcel(
+        "http://canteen.tonglingok.com/api/v1/wallet/recharges/export",
+        this.formdata
+      );
+    },
+    async fetchTableList() {
       this.formdata.page = this.current_page;
-      $axios
+      await $axios
         .get(
           "http://canteen.tonglingok.com/api/v1/wallet/recharges",
           this.formdata
@@ -237,40 +251,40 @@ export default {
 </script>
 
 <style lang="scss" scpoed>
-.clearfix::after {
-  content: "";
-  display: block;
-  clear: both;
-}
-.main-header {
-  .select-title {
-    float: left;
-    width: 90%;
-    display: flex;
-    flex-wrap: wrap;
-    .el-select {
-      width: 200px;
-    }
-  }
-  .btn-area {
-    float: right;
-    width: 10%;
-    display: flex;
-    flex-direction: column;
-    display: block;
-    .el-button {
-      margin-bottom: 20px;
-    }
-  }
-}
-.main-content {
-  .el-table {
-    th,
-    td {
-      text-align: center;
-    }
-  }
-}
+// .clearfix::after {
+//   content: "";
+//   display: block;
+//   clear: both;
+// }
+// .main-header {
+//   .select-title {
+//     float: left;
+//     width: 90%;
+//     display: flex;
+//     flex-wrap: wrap;
+//     .el-select {
+//       width: 200px;
+//     }
+//   }
+//   .btn-area {
+//     float: right;
+//     width: 10%;
+//     display: flex;
+//     flex-direction: column;
+//     display: block;
+//     .el-button {
+//       margin-bottom: 20px;
+//     }
+//   }
+// }
+// .main-content {
+//   .el-table {
+//     th,
+//     td {
+//       text-align: center;
+//     }
+//   }
+// }
 .main {
   .total {
     display: flex;

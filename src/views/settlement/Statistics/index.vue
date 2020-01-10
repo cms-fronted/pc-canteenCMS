@@ -5,78 +5,99 @@
     <div class="main">
       <div class="main-header">
         <div class="select-title">
-          <el-form :inline="true" :model="formdata" label-width="80px">
-            <el-form-item label="时间">
-              <el-date-picker
-                value-format="yyyy-MM-dd"
-                v-model="formdata.date"
-                range-separator="~"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                type="daterange"
-              />
-            </el-form-item>
-            <el-form-item label="公司" v-if="companiesVisible">
-              <el-select
-                placeholder="请选择企业"
-                filterable
-                v-model="formdata.company_ids"
-                @change="getList"
-              >
-                <el-option
-                  v-for="item in companiesList"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="消费地点">
-              <el-select v-model="formdata.canteen_id" placeholder="请选择饭堂">
-                <el-option
-                  v-for="item in locationList"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="部门" v-if="companiesVisible">
-              <el-select
-                v-model="formdata.department_id"
-                placeholder="请选择部门"
-              >
-                <el-option
-                  v-for="item in departmentList"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="姓名">
-              <el-input v-model="formdata.username" placeholder="请输入姓名" />
-            </el-form-item>
-            <el-form-item label="消费类型">
-              <el-select v-model="formdata.status">
-                <el-option
-                  v-for="item in consumptionOptions"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="人员类型">
-              <el-select v-model="formdata.staff_type_id">
-                <el-option
-                  v-for="item in roleOptions"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
-              </el-select>
-            </el-form-item>
+          <el-form :model="formdata" label-width="70px">
+            <el-row>
+              <el-col :span="6">
+                <el-form-item label="时间">
+                  <el-date-picker
+                    class="date-picker"
+                    value-format="yyyy-MM-dd"
+                    v-model="formdata.date"
+                    range-separator="~"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    type="daterange"
+                  /> </el-form-item
+              ></el-col>
+              <el-col :span="6">
+                <el-form-item label="公司" v-if="companiesVisible">
+                  <el-select
+                    placeholder="请选择企业"
+                    filterable
+                    v-model="formdata.company_ids"
+                    @change="getList"
+                  >
+                    <el-option
+                      v-for="item in companiesList"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    />
+                  </el-select> </el-form-item
+              ></el-col>
+              <el-col :span="6">
+                <el-form-item label="消费地点">
+                  <el-select
+                    v-model="formdata.canteen_id"
+                    placeholder="请选择饭堂"
+                  >
+                    <el-option
+                      v-for="item in locationList"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    />
+                  </el-select> </el-form-item
+              ></el-col>
+              <el-col :span="6">
+                <el-form-item label="部门" v-if="companiesVisible">
+                  <el-select
+                    v-model="formdata.department_id"
+                    placeholder="请选择部门"
+                  >
+                    <el-option
+                      v-for="item in departmentList"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    />
+                  </el-select> </el-form-item
+              ></el-col>
+            </el-row>
+            <el-row>
+              <el-col :span="6">
+                <el-form-item label="姓名">
+                  <el-input
+                    v-model="formdata.username"
+                    placeholder="请输入姓名"
+                  />
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="消费类型">
+                  <el-select v-model="formdata.status">
+                    <el-option
+                      v-for="item in consumptionOptions"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="人员类型">
+                  <el-select v-model="formdata.staff_type_id">
+                    <el-option
+                      v-for="item in roleOptions"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    />
+                  </el-select> </el-form-item
+              ></el-col>
+            </el-row>
+
             <el-form-item class="types-radio">
               <el-radio-group
                 v-model="formdata.type"
@@ -95,32 +116,48 @@
           <el-button type="primary" @click="queryList" :disabled="isDisabled"
             >查询</el-button
           >
-          <el-button type="primary">导出</el-button>
+          <el-button type="primary" @click="exportFile">导出</el-button>
         </div>
+        <div class="clearfix"></div>
       </div>
       <div class="main-content">
-        <el-table :data="tableData" border>
-          <el-table-column type="expand" v-if="formdata.type === 2">
-            <el-table size="mini" :data="tableData.dinner_statstic">
-              <el-table-column label="餐次信息">
-                <div
-                  slot-scope="scoped"
-                  v-html="showCellData(scoped.row.dinner)"
-                ></div>
-              </el-table-column>
-              <el-table-column label="订餐数量">
-                <div
-                  slot-scope="scoped"
-                  v-html="showCellData(scoped.row.order_count)"
-                ></div
-              ></el-table-column>
-              <el-table-column label="金额">
-                <div
-                  slot-scope="scoped"
-                  v-html="showCellData(scoped.row.order_money)"
-                ></div
-              ></el-table-column>
-            </el-table>
+        <el-table
+          :data="tableData"
+          border
+          show-summary
+          :summary-method="getOuterSum"
+        >
+          <el-table-column type="expand" width="60px">
+            <template slot-scope="tableScoped">
+              <el-table
+                size="mini"
+                :data="
+                  tableScoped.row.dinnerStatistic ||
+                    tableScoped.row.dinner_statistic
+                "
+                show-summary
+                :summary-method="getInnerSum"
+              >
+                <el-table-column prop="dinner" label="餐次信息">
+                  <div
+                    slot-scope="scoped"
+                    v-html="showCellData(scoped.row.dinner)"
+                  ></div>
+                </el-table-column>
+                <el-table-column label="订餐数量" prop="order_count">
+                  <div
+                    slot-scope="scoped"
+                    v-html="showCellData(scoped.row.order_count)"
+                  ></div
+                ></el-table-column>
+                <el-table-column label="金额" prop="order_money">
+                  <div
+                    slot-scope="scoped"
+                    v-html="showCellData(scoped.row.order_money)"
+                  ></div
+                ></el-table-column>
+              </el-table>
+            </template>
           </el-table-column>
           <el-table-column label="统计变量">
             <div
@@ -154,6 +191,7 @@
           ></el-table-column>
         </el-table>
         <pagination
+          v-if="formdata.type === 2 && total > 10"
           :total="total"
           :pageSize="size"
           :currentPage="current_page"
@@ -233,6 +271,10 @@ export default {
           ]
         }*/
       ],
+      summary: {
+        allMoney: 0,
+        allCount: 0
+      },
       consumptionOptions: consumption_options,
       current_page: 1,
       size: 10,
@@ -348,7 +390,19 @@ export default {
         this.formdata.staff_type_id = this.roleOptions[0].id;
       }
     },
+    async exportFile() {
+      if (this.formdata.canteen_id) {
+        delete this.formdata.company_ids;
+      }
+      await this.$exportExcel(
+        "http://canteen.tonglingok.com/api/v1/order/consumptionStatistic/export",
+        this.formdata
+      );
+    },
     async queryList(page) {
+      if (this.formdata.canteen_id) {
+        delete this.formdata.company_ids;
+      }
       page = typeof page == "number" ? page : 1;
       const type = this.formdata.type;
       if (this.formdata.canteen_id) {
@@ -362,15 +416,53 @@ export default {
       );
       if (res.msg === "ok") {
         if (type === 2) {
-          this.tableData = Array.from(res.data.statistic.data);
-          this.current_page = res.data.statistic.current_page;
-          this.total = res.data.statistic.total;
+          this.tableData = Array.from(res.data.data);
+          this.current_page = res.data.current_page;
+          this.total = res.data.total;
+          this.summary.allMoney = "";
+          this.summary.allCount = "/";
         } else {
           this.tableData = Array.from(res.data.statistic);
           this.current_page = res.data.current_page;
           this.total = res.data.total;
+          this.summary.allMoney = res.data.allMoney;
+          this.summary.allCount = res.data.allCount;
         }
       }
+    },
+    getInnerSum(params) {
+      const { columns, data } = params;
+      const sums = [];
+      columns.forEach((column, index) => {
+        if (index === 0) {
+          sums[0] = "合计";
+          return;
+        }
+        const values = data.map(item => {
+          return Number(item[column.property]); // property为el-table标签钟的prop属性值
+        });
+        if (!values.every(value => isNaN(value))) {
+          sums[index] = values.reduce((prev, curr) => {
+            const value = Number(curr);
+            if (!isNaN(value)) {
+              return prev + curr;
+            } else {
+              return prev;
+            }
+          }, 0);
+          index == 1 ? (sums[index] += "次") : (sums[index] += "元");
+        } else {
+          sums[index] = "N/A";
+        }
+      });
+      return sums;
+    },
+    getOuterSum(params) {
+      const { columns, data } = params;
+      const sums = ["合计", "/", "/", "/"];
+      sums[1] = this.summary.allCount + "个";
+      sums[5] = "总金额：" + this.summary.allMoney + "元";
+      return sums;
     }
   }
 };
@@ -378,36 +470,36 @@ export default {
 
 <style lang="scss" scoped>
 .order-statistics {
-  .main-header {
-    .select-title {
-      float: left;
-      width: 90%;
-      display: flex;
-      flex-wrap: wrap;
-      .el-input {
-        width: 200px;
-      }
-      .el-select {
-        width: 200px;
-      }
-      .types-radio {
-        display: flex;
-        justify-content: space-between;
-        .el-radio-group {
-          display: block;
-        }
-      }
-    }
-    .btn-area {
-      float: right;
-      width: 10%;
-      display: flex;
-      flex-direction: column;
+  // .main-header {
+  //   .select-title {
+  //     float: left;
+  //     width: 90%;
+  //     display: flex;
+  //     flex-wrap: wrap;
+  //     .el-input {
+  //       width: 200px;
+  //     }
+  //     .el-select {
+  //       width: 200px;
+  //     }
+  .types-radio {
+    display: flex;
+    justify-content: space-between;
+    .el-radio-group {
       display: block;
-      .el-button {
-        margin-bottom: 20px;
-      }
     }
   }
+  //   }
+  //   .btn-area {
+  //     float: right;
+  //     width: 10%;
+  //     display: flex;
+  //     flex-direction: column;
+  //     display: block;
+  //     .el-button {
+  //       margin-bottom: 20px;
+  //     }
+  //   }
+  // }
 }
 </style>

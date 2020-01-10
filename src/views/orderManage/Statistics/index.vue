@@ -4,54 +4,54 @@
       <div class="nav-title">订餐统计</div>
       <el-divider />
       <div class="main">
-        <div class="main-header" :class="{ active: !companiesVisible }">
+        <div class="main-header">
           <div class="select-title">
-            <el-form
-              :inline="true"
-              :model="formdata"
-              label-width="40px"
-              label-position="left"
-            >
-              <el-form-item label="时间">
-                <el-date-picker
-                  value-format="yyyy-MM-dd"
-                  v-model="formdata.date"
-                  range-separator="~"
-                  start-placeholder="开始日期"
-                  end-placeholder="结束日期"
-                  type="daterange"
-                />
-              </el-form-item>
-              <el-form-item label="公司" v-if="companiesVisible">
-                <el-select
-                  v-model="formdata.company_ids"
-                  placeholder="请选择公司"
-                  style="width:200px"
-                  filterable
-                  @change="getList"
-                >
-                  <el-option
-                    v-for="item in companyOptions"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id"
-                  />
-                </el-select>
-              </el-form-item>
-              <el-form-item label="消费地点" label-width="80px">
-                <el-select
-                  v-model="formdata.canteen_id"
-                  placeholder="请选择消费地点"
-                  style="width:200px"
-                >
-                  <el-option
-                    v-for="item in canteenOptions"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id"
-                  />
-                </el-select>
-              </el-form-item>
+            <el-form label-width="70px" :model="formdata">
+              <el-row :gutter="10">
+                <el-col :span="6">
+                  <el-form-item label="时间">
+                    <el-date-picker
+                      class="date-picker"
+                      value-format="yyyy-MM-dd"
+                      v-model="formdata.date"
+                      range-separator="~"
+                      start-placeholder="开始日期"
+                      end-placeholder="结束日期"
+                      type="daterange"
+                    />
+                  </el-form-item>
+                </el-col>
+                <el-col :span="6">
+                  <el-form-item label="公司" v-if="companiesVisible">
+                    <el-select
+                      v-model="formdata.company_ids"
+                      placeholder="请选择公司"
+                      filterable
+                      @change="getList"
+                    >
+                      <el-option
+                        v-for="item in companyOptions"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id"
+                      />
+                    </el-select> </el-form-item
+                ></el-col>
+                <el-col :span="6">
+                  <el-form-item label="消费地点">
+                    <el-select
+                      v-model="formdata.canteen_id"
+                      placeholder="请选择消费地点"
+                    >
+                      <el-option
+                        v-for="item in canteenOptions"
+                        :key="item.id"
+                        :label="item.name"
+                        :value="item.id"
+                      />
+                    </el-select> </el-form-item
+                ></el-col>
+              </el-row>
             </el-form>
           </div>
           <div class="btn-area">
@@ -59,21 +59,20 @@
               type="primary"
               @click="queryList(1)"
               :disabled="isDisabled"
+              plain
               >查询</el-button
             >
-            <el-button type="primary">导出</el-button>
+            <el-button type="primary" @click="exportFile">导出</el-button>
           </div>
+          <div class="clearfix"></div>
         </div>
         <div class="main-content">
           <el-table style="width:100%" :data="tableData" border>
-            <el-table-column
-              label="日期"
-              prop="ordering_date"
-            ></el-table-column>
-            <el-table-column label="公司" prop="company"></el-table-column>
-            <el-table-column label="消费地点" prop="canteen"></el-table-column>
-            <el-table-column label="餐次" prop="dinner"></el-table-column>
-            <el-table-column label="消费人数" prop="count"></el-table-column>
+            <el-table-column label="日期" prop="ordering_date" />
+            <el-table-column label="公司" prop="company" />
+            <el-table-column label="消费地点" prop="canteen" />
+            <el-table-column label="餐次" prop="dinner" />
+            <el-table-column label="消费人数" prop="count" />
           </el-table>
           <pagination
             @pagination="queryList"
@@ -195,6 +194,12 @@ export default {
         this.formdata.canteen_id = this.canteenOptions[0].id;
       }
     },
+    async exportFile() {
+      await this.$exportExcel(
+        "http://canteen.tonglingok.com/api/v1/order/orderStatistic/export",
+        this.formdata
+      );
+    },
     async queryList(page) {
       page = typeof page == "number" ? page : 1;
       const res = await $axios.get(
@@ -248,7 +253,7 @@ export default {
 </script>
 
 <style lang="scss" scpoed>
-.main-header {
+/*.main-header {
   .select-title {
     float: left;
     width: 90%;
@@ -265,17 +270,17 @@ export default {
       margin-bottom: 20px;
     }
   }
-}
-.main-header.active {
-  .select-title {
-    width: 85%;
-  }
-  .btn-area {
-    width: 15%;
-    flex-direction: row;
-    .el-button {
-      margin-left: 8px;
-    }
-  }
-}
+}*/
+/*.main-header.active {*/
+/*  .select-title {*/
+/*    width: 85%;*/
+/*  }*/
+/*  .btn-area {*/
+/*    width: 15%;*/
+/*    flex-direction: row;*/
+/*    .el-button {*/
+/*      margin-left: 8px;*/
+/*    }*/
+/*  }*/
+/*}*/
 </style>

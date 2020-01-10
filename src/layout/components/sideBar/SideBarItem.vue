@@ -13,7 +13,7 @@
         </el-menu-item>
       </page-link>
     </template>
-    
+
     <el-submenu v-else :index="resolvePath(item.path)" popper-append-to-body>
       <template slot="title">
         <i :class="item.meta.icon ? item.meta.icon : ''"></i>
@@ -46,8 +46,10 @@ export default {
     }
   },
   data() {
+    //To fix 当设置多层路由时， 设置 hidden: true ，出现死循环
+    this.childItem = null;
     return {
-      childItem: null,
+      // childItem: null,
     };
   },
   methods: {
@@ -80,7 +82,7 @@ export default {
     }
   },
   components: {
-    PageLink,
+    PageLink
   }
 };
 </script>

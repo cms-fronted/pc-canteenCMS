@@ -7,12 +7,12 @@
         <div class="main-header">
           <span class="content-header">人员信息</span>
           <el-input class="filter-input" v-model="key" placeholder="关键字查询" prefix-icon="el-icon-search" style="width:180px"></el-input>
-          <el-button type="primary" @click="fetchPersonnelList">查询</el-button>
+          <el-button type="primary" @click="fetchPersonnelList" style="margin-left:10px">查询</el-button>
           <span class="content-header">充值金额</span>
           <el-input v-model="money" placeholder="请输入"  style="width:180px"></el-input>
           <span class="content-header">备注</span>
           <el-input v-model="remark" placeholder="请输入"  style="width:180px"></el-input>
-          <el-button type="primary" @click="recharge">充值</el-button>
+          <el-button type="primary" @click="recharge"  style="margin-left:10px">充值</el-button>
           <!-- <el-button type="primary" @click="batchRecharge">批量充值</el-button> -->
           <el-upload
             class="upload-excel upload"
@@ -25,7 +25,7 @@
             :on-success='handleSuccess'
             name="cash"
             >
-            <el-button type="primary">批量充值</el-button>
+            <el-button type="primary"  style="margin-left:10px">批量充值</el-button>
           </el-upload>
         </div>
         <div class="total" v-show="total > 0"><span>共有 <strong>{{total}}</strong> 条记录</span></div>

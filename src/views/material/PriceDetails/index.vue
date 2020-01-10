@@ -40,13 +40,7 @@
           v-model="keyword"
           style="width:180px;margin: 0 15px;"
         />
-        <el-button
-          type="primary"
-          plain
-          style="margin-left:0"
-          @click="fetchTableList"
-          >查询</el-button
-        >
+        <el-button type="primary" plain @click="fetchTableList">查询</el-button>
         <el-button type="primary" @click="deriveData">导出</el-button>
         <el-upload
           class="upload-excel"
@@ -60,11 +54,14 @@
           :data="{ c_id: canteen_id }"
           name="materials"
         >
-          <el-button type="primary">批量导入</el-button>
+          <el-button type="primary" style="margin-left:10px"
+            >批量导入</el-button
+          >
         </el-upload>
         <el-button
           type="primary"
           @click="handleClick({ c_id: canteen_id }, '_add', '新增材料')"
+          style="margin-left:10px"
           >添加</el-button
         >
       </div>

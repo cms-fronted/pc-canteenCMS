@@ -27,11 +27,16 @@
             </el-select>
           </el-form-item>
           <el-button type="primary" @click="queryList">查询</el-button>
-          <el-button>导出</el-button>
+          <el-button @click="exportFile">导出</el-button>
         </el-form>
       </div>
       <div class="main-content">
-        <el-table :data="tableData" style="width:100%">
+        <el-table
+          :data="tableData"
+          style="width:100%"
+          show-summary
+          :summary-method="getSummary"
+        >
           <el-table-column
             label="序号"
             type="index"
@@ -56,6 +61,13 @@
               slot-scope="scoped"
               v-html="showCellData(scoped.row.sale_sum)"
             ></div>
+          </el-table-column>
+          <el-table-column label="总销售额">
+            <template slot-scope="scoped">
+              <span>
+                {{ scoped.row.sale_sum * scoped.row.purchase_sum }}
+              </span>
+            </template>
           </el-table-column>
         </el-table>
         <pagination
@@ -90,6 +102,7 @@ export default {
         ],
         supplier_id: ""
       },
+      allMoney: null,
       current_page: 1,
       size: 10,
       total: 0
@@ -126,6 +139,12 @@ export default {
         this.formdata.supplier_id = this.supplierOptions[0].id;
       }
     },
+    async exportFile() {
+      await this.$exportExcel(
+        "http://canteen.tonglingok.com/api/v1/shop/order/exportSalesReport/manager",
+        this.formdata
+      );
+    },
     async queryList(page) {
       page = typeof page == Number ? page : 1;
       const res = await $axios.get(
@@ -136,9 +155,16 @@ export default {
       );
       if (res.msg === "ok") {
         this.tableData = Array.from(res.data.data);
+        this.allMoney = res.data.money;
         this.total = res.data.total;
         this.current_page = res.data.current_page;
       }
+    },
+    getSummary(params) {
+      const { columns, data } = params;
+      const sums = ["合计（元）"];
+      sums[6] = "总金额：" + this.allMoney;
+      return sums;
     }
   }
 };

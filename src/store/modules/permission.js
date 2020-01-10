@@ -32,7 +32,7 @@ const actions = {
   getAsyncRoutes({ commit, rootGetters }, roles) {
     return new Promise(resolve => {
       let routes = [];
-      if (rootGetters.isProducer) {
+      if (localStorage.isProducer) {
         routes = producerRoutes || "";
       } else {
         routes = forSearchArr(asyncRoutes, roles);

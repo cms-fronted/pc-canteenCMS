@@ -5,64 +5,75 @@
     <div class="main">
       <div class="main-header">
         <div class="select-title">
-          <el-form :model="formdata" :inline="true">
-            <el-form-item label="时间">
-              <el-date-picker
-                value-format="yyyy-MM-dd"
-                v-model="formdata.date"
-                range-separator="~"
-                start-placeholder="开始日期"
-                end-placeholder="结束日期"
-                type="daterange"
-              />
-            </el-form-item>
-            <el-form-item label="公司" v-if="companiesVisible">
-              <el-select
-                v-model="formdata.company_id"
-                filterable
-                placeholder="请选择企业"
-                @change="getDepartmentList"
-              >
-                <el-option
-                  v-for="item in companyList"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="部门">
-              <el-select
-                v-model="formdata.department_id"
-                placeholder="请选择部门"
-              >
-                <el-option
-                  v-for="item in departmentList"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
-              </el-select>
-            </el-form-item>
-
-            <el-form-item label="状态">
-              <el-select v-model="formdata.status" placeholder="请选择状态">
-                <el-option
-                  v-for="item in goodStateOptions"
-                  :key="item.id"
-                  :label="item.name"
-                  :value="item.id"
-                />
-              </el-select>
-            </el-form-item>
+          <el-form :model="formdata" label-width="70px">
+            <el-row>
+              <el-col :span="6">
+                <el-form-item label="时间">
+                  <el-date-picker
+                    class="date-picker"
+                    value-format="yyyy-MM-dd"
+                    v-model="formdata.date"
+                    range-separator="~"
+                    start-placeholder="开始日期"
+                    end-placeholder="结束日期"
+                    type="daterange"
+                  />
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="公司" v-if="companiesVisible">
+                  <el-select
+                    v-model="formdata.company_id"
+                    filterable
+                    placeholder="请选择企业"
+                    @change="getDepartmentList"
+                  >
+                    <el-option
+                      v-for="item in companyList"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="部门">
+                  <el-select
+                    v-model="formdata.department_id"
+                    placeholder="请选择部门"
+                  >
+                    <el-option
+                      v-for="item in departmentList"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+              <el-col :span="6">
+                <el-form-item label="状态">
+                  <el-select v-model="formdata.status" placeholder="请选择状态">
+                    <el-option
+                      v-for="item in goodStateOptions"
+                      :key="item.id"
+                      :label="item.name"
+                      :value="item.id"
+                    />
+                  </el-select>
+                </el-form-item>
+              </el-col>
+            </el-row>
           </el-form>
         </div>
         <div class="btn-area">
           <el-button type="primary" @click="fetchList" :disabled="isDisabled"
             >查询</el-button
           >
-          <el-button type="primary" @click="deriveData">导出</el-button>
+          <el-button type="primary" @click="exportFile">导出</el-button>
         </div>
+        <div class="clearfix"></div>
       </div>
       <div class="main-content">
         <el-table style="width:100%" :data="tableData" border>
@@ -109,6 +120,17 @@
                 scoped.row.address ? scoped.row.address.address : "/"
               }}</span>
             </template>
+          </el-table-column>
+          <el-table-column label="状态">
+            <div
+              slot-scope="scoped"
+              v-html="
+                showCellStatus(
+                  scoped.row.status,
+                  orderStatus[scoped.row.status]
+                )
+              "
+            ></div>
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scoped">
@@ -196,10 +218,12 @@ const good_state = [
   { id: 3, name: "待取货" },
   { id: 4, name: "已取货" }
 ];
+const order_status = ["", "已完成", "已取消", "待取货", "待送货"];
 export default {
   components: { Pagination },
   data() {
     return {
+      orderStatus: order_status,
       fullscreenLoading: false,
       grade: store.getters.grade,
       isPrint: false,
@@ -361,8 +385,11 @@ export default {
         this.$print(this.$refs.detail, { noPrint: ".el-button" });
       }, 1000);
     },
-    deriveData() {
-      console.log("点击导出表格");
+    async exportFile() {
+      await this.$exportExcel(
+        "http://canteen.tonglingok.com/api/v1/shop/order/exportOrderStatistic/manager",
+        this.formdata
+      );
     }
   }
 };
@@ -381,27 +408,27 @@ export default {
   clear: both;
 }
 .shop-order-detail-manager {
-  .el-select {
-    width: 220px;
-  }
-  .main-header {
-    .select-title {
-      float: left;
-      width: 90%;
-      display: flex;
-      flex-wrap: wrap;
-    }
-    .btn-area {
-      float: right;
-      width: 10%;
-      display: flex;
-      flex-direction: column;
-      display: block;
-      .el-button {
-        margin-bottom: 20px;
-      }
-    }
-  }
+  // .el-select {
+  //   width: 220px;
+  // }
+  // .main-header {
+  //   .select-title {
+  //     float: left;
+  //     width: 90%;
+  //     display: flex;
+  //     flex-wrap: wrap;
+  //   }
+  //   .btn-area {
+  //     float: right;
+  //     width: 10%;
+  //     display: flex;
+  //     flex-direction: column;
+  //     display: block;
+  //     .el-button {
+  //       margin-bottom: 20px;
+  //     }
+  //   }
+  // }
   .main-content {
     .el-table {
       th,

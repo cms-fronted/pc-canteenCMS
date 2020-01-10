@@ -41,16 +41,24 @@
             :data="{ c_id: c_id }"
             name="staffs"
           >
-            <el-button type="primary" :disabled="!!!c_id"
+            <el-button
+              type="primary"
+              :disabled="!!!c_id"
+              style="margin-left:10px"
               >批量导入人员</el-button
             >
           </el-upload>
-          <el-button type="danger" :disabled="!!!d_id" @click="deleteDepartment"
+          <el-button
+            type="danger"
+            style="margin-left:10px"
+            :disabled="!!!d_id"
+            @click="deleteDepartment"
             >删除部门</el-button
           >
           <el-button type="primary" @click="openRoleTypeDialog"
             >新增类型</el-button
           >
+          <el-button @click="exportFile">导出</el-button>
         </el-form>
         <div class="main-content">
           <el-row :gutter="10">
@@ -596,6 +604,15 @@ export default {
         this.treeData = Array.from(res.data);
         this.departmentOptions = flatten(res.data);
       }
+    },
+    async exportFile() {
+      await this.$exportExcel(
+        "http://canteen.tonglingok.com/api/v1/export/staffs",
+        {
+          company_id: this.c_id,
+          department_id: this.d_id
+        }
+      );
     },
     async fetchList(page) {
       page = page || this.current_page;

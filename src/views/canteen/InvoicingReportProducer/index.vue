@@ -17,11 +17,16 @@
             />
           </el-form-item>
           <el-button type="primary" @click="queryList">查询</el-button>
-          <el-button>导出</el-button>
+          <el-button @click="exportFile">导出</el-button>
         </el-form>
       </div>
       <div class="main-content">
-        <el-table :data="tableData" style="width:100%">
+        <el-table
+          :data="tableData"
+          style="width:100%"
+          show-summary
+          :summary-method="getSummary"
+        >
           <el-table-column
             label="序号"
             type="index"
@@ -46,6 +51,13 @@
               slot-scope="scoped"
               v-html="showCellData(scoped.row.sale_sum)"
             ></div>
+          </el-table-column>
+          <el-table-column label="总销售额">
+            <template slot-scope="scoped">
+              <span>
+                {{ scoped.row.sale_sum * scoped.row.purchase_sum }}
+              </span>
+            </template>
           </el-table-column>
         </el-table>
         <pagination
@@ -116,7 +128,20 @@ export default {
         this.tableData = Array.from(res.data.data);
         this.total = res.data.total;
         this.current_page = res.data.current_page;
+        this.allMoney = res.data.money;
       }
+    },
+    async exportFile() {
+      await this.$exportExcel(
+        "http://canteen.tonglingok.com/api/v1/shop/order/exportSalesReport/supplier",
+        this.formdata
+      );
+    },
+    getSummary(params) {
+      const { columns, data } = params;
+      const sums = ["合计（元）"];
+      sums[6] = "总金额：" + this.allMoney;
+      return sums;
     }
   }
 };
