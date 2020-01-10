@@ -46,7 +46,7 @@ export const currencyRoutes = [
         meta: { title: "首页", icon: "el-icon-s-data" }
       }
     ]
-  },
+  }
   // {
   //   path: "*",
   //   name: "*404",
@@ -380,7 +380,7 @@ const creatRouter = () => {
     }
   });
 };
-const router = creatRouter()
+const router = creatRouter();
 // 解决addRoute不能删除动态路由问题
 export function resetRouter() {
   const reset = creatRouter();
@@ -399,7 +399,7 @@ router.beforeEach(async (to, from, next) => {
         next();
       } else {
         try {
-          const  {roles}  = await store.dispatch("user/_getUserModules");
+          const { roles } = await store.dispatch("user/_getUserModules");
           const addRoutes = await store.dispatch(
             "permission/getAsyncRoutes",
             roles

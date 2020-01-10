@@ -229,9 +229,7 @@ export default {
     getCategoryList() {
       this.category_id = "";
       $axios
-        .get(
-          "http://canteen.tonglingok.com/api/v1/company/categories"
-        )
+        .get("http://canteen.tonglingok.com/api/v1/company/categories")
         .then(res => {
           this.categoryList = res.data;
           this.categoryList.unshift({

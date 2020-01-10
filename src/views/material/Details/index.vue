@@ -62,11 +62,7 @@
               </el-table>
             </template>
           </el-table-column>
-          <el-table-column
-            label="序号"
-            type="index"
-            width="50"
-          />
+          <el-table-column label="序号" type="index" width="50" />
           <el-table-column label="公司" prop="company" />
           <el-table-column label="饭堂" prop="canteen" />
           <el-table-column label="餐次" prop="dinner" />

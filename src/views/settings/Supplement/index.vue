@@ -5,30 +5,30 @@
       <el-divider></el-divider>
       <div class="main">
         <div class="main-header">
-<!--          <div class="select-title">-->
-            <span class="content-header">人员信息</span>
-            <el-input
-              class="filter-input"
-              v-model="key"
-              placeholder="输入人员信息"
-              style="width:200px"
-            ></el-input>
-            <el-button type="primary" @click="queryList">查询</el-button>
-            <el-upload
-              class="upload-excel upload"
-              ref="upload"
-              :limit="limit"
-              :headers="header"
-              :show-file-list="false"
-              accept=".xls,.xlsx"
-              action="http://canteen.tonglingok.comhttp://canteen.tonglingok.com/api/v1/wallet/supplement/upload"
-              :on-success="handleSuccess"
-              :on-error="handleError"
-              name="supplement"
-            >
-              <el-button type="primary">批量补录</el-button>
-            </el-upload>
-<!--          </div>-->
+          <!--          <div class="select-title">-->
+          <span class="content-header">人员信息</span>
+          <el-input
+            class="filter-input"
+            v-model="key"
+            placeholder="输入人员信息"
+            style="width:200px"
+          ></el-input>
+          <el-button type="primary" @click="queryList">查询</el-button>
+          <el-upload
+            class="upload-excel upload"
+            ref="upload"
+            :limit="limit"
+            :headers="header"
+            :show-file-list="false"
+            accept=".xls,.xlsx"
+            action="http://canteen.tonglingok.comhttp://canteen.tonglingok.com/api/v1/wallet/supplement/upload"
+            :on-success="handleSuccess"
+            :on-error="handleError"
+            name="supplement"
+          >
+            <el-button type="primary">批量补录</el-button>
+          </el-upload>
+          <!--          </div>-->
         </div>
         <div class="main-content">
           <el-table

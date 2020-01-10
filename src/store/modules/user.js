@@ -112,10 +112,9 @@ const actions = {
   _getUserModules({ commit }) {
     let roles = null;
     return new Promise((resolve, reject) => {
-      if (localStorage.getItem("isProducer"))
-       {
-        return resolve({roles});
-      };
+      if (localStorage.getItem("isProducer")) {
+        return resolve({ roles });
+      }
       getUserModules()
         .then(res => {
           if (res.msg === "ok") {

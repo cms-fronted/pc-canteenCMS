@@ -100,7 +100,7 @@ export default {
       });
     },
     _login() {
-      return alert("有bug，维护中")
+      return alert("有bug，维护中");
       this.$store
         .dispatch("user/_producerLogin", this.ruleForm)
         .then(res => {

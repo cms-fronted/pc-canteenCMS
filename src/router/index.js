@@ -554,7 +554,7 @@ export function resetRouter() {
 }
 router.beforeEach(async (to, from, next) => {
   document.title = getTitle(to.meta.title);
-  if (to.path === "/login"||to.path === "/Producer") {
+  if (to.path === "/login" || to.path === "/Producer") {
     next();
   } else {
     // let res = await store.dispatch('user/_getUserModules')
