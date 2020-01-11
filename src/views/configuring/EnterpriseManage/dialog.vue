@@ -285,7 +285,7 @@
           <el-button
             style="float: right; padding: 3px 0"
             type="text"
-            @click="oprnMachineDialog"
+            @click="openMachineDialog"
             >添加硬件</el-button
           >
         </div>
@@ -537,6 +537,7 @@ export default {
             this.$message.success("设置成功");
             this.dataTable.length = 0;
             this.$emit("updateCanteenList", this.company_id);
+            this.canteen_id = null;
             this.handleClose();
           } else {
             this.$message.error(res.msg);
@@ -552,7 +553,7 @@ export default {
     changeDay(val) {
       this.accountForm.clean_day = val > 31 ? 31 : val;
     },
-    oprnMachineDialog() {
+    openMachineDialog() {
       this.addMachineVisible = true;
       this.machineForm = {};
     },
@@ -601,7 +602,7 @@ export default {
         this.machineForm.machine_type = "canteen";
         console.log(this.machineForm);
         $axios
-          .post("v1/canteen/saveMachine", this.machineForm)
+          .post("http://canteen.tonglingok.com/api/v1/canteen/saveMachine", this.machineForm)
           .then(res => {
             if (res.msg === "ok") {
               this.$emit(
