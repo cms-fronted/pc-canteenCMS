@@ -17,7 +17,14 @@
       >
         <el-form ref="dinnerForm" :model="dinnerForm" label-width="120px">
           <el-form-item label="餐次名称">
-            <el-input v-model="dinnerForm.name" style="width:150px;" />
+            <el-select style="width:150px;" v-model="dinnerForm.name">
+              <el-option
+                v-for="item in dinnerOptions"
+                :key="item.value"
+                :label="item.value"
+                :value="item.value"
+              ></el-option>
+            </el-select>
           </el-form-item>
           <el-form-item label="消费状态">
             <el-radio-group v-model="dinnerForm.fixed">
@@ -337,6 +344,13 @@ const weekOptions = [
   { label: "周六", value: 5 },
   { label: "周日", value: 6 }
 ];
+const dinner_name = [
+  { value: "早餐" },
+  { value: "午餐" },
+  { value: "下午茶" },
+  { value: "晚餐" },
+  { value: "宵夜" }
+];
 export default {
   props: [
     "visible",
@@ -374,6 +388,7 @@ export default {
       day: "",
       week: "",
       weekOptions: weekOptions,
+      dinnerOptions: dinner_name,
       dinnerForm: {
         name: "",
         type: "day",
@@ -602,7 +617,10 @@ export default {
         this.machineForm.machine_type = "canteen";
         console.log(this.machineForm);
         $axios
-          .post("http://canteen.tonglingok.com/api/v1/canteen/saveMachine", this.machineForm)
+          .post(
+            "http://canteen.tonglingok.com/api/v1/canteen/saveMachine",
+            this.machineForm
+          )
           .then(res => {
             if (res.msg === "ok") {
               this.$emit(
