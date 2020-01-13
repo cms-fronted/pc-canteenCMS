@@ -20,7 +20,10 @@
               :value="item.id"
             ></el-option>
           </el-select>
-          <el-button type="primary" @click="fetchTableList" style="margin-left:10px"
+          <el-button
+            type="primary"
+            @click="fetchTableList"
+            style="margin-left:10px"
             >查询商品类型</el-button
           >
           <el-button
@@ -118,9 +121,7 @@ export default {
       if (this.companiesVisible) {
         await $axios
           .get(
-            `http://canteen.tonglingok.com/api/v1/categories?c_id=${
-              this.company_id
-            }&page=${this.page}&size=10`
+            `http://canteen.tonglingok.com/api/v1/categories?c_id=${this.company_id}&page=${this.page}&size=10`
           )
           .then(res => {
             this.tableList = Array.from(res.data.data);
@@ -130,9 +131,7 @@ export default {
       } else {
         await $axios
           .get(
-            `http://canteen.tonglingok.com/api/v1/categories?page=${
-              this.page
-            }&size=10`
+            `http://canteen.tonglingok.com/api/v1/categories?page=${this.page}&size=10`
           )
           .then(res => {
             console.log(res);

@@ -5,30 +5,34 @@
       <el-divider></el-divider>
       <div class="main">
         <div class="main-header">
-<!--          <div class="select-title">-->
-            <span class="content-header">人员信息</span>
-            <el-input
-              class="filter-input"
-              v-model="key"
-              placeholder="输入人员信息"
-              style="width:200px"
-            ></el-input>
-            <el-button type="primary" @click="queryList" style="margin-left:10px">查询</el-button>
-            <el-upload
-              class="upload-excel upload"
-              ref="upload"
-              :limit="limit"
-              :headers="header"
-              :show-file-list="false"
-              accept=".xls,.xlsx"
-              action="http://canteen.tonglingok.comhttp://canteen.tonglingok.com/api/v1/wallet/supplement/upload"
-              :on-success="handleSuccess"
-              :on-error="handleError"
-              name="supplement"
+          <!--          <div class="select-title">-->
+          <span class="content-header">人员信息</span>
+          <el-input
+            class="filter-input"
+            v-model="key"
+            placeholder="输入人员信息"
+            style="width:200px"
+          ></el-input>
+          <el-button type="primary" @click="queryList" style="margin-left:10px"
+            >查询</el-button
+          >
+          <el-upload
+            class="upload-excel upload"
+            ref="upload"
+            :limit="limit"
+            :headers="header"
+            :show-file-list="false"
+            accept=".xls,.xlsx"
+            action="http://canteen.tonglingok.comhttp://canteen.tonglingok.com/api/v1/wallet/supplement/upload"
+            :on-success="handleSuccess"
+            :on-error="handleError"
+            name="supplement"
+          >
+            <el-button type="primary" style="margin-left:10px"
+              >批量补录</el-button
             >
-              <el-button type="primary" style="margin-left:10px">批量补录</el-button>
-            </el-upload>
-<!--          </div>-->
+          </el-upload>
+          <!--          </div>-->
         </div>
         <div class="main-content">
           <el-table
@@ -204,9 +208,7 @@ export default {
       console.log(this.current_page);
       $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/department/staffs/recharge?page=${
-            this.current_page
-          }&size=10&department_id=0&key=${this.key}`
+          `http://canteen.tonglingok.com/api/v1/department/staffs/recharge?page=${this.current_page}&size=10&department_id=0&key=${this.key}`
         )
         .then(res => {
           this.tableData = Array.from(res.data.data);
