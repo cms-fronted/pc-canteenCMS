@@ -617,7 +617,9 @@ export default {
     async fetchList(page) {
       page = page || this.current_page;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/staffs?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/staffs?page=${page}&size=${
+          this.size
+        }`,
         {
           c_id: this.c_id, //company_id,
           d_id: this.d_id //d_id,

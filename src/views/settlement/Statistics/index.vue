@@ -409,7 +409,9 @@ export default {
         delete this.formdata.company_ids;
       }
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/consumptionStatistic?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/order/consumptionStatistic?page=${page}&size=${
+          this.size
+        }`,
         this.formdata
       );
       if (res.msg === "ok") {
@@ -480,13 +482,13 @@ export default {
   //     .el-select {
   //       width: 200px;
   //     }
-      .types-radio {
-        display: flex;
-        justify-content: space-between;
-        .el-radio-group {
-          display: block;
-        }
-      }
+  .types-radio {
+    display: flex;
+    justify-content: space-between;
+    .el-radio-group {
+      display: block;
+    }
+  }
   //   }
   //   .btn-area {
   //     float: right;

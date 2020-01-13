@@ -33,7 +33,9 @@
             :value="item.id"
           />
         </el-select>
-        <el-button @click="AddVisible = true" style="margin-left:10px">新增</el-button>
+        <el-button @click="AddVisible = true" style="margin-left:10px"
+          >新增</el-button
+        >
         <el-button @click="fetchTableList(1)">查询</el-button>
       </div>
       <div class="main-content">
@@ -337,7 +339,7 @@ export default {
     },
     async addNewMenu() {
       console.log(this.menuForm);
-      return ;
+      return;
       const res = await $axios.post(
         "http://canteen.tonglingok.com/api/v1/menu/save",
         this.menuForm
@@ -357,7 +359,9 @@ export default {
       page = typeof page == "number" ? page : 1;
       await $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/menus/company?company_id=${this.company_id}&canteen_id=${this.canteen_id}&size=${this.size}&page=${page}`
+          `http://canteen.tonglingok.com/api/v1/menus/company?company_id=${
+            this.company_id
+          }&canteen_id=${this.canteen_id}&size=${this.size}&page=${page}`
         )
         .then(res => {
           let _data = Array.from(res.data.data);

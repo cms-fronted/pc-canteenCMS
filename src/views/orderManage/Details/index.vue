@@ -322,6 +322,5 @@ export default {
 
 <style lang="scss" scpoed>
 .order-manage-details {
-
 }
 </style>

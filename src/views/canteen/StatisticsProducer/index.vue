@@ -273,7 +273,9 @@ export default {
     async queryList(page) {
       page = Number(page) || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/shop/orderConsumption?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/shop/orderConsumption?page=${page}&size=${
+          this.size
+        }`,
         this.formdata
       );
       if (res.msg === "ok") {

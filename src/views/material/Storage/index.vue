@@ -216,8 +216,11 @@ export default {
       return res;
     },
     async exportFile(row) {
-      let id = row.id
-      this.$exportExcel('http://canteen.tonglingok.com/api/v1/material/exportMaterialReports',{report_id: id})
+      let id = row.id;
+      this.$exportExcel(
+        "http://canteen.tonglingok.com/api/v1/material/exportMaterialReports",
+        { report_id: id }
+      );
     },
     async queryList(page) {
       page = page || 1;

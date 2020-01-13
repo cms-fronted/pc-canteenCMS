@@ -342,7 +342,9 @@ export default {
       page = typeof page === Number ? page : 1;
       // page = page || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/shop/order/statistic/manager?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/shop/order/statistic/manager?page=${page}&size=${
+          this.size
+        }`,
         this.formdata
       );
       if (res.msg === "ok") {

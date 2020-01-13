@@ -77,7 +77,9 @@
           <el-table-column prop="id" label="序号" width="200px" />
           <el-table-column prop="name" label="材料名称" />
           <el-table-column label="单价/元">
-            <template slot-scope="scope">{{ scope.row.price }}元/kg</template>
+            <template slot-scope="scope"
+              >{{ scope.row.price }}元/kg</template
+            >
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
@@ -211,7 +213,9 @@ export default {
       page = Number(page) || 1;
       await $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/materials?page=${page}&size=10&key=${this.keyword}&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
+          `http://canteen.tonglingok.com/api/v1/materials?page=${page}&size=10&key=${
+            this.keyword
+          }&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
         )
         .then(res => {
           this.tableData = res.data.data;
@@ -264,7 +268,9 @@ export default {
     async deriveData() {
       await $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/material/export?key=${this.keyword}&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
+          `http://canteen.tonglingok.com/api/v1/material/export?key=${
+            this.keyword
+          }&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
         )
         .then(res => {
           if (this.tableData.length > 0) {

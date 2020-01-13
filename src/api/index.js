@@ -19,7 +19,7 @@ Vue.prototype.$http = axios; // 并发请求
 // 请求拦截器
 $axios.interceptors.request.use(
   config => {
-/*    if (loading) {
+    /*    if (loading) {
       loading.close();
     }
     loading = Loading.service({ text: "拼命加载中" });*/

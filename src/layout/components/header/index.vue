@@ -1,12 +1,12 @@
 <template>
   <div class="header">
     <div class="header_l">
-         <a href="javascript:;" class="logoLink"
+      <a href="javascript:;" class="logoLink"
         ><img src="./logo.png" alt="logo" />饭堂后台管理系统</a
       >
     </div>
     <div class="header_r">
-       <div class="headr_d1">
+      <div class="headr_d1">
         <side-collapse class="sidecoll"></side-collapse>
         <bread-crumb class="bread"></bread-crumb>
       </div>
@@ -30,10 +30,10 @@
 </template>
 
 <script>
-import SideCollapse from '@/components/SideCollapse/index'
-import BreadCrumb from '@/components/BreadCrumb/index'
-import UserDropdown from '@/components/UserDropdown/index'
-import FullScreen from '@/components/FullScreen/index'
+import SideCollapse from "@/components/SideCollapse/index";
+import BreadCrumb from "@/components/BreadCrumb/index";
+import UserDropdown from "@/components/UserDropdown/index";
+import FullScreen from "@/components/FullScreen/index";
 export default {
   name: "Header",
   components: {
@@ -42,15 +42,12 @@ export default {
     UserDropdown,
     FullScreen
   },
-   methods: {
+  methods: {
     toggleMsgShow() {
-      this.$store.commit('app/SET_MSGISOPEN')
+      this.$store.commit("app/SET_MSGISOPEN");
     }
   }
 };
 </script>
 
-<style lang="scss" scoped>
-
-</style>
-
+<style lang="scss" scoped></style>

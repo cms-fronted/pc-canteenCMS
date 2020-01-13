@@ -140,12 +140,17 @@ export default {
       }
     },
     async exportFile() {
-      await this.$exportExcel('http://canteen.tonglingok.com/api/v1/shop/order/exportSalesReport/manager',this.formdata)
+      await this.$exportExcel(
+        "http://canteen.tonglingok.com/api/v1/shop/order/exportSalesReport/manager",
+        this.formdata
+      );
     },
     async queryList(page) {
       page = typeof page == Number ? page : 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/shop/salesReport/manager?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/shop/salesReport/manager?page=${page}&size=${
+          this.size
+        }`,
         this.formdata
       );
       if (res.msg === "ok") {

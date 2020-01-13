@@ -216,7 +216,9 @@ export default {
     async queryList(page) {
       page = page || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/materialsStatistic?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/order/materialsStatistic?page=${page}&size=${
+          this.size
+        }`,
         this.queryForm
       );
       if (res.msg === "ok") {

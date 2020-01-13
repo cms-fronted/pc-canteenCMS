@@ -248,7 +248,9 @@ export default {
     fetchTableList() {
       $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/shop/cms/products?supplier_id=${this.supplier_id}&category_id=${this.category_id}&page=1&size=10`
+          `http://canteen.tonglingok.com/api/v1/shop/cms/products?supplier_id=${
+            this.supplier_id
+          }&category_id=${this.category_id}&page=1&size=10`
         )
         .then(res => {
           this.tabledata = Array.from(res.data.data);

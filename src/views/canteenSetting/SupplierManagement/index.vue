@@ -20,7 +20,10 @@
               :value="item.id"
             ></el-option>
           </el-select>
-          <el-button type="primary" style="margin-left:10px" @click="fetchSupplierList"
+          <el-button
+            type="primary"
+            style="margin-left:10px"
+            @click="fetchSupplierList"
             >查询供应商</el-button
           >
           <el-button type="primary" @click="handleClick({ c_id: company_id })"
