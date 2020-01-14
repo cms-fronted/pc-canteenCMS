@@ -568,6 +568,9 @@ export default {
     },
     //提交消费策略设置修改请求
     async changeSetting() {
+      if(!this.detail.length) {
+        return this.$message.error("消费设置不能为空");
+      }
       this.editSettingForm.consumption_count = this.detail.length;
       this.editSettingForm.detail = JSON.stringify(this.detail);
       await $axios
