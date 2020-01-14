@@ -197,6 +197,7 @@
 import $axios from "@/api/index";
 import AddCanteenDialog from "./dialog";
 import AddShopDialog from "./addShop";
+import { Loading } from "element-ui";
 import EditEnterpriseDialog from "./editEnterprise";
 export default {
   components: {
@@ -206,6 +207,7 @@ export default {
   },
   data() {
     return {
+      loading: null,
       editEnterpriseDialogVisible: false,
       addCanteenVisible: false,
       addEnterpriseVisible: false,
@@ -352,8 +354,9 @@ export default {
       this.editEnterpriseDialogVisible = val;
       this.modules = [];
     },
-    _addEnterprise() {
-      $axios
+    async _addEnterprise() {
+      this.loading = Loading.service({ text: "拼命加载中..." });
+      await $axios
         .post("http://canteen.tonglingok.com/api/v1/company/save", {
           parent_id: this.parent.id || 0,
           name: this.enterpriseForm.name
@@ -369,6 +372,7 @@ export default {
           this.parent_name = "";
         })
         .catch(err => console.log(err));
+      this.loading.close();
     },
     async getCanteenConfig(id) {
       let data = null;

@@ -53,128 +53,140 @@
             style="margin-left:10px"
             :disabled="!!!d_id"
             @click="deleteDepartment"
-            >删除部门</el-button
+            >删除当前部门</el-button
           >
           <el-button type="primary" @click="openRoleTypeDialog"
             >新增类型</el-button
           >
           <el-button @click="exportFile">导出</el-button>
         </el-form>
-        <div class="main-content">
-          <el-row :gutter="10">
-            <el-col :span="6">
-              <el-input
-                size="small"
-                v-model="filterText"
-                placeholder="关键字查询"
-              ></el-input>
-              <el-tree
-                class="tree"
-                ref="tree"
-                :data="treeData"
-                :props="defaultProps"
-                :filter-node-method="filterNode"
-                default-expand-all
-              >
-                <span class="department-tree-node" slot-scope="{ node, data }">
-                  <span>
-                    <el-button type="text" @click="handleNodeClick(data)">{{
-                      node.label
-                    }}</el-button>
-                  </span>
-                  <span class="btns-text">
-                    <el-button
-                      type="text"
-                      size="small"
-                      @click="() => editDepartmentDialog(node, data)"
-                      >编辑</el-button
-                    >
-                    <el-button
-                      type="text"
-                      size="small"
-                      @click="() => openDepartmentDialog(node, data)"
-                      >新增</el-button
-                    >
-                  </span>
+      </div>
+      <div class="main-content">
+        <el-row :gutter="10">
+          <el-col :span="6">
+            <el-input
+              size="small"
+              v-model="filterText"
+              placeholder="关键字查询"
+            ></el-input>
+            <el-tree
+              class="tree"
+              ref="tree"
+              :data="treeData"
+              :props="defaultProps"
+              :filter-node-method="filterNode"
+              default-expand-all
+              :highlight-current="true"
+              @node-click="handleNodeClick"
+              :expand-on-click-node="false"
+            >
+              <span class="department-tree-node" slot-scope="{ node, data }">
+                <span>
+                  <!-- <el-button
+                    type="text"
+                    @click="handleNodeClick(data, $event)"
+                    > -->
+                    {{ node.label }}
+                    <!-- </el-button
+                  > -->
                 </span>
-              </el-tree>
-            </el-col>
-            <el-col :span="18">
-              <el-table style="width:100%" :data="tabledata">
-                <el-table-column label="归属饭堂">
-                  <template slot-scope="scoped">
-                    <span>
-                      {{
-                        scoped.row.canteens
-                          .map(item => {
-                            if (item.info && item.info.name) {
-                              return item.info.name;
-                            }
-                          })
-                          .filter(item => item)
-                          .join(",")
-                      }}
-                      <!--使用filter去除空对象-->
-                    </span>
-                  </template>
-                </el-table-column>
-                <el-table-column label="人员类型" prop="type"></el-table-column>
-                <el-table-column label="员工编号" prop="code"></el-table-column>
-                <el-table-column label="姓名" prop="username"></el-table-column>
-                <el-table-column
-                  label="手机号码"
-                  prop="phone"
-                ></el-table-column>
-                <el-table-column label="卡号" prop="card_num"></el-table-column>
-                <el-table-column label="二维码有效周期" show-overflow-tooltip>
-                  <template slot-scope="scoped">
+                <span class="btns-text">
+                  <el-button
+                    type="text"
+                    size="small"
+                    @click="() => editDepartmentDialog(node, data)"
+                    >编辑</el-button
+                  >
+                  <el-button
+                    type="text"
+                    size="small"
+                    @click="() => openDepartmentDialog(node, data)"
+                    >新增</el-button
+                  >
+                </span>
+              </span>
+            </el-tree>
+          </el-col>
+          <el-col :span="18">
+            <el-table style="width:100%" :data="tabledata">
+              <el-table-column label="归属饭堂">
+                <template slot-scope="scoped">
+                  <span>
+                    {{
+                      scoped.row.canteens
+                        .map(item => {
+                          if (item.info && item.info.name) {
+                            return item.info.name;
+                          }
+                        })
+                        .filter(item => item)
+                        .join(",")
+                    }}
+                    <!--使用filter去除空对象-->
+                  </span>
+                </template>
+              </el-table-column>
+              <el-table-column label="人员类型" prop="type"></el-table-column>
+              <el-table-column label="员工编号" prop="code"></el-table-column>
+              <el-table-column label="姓名" prop="username"></el-table-column>
+              <el-table-column label="手机号码" prop="phone"></el-table-column>
+              <el-table-column label="卡号" prop="card_num"></el-table-column>
+              <el-table-column label="消费二维码" show-overflow-tooltip>
+                <template slot-scope="scoped">
+                  <el-tooltip
+                    class="item"
+                    effect="dark"
+                    :content="scoped.row.expiry_date"
+                    placement="bottom"
+                  >
                     <el-button
                       size="mini"
                       type="text"
                       @click="showQRcode(scoped.row)"
-                      >{{ scoped.row.expiry_date }}</el-button
+                      >点击查看</el-button
                     >
-                  </template>
-                </el-table-column>
-                <el-table-column label="操作" prop="new">
-                  <template slot-scope="scoped">
-                    <div style="display:flex; flex-wrap:wrap">
-                      <el-button
-                        size="mini"
-                        style="marginRight:5px;marginBottom: 5px"
-                        @click="editStaff(scoped.row)"
-                        >编辑</el-button
-                      >
-                      <el-button
-                        size="mini"
-                        style="marginRight:5px;marginBottom: 5px"
-                        @click="openMoveStaff(scoped.row)"
-                        >移动</el-button
-                      >
-                      <el-button
-                        size="mini"
-                        style="marginRight:5px;marginBottom: 5px"
-                        @click="_deleteStaff(scoped.row)"
-                        >删除</el-button
-                      >
-                      <el-button
-                        size="mini"
-                        @click="openQRSettingDialog(scoped.row)"
-                        >生成二维码</el-button
-                      >
-                    </div>
-                  </template>
-                </el-table-column>
-              </el-table>
-              <pagination
-                :currentPage="current_page"
-                :total="total"
-                :pageSize="size"
-                @pagination="fetchList"
-              ></pagination>
-            </el-col>
-          </el-row>
-        </div>
+                  </el-tooltip>
+                </template>
+              </el-table-column>
+              <el-table-column label="操作" prop="new">
+                <template slot-scope="scoped">
+                  <div class="table-button">
+                    <el-button
+                      size="mini"
+                      type="text"
+                      @click="editStaff(scoped.row)"
+                      >编辑</el-button
+                    >
+                    <el-button
+                      size="mini"
+                      type="text"
+                      @click="openMoveStaff(scoped.row)"
+                      >移动</el-button
+                    >
+                    <el-button
+                      size="mini"
+                      type="text"
+                      @click="_deleteStaff(scoped.row)"
+                      >删除</el-button
+                    >
+                    <el-button
+                      size="mini"
+                      type="text"
+                      @click="openQRSettingDialog(scoped.row)"
+                      >设置二维码</el-button
+                    >
+                  </div>
+                </template>
+              </el-table-column>
+            </el-table>
+            <pagination
+              :currentPage="current_page"
+              :total="total"
+              :pageSize="size"
+              @pagination="fetchList"
+            ></pagination>
+          </el-col>
+        </el-row>
       </div>
     </div>
 
@@ -256,7 +268,7 @@
       @close="closeQRSettingDialog"
       width="35%"
       center
-      title="二维码设置"
+      title="设置二维码"
     >
       <el-form :model="QRForm">
         <el-form-item label="二维码有效期">
@@ -617,9 +629,7 @@ export default {
     async fetchList(page) {
       page = page || this.current_page;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/staffs?page=${page}&size=${
-          this.size
-        }`,
+        `http://canteen.tonglingok.com/api/v1/staffs?page=${page}&size=${this.size}`,
         {
           c_id: this.c_id, //company_id,
           d_id: this.d_id //d_id,
@@ -829,14 +839,27 @@ export default {
     },
     async _deleteStaff(row) {
       let id = row.id;
-      const res = await $axios.post(
-        "http://canteen.tonglingok.com/api/v1/department/staff/delete",
-        { id }
-      );
-      if (res.msg === "ok") {
-        this.$message.success("删除成功");
-        await this.fetchList(this.current_page);
-      }
+      this.$confirm("此操作将删除员工" + row.username + ", 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(async () => {
+          const res = await $axios.post(
+            "http://canteen.tonglingok.com/api/v1/department/staff/delete",
+            { id }
+          );
+          if (res.msg === "ok") {
+            this.$message.success("删除成功");
+            await this.fetchList(this.current_page);
+          }
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
     },
     openQRSettingDialog(row) {
       let id = row.id; //员工id
@@ -937,6 +960,11 @@ export default {
 
 <style lang="scss" scoped>
 .department {
+  .table-button {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
   .upload-excel {
     display: inline-block;
   }

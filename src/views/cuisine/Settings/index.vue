@@ -338,8 +338,6 @@ export default {
       };
     },
     async addNewMenu() {
-      console.log(this.menuForm);
-      return;
       const res = await $axios.post(
         "http://canteen.tonglingok.com/api/v1/menu/save",
         this.menuForm
@@ -359,9 +357,7 @@ export default {
       page = typeof page == "number" ? page : 1;
       await $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/menus/company?company_id=${
-            this.company_id
-          }&canteen_id=${this.canteen_id}&size=${this.size}&page=${page}`
+          `http://canteen.tonglingok.com/api/v1/menus/company?company_id=${this.company_id}&canteen_id=${this.canteen_id}&size=${this.size}&page=${page}`
         )
         .then(res => {
           let _data = Array.from(res.data.data);
@@ -445,10 +441,11 @@ export default {
         type: "warning"
       })
         .then(async () => {
-          const res = $axios.post(
+          const res = await $axios.post(
             "http://canteen.tonglingok.com/api/v1/menu/save",
             formdata
           );
+          console.log("test");
           if (res.msg === "ok") {
             this.$message({
               type: "success",

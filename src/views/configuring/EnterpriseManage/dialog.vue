@@ -26,7 +26,7 @@
               ></el-option>
             </el-select>
           </el-form-item>
-          <el-form-item label="消费状态">
+          <el-form-item label="消费策略">
             <el-radio-group v-model="dinnerForm.fixed">
               <el-radio :label="1">固定</el-radio>
               <el-radio :label="2">动态</el-radio>
@@ -233,7 +233,7 @@
               {{ scoped.row.meal_time_begin }}-{{ scoped.row.meal_time_end }}
             </span>
           </el-table-column>
-          <el-table-column label="餐费状态">
+          <el-table-column label="消费策略">
             <span slot-scope="scoped">
               {{ scoped.row.fixed === 1 ? "固定" : "动态" }}
             </span>
@@ -334,6 +334,7 @@
 </template>
 <script>
 import $axios from "@/api/index";
+import {Loading} from "element-ui";
 import { treeToArr } from "@/utils/flatternArr";
 const weekOptions = [
   { label: "周一", value: 0 },
@@ -438,10 +439,14 @@ export default {
     handleClick() {
       this.dinnersVisible = true;
     },
-    addCanteen() {
-      $axios
+    trim(val) {
+      return val.replace(/(^\s*)|(\s*$)/g, "");
+    },
+    async addCanteen() {
+      let loading = Loading.service({ text: "拼命加载中" })
+      await $axios
         .post("http://canteen.tonglingok.com/api/v1/canteen/save", {
-          canteens: this.canteens,
+          canteens: this.trim(this.canteens),
           c_id: this.company_id
         })
         .then(res => {
@@ -457,6 +462,7 @@ export default {
         .catch(err => {
           console.log(err);
         });
+        loading.close()
     },
     _addDinner() {
       //添加餐次信息
