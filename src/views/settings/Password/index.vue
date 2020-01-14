@@ -13,13 +13,13 @@
           >
             <el-form-item label="旧密码" prop="old">
               <el-input
-                v-model="passwordForm.oldPassword"
+                v-model="passwordForm.oldPasswd"
                 show-password
               ></el-input>
             </el-form-item>
             <el-form-item label="新密码" prop="new">
               <el-input
-                v-model="passwordForm.newPassword"
+                v-model="passwordForm.newPasswd"
                 show-password
               ></el-input>
             </el-form-item>
@@ -41,8 +41,8 @@ export default {
   data() {
     return {
       passwordForm: {
-        oldPassword: "",
-        newPassword: ""
+        oldPasswd: "",
+        newPasswd: ""
       },
       isDisabled: true
     };
@@ -54,7 +54,7 @@ export default {
   },
   computed: {
     isAble() {
-      return this.passwordForm.oldPassword && this.passwordForm.newPassword;
+      return this.passwordForm.oldPasswd && this.passwordForm.newPasswd;
     }
   },
   methods: {
