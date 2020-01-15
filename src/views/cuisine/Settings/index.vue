@@ -314,6 +314,12 @@ export default {
         return;
       }
       if (!!this.listObj[len - 1].category) {
+        let newCatogry = this.listObj[len - 1];
+        if(this.detail.find(item => {
+          return item.category === newCatogry.category
+        })){
+          return this.$message.error("该菜类已存在，请勿重复添加")
+        }
         this.listObj[len - 1].disabled = true;
         this.detail.push({
           category: this.listObj[len - 1].category,
