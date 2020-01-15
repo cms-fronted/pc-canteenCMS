@@ -353,6 +353,8 @@ export default {
         this.detail = [];
         this.fetchTableList();
         this.closeNewMenu();
+      } else {
+        this.$message.error(res.msg);
       }
     },
     changeStatus() {

@@ -590,20 +590,20 @@ export default {
         .catch(err => console.log(err));
     },
     //处理合并数据
-    objectSpanMethod({ row, column, rowIndex, columnIndex }) {
-      if (column.label == "人员类型") {
-        let _row, _col;
-        _row = row.detail[0].strategy.length;
-        return {
-          rowspan: _row,
-          colspan: 1
-        };
-      }
-    },
+    // objectSpanMethod({ row, column, rowIndex, columnIndex }) {
+    //   if (column.label == "人员类型") {
+    //     let _row, _col;
+    //     _row = row.detail[0].strategy.length;
+    //     return {
+    //       rowspan: _row,
+    //       colspan: 1
+    //     };
+    //   }
+    // },
     handleData() {
       let _data = [];
       this.budgetList.forEach(i => {
-        if (i.detail) {
+        if (i.detail.length!==0) {
           i.detail.forEach(j => {
             j.strategy.forEach(k => {
               _data.push({
@@ -625,6 +625,7 @@ export default {
             });
           });
         } else {
+          console.log(i);
           _data.push({
             id: i.id,
             canteen: i.canteen.name,
@@ -640,6 +641,8 @@ export default {
         }
       });
       this.dataList = _data;
+      console.log(this.budgetList)
+      console.log(this.dataList);
     },
 
     rowspan(idx, prop) {
