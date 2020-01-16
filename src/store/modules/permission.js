@@ -13,13 +13,12 @@ const mutations = {
 // 遍历asyncRoutes动态路由
 function forSearchArr(route, roles) {
   let arrNew = [];
-
-  console.log(roles);
-  console.log(route);
   // if (roles.length == 0) return arrNew;
   for (let item of route) {
     let itemNew = { ...item }; //解决浅拷贝共享同一内存地址
+    console.log(itemNew);
     if (roles.includes(itemNew.name)) {
+      console.log(itemNew.name)
       if (itemNew.children) {
         itemNew.children = forSearchArr(itemNew.children, roles);
       }

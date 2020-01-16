@@ -43,7 +43,7 @@
                         <el-button
                           type="text"
                           size="mini"
-                          @click="() => openEditModuleDialog(data, 2)"
+                          @click="() => openEditModuleDialog(data)"
                           >编辑</el-button
                         >
                         <el-button
@@ -228,11 +228,11 @@ export default {
       this.systemType = 1;
       this.$refs.modulesForm.resetFields();
     },
-    openEditModuleDialog(data, type) {
+    openEditModuleDialog(data) {
       this.editModuleVisible = true;
       this.editModuleForm = Object.assign(
         {},
-        { name: data.name, id: data.id, type: type }
+        { name: data.name, id: data.id}
       );
     },
     closeEditModuleDialog() {
@@ -304,7 +304,6 @@ export default {
           "http://canteen.tonglingok.com/api/v1/modules?type=2"
         );
         if (res.msg === "ok") {
-          console.log(res);
           this.canteenModules = Array.from(res.data);
           this.modulesData = treeToArr(res.data);
           this.c_modules = flatten(res.data);
@@ -336,7 +335,6 @@ export default {
       let data = {};
       data.id = row.id;
       data.state = row.state === 1 ? 2 : 1;
-      console.log(data);
       const res = await $axios.post(
         "http://canteen.tonglingok.com/api/v1/module/system/handel",
         data

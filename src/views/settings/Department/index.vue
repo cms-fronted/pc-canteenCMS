@@ -588,6 +588,7 @@ export default {
       if (res.msg === "ok") {
         this.companyOptions = flatten(res.data);
         this.queryForm.c_id = this.companyOptions[0].id;
+        this.c_id =this.companyOptions[0].id;
         this.fetchDepartmentTreeData();
       }
     },
@@ -745,7 +746,8 @@ export default {
         });
     },
 
-    openStaffDialog() {
+    async openStaffDialog() {
+      await this.getCanteenOptions(this.c_id);
       this.addStaffVisible = true;
     },
     editStaff(val) {
@@ -780,6 +782,7 @@ export default {
       this.isEditStaff = false;
     },
     async _addNewStaff() {
+
       if (!this.isEditStaff) {
         //新增员工
         this.addFormData.company_id = this.c_id;
