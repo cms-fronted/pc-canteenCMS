@@ -106,6 +106,7 @@ export default {
           console.log(res);
           if (!res.code == "200") {
             this.refresh();
+            this.$message.error(res.msg);
           } else {
             this.$router.push("/canteen/manage");
             if (this.notifyObj) {

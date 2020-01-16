@@ -27,26 +27,9 @@ export const currencyRoutes = [
   },
   {
     path: "/404",
-    name: "404",
     component: () => import("@/views/error"),
     hidden: true
   },
-  /*  {
-    path: "/home",
-    name: "Home",
-    component: Layout,
-    children: [
-      {
-        path: "index",
-        name: "HomeIndex",
-        component: () => import("@/views/home"),
-        meta: {
-          title: "首页",
-          icon: "el-icon-document"
-        }
-      }
-    ]
-  }, */
   {
     path: "/login",
     name: "Login",
@@ -453,12 +436,12 @@ export const currencyRoutes = [
   //     }
   //   ]
   // },
-  {
-    path: "*",
-    name: "*404",
-    redirect: "/404",
-    hidden: true
-  }
+  // {
+  //   path: "*",
+  //   name: "*404",
+  //   redirect: "/404",
+  //   hidden: true
+  // }
 ];
 export const producerRoutes = [
   {
@@ -809,6 +792,14 @@ export const asyncRoutes = [
           title: "模块管理"
         },
         component: () => import("@/views/configuring/Modules")
+      },
+      {
+        path: "modules-setting",
+        name: "Configuring-modules-setting",
+        meta: {
+          title: "模块设置"
+        },
+        component: () => import("@/views/configuring/ModuleManage")
       }
     ]
   },
@@ -840,6 +831,7 @@ export const asyncRoutes = [
       }
     ]
   },
+  { path: '*', redirect: '/404', hidden: true }
 ];
 
 const createRouter = () => {

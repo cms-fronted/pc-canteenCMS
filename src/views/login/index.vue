@@ -105,6 +105,7 @@ export default {
         .then(res => {
           if (!res.code == "200") {
             this.refresh();
+            this.$message.error(res.msg)
           } else {
             console.log(this.$route.query.route);
             this.$router.push("/order");
