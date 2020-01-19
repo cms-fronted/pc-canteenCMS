@@ -6,11 +6,7 @@
       <div class="main">
         <div class="main-header">
           <el-form :inline="true" label-width="60px" :model="queryForm">
-            <el-form-item
-              label="公司"
-              prop="company_ids"
-              v-if="companiesVisible"
-            >
+            <el-form-item label="公司" prop="company_ids" v-if="companiesVisible">
               <el-select
                 v-model="queryForm.company_id"
                 placeholder="请选择企业"
@@ -26,10 +22,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="消费地点" label-width="80px" prop="canteen_id">
-              <el-select
-                v-model="queryForm.canteen_id"
-                @change="getDinnersList"
-              >
+              <el-select v-model="queryForm.canteen_id" @change="getDinnersList">
                 <el-option
                   v-for="item in locationList"
                   :label="item.name"
@@ -39,10 +32,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="餐次" prop="dinner_id">
-              <el-select
-                v-model="queryForm.dinner_id"
-                @change="getCategoryList"
-              >
+              <el-select v-model="queryForm.dinner_id" @change="getCategoryList">
                 <el-option
                   v-for="item in dinnersList"
                   :label="item.name"
@@ -62,9 +52,7 @@
               </el-select>
             </el-form-item>
             <el-button type="primary" @click="fetchList">查询</el-button>
-            <el-button @click="addCuisine" :disabled="locationList.length === 0"
-              >新增</el-button
-            >
+            <el-button @click="addCuisine" :disabled="locationList.length === 0">新增</el-button>
           </el-form>
         </div>
         <div class="main-content">
@@ -86,9 +74,7 @@
                 <li class="list">主厨:{{ item.chef }}</li>
               </ul>
               <div class="btns">
-                <el-button type="danger" plain @click="handleDelete(item)"
-                  >删除</el-button
-                >
+                <el-button type="danger" plain @click="handleDelete(item)">删除</el-button>
                 <el-button type="primary" @click="_edit(item)">编辑</el-button>
               </div>
             </div>
@@ -120,22 +106,22 @@
       :before-close="handleClose"
     >
       <el-form ref="editForm" :model="editFormdata" label-width="80px">
-        <el-form-item label="类型" prop="m_id">
-          <el-select v-model="editFormdata.m_id" disabled>
-            <el-option
-              v-for="item in editCategoryList"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            />
-          </el-select>
-        </el-form-item>
         <el-form-item label="餐次" prop="dinner_id">
           <el-select v-model="editFormdata.dinner_id" disabled>
             <el-option
               v-for="item in editDinnersList"
               :label="item.name"
               :key="item.id"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="类型" prop="m_id">
+          <el-select v-model="editFormdata.m_id" disabled>
+            <el-option
+              v-for="item in editCategoryList"
+              :key="item.id"
+              :label="item.name"
               :value="item.id"
             />
           </el-select>
@@ -235,7 +221,7 @@ export default {
   },
   computed: {
     companiesVisible() {
-      return this.grade !== 3;
+      return this.grade != 3;
     }
   },
   methods: {
@@ -243,8 +229,9 @@ export default {
       page = page || 1;
       let queryForm = this.queryForm;
       let { m_id, dinner_id, canteen_id, company_id } = queryForm;
-      await $axios
-        .get(`http://canteen.tonglingok.com/api/v1/foods`, {
+      const res = await $axios.get(
+        `http://canteen.tonglingok.com/api/v1/foods`,
+        {
           f_type: 2,
           page: page,
           size: this.pageSize,
@@ -252,30 +239,30 @@ export default {
           canteen_ids: canteen_id,
           dinner_ids: dinner_id,
           menu_ids: m_id
-        })
-        .then(res => {
-          this.goodsList = Array.from(res.data.data);
-          this.current_page = res.data.current_page;
-          this.total = res.data.total;
-        })
-        .catch(err => console.log(err));
+        }
+      );
+      if (res.msg == "ok") {
+        this.goodsList = Array.from(res.data.data);
+        this.current_page = res.data.current_page;
+        this.total = res.data.total;
+      }
     },
     async getCompanies() {
-      await $axios
-        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
-        .then(res => {
-          let arr = res.data;
-          let companiesList = flatten(arr);
-          this.companyList = getAllOptions(companiesList);
-          this.queryForm.company_id = this.companyList[0].id;
-          this.locationList = [{ name: "全部", id: 0 }];
-          this.queryForm.canteen_id = 0;
-          this.dinnersList = [{ name: "全部", id: 0 }];
-          this.queryForm.dinner_id = 0;
-          this.categoryList = [{ name: "全部", id: 0 }];
-          this.queryForm.m_id = 0;
-        })
-        .catch(err => console.log(err));
+      const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/admin/companies"
+      );
+      if (res.msg == "ok") {
+        let arr = res.data;
+        let companiesList = flatten(arr);
+        this.companyList = getAllOptions(companiesList);
+        this.queryForm.company_id = this.companyList[0].id;
+        this.locationList = [{ name: "全部", id: 0 }];
+        this.queryForm.canteen_id = 0;
+        this.dinnersList = [{ name: "全部", id: 0 }];
+        this.queryForm.dinner_id = 0;
+        this.categoryList = [{ name: "全部", id: 0 }];
+        this.queryForm.m_id = 0;
+      }
     },
     async getLocationList(company_id) {
       let res = null;
@@ -289,6 +276,7 @@ export default {
           res = await $axios.get(
             "http://canteen.tonglingok.com/api/v1/managerCanteens"
           );
+          this.queryForm.company_id = localStorage.getItem("company_id");
           /*   $axios
             .get(`http://canteen.tonglingok.com/api/v1/canteens?company_id=0`)
             .then(res => {
@@ -297,13 +285,15 @@ export default {
             })
             .catch(err => console.log(err)); */
         }
-        this.diaLocationList = Array.from(res.data);
-        this.locationList = getAllOptions(Array.from(res.data));
-        this.queryForm.canteen_id = this.locationList[0].id;
-        this.dinnersList = [{ name: "全部", id: 0 }];
-        this.queryForm.dinner_id = 0;
-        this.categoryList = [{ name: "全部", id: 0 }];
-        this.queryForm.m_id = 0;
+        if (res.msg == "ok") {
+          this.diaLocationList = Array.from(res.data);
+          this.locationList = getAllOptions(Array.from(res.data));
+          this.queryForm.canteen_id = this.locationList[0].id;
+          this.dinnersList = [{ name: "全部", id: 0 }];
+          this.queryForm.dinner_id = 0;
+          this.categoryList = [{ name: "全部", id: 0 }];
+          this.queryForm.m_id = 0;
+        }
       } else {
         this.locationList = [{ name: "全部", id: 0 }];
         this.queryForm.canteen_id = 0;
@@ -313,17 +303,15 @@ export default {
         this.queryForm.m_id = 0;
       }
     },
-    getDinnersList(canteen_id) {
+    async getDinnersList(canteen_id) {
       if (!isNaN(canteen_id)) {
-        $axios
-          .get(
-            `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
-          )
-          .then(res => {
-            this.dinnersList = getAllOptions(Array.from(res.data));
-            this.queryForm.dinner_id = this.dinnersList[0].id;
-          })
-          .catch(err => console.log(err));
+        const res = await $axios.get(
+          `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
+        );
+        if (res.msg == "ok") {
+          this.dinnersList = getAllOptions(Array.from(res.data));
+          this.queryForm.dinner_id = this.dinnersList[0].id;
+        }
       } else {
         this.dinnersList = [{ name: "全部", id: 0 }];
         this.queryForm.dinner_id = 0;
@@ -332,41 +320,36 @@ export default {
       }
     },
 
-    getCategoryList(dinner_id) {
+    async getCategoryList(dinner_id) {
       if (!isNaN(dinner_id)) {
-        $axios
-          .get(
-            `http://canteen.tonglingok.com/api/v1/menus/dinner?dinner_id=${dinner_id}`
-          )
-          .then(res => {
-            this.categoryList = getAllOptions(Array.from(res.data));
-            this.queryForm.m_id = this.categoryList[0].id;
-          })
-          .catch(err => console.log(err));
+        const res = await $axios.get(
+          `http://canteen.tonglingok.com/api/v1/menus/dinner?dinner_id=${dinner_id}`
+        );
+        if (res.msg == "ok") {
+          this.categoryList = getAllOptions(Array.from(res.data));
+          this.queryForm.m_id = this.categoryList[0].id;
+        }
       } else {
         this.categoryList = [{ name: "全部", id: 0 }];
         this.queryForm.m_id = 0;
       }
     },
     async getEditDinnerList(canteen_id) {
-      await $axios
-        .get(
-          `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
-        )
-        .then(res => {
-          this.editDinnersList = Array.from(res.data);
-        })
-        .catch(err => console.log(err));
+      const res = await $axios.get(
+        `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
+      );
+      if (res.msg == "ok") {
+        this.editDinnersList = res.data;
+      }
     },
     async getEditCategoryList(dinner_id) {
-      await $axios
-        .get(
-          `http://canteen.tonglingok.com/api/v1/menus/dinner?dinner_id=${dinner_id}`
-        )
-        .then(res => {
-          this.editCategoryList = Array.from(res.data);
-        })
-        .catch(err => console.log(err));
+      const res = await $axios.get(
+        `http://canteen.tonglingok.com/api/v1/menus/dinner?dinner_id=${dinner_id}`
+      );
+      if (res.msg == "ok") {
+        this.editCategoryList = Array.from(res.data);
+        console.log(this.editCategoryList);
+      }
     },
     async _edit(item) {
       let data = [];
@@ -383,19 +366,20 @@ export default {
       this.editVisible = true;
       this.editFormdata = { ...item };
       delete this.editFormdata.img_url;
-      await $axios
-        .get("http://canteen.tonglingok.com/api/v1/food", {
+      const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/food",
+        {
           id: item.id
-        })
-        .then(res => {
-          data = res.data;
-          let { dinner_id, canteen_id } = res.data;
-          this.getEditDinnerList(canteen_id);
-          this.getEditCategoryList(dinner_id);
-          this.editFormdata.dinner_id = data.dinner_id;
-          this.editFormdata.m_id = data.menu_id;
-        })
-        .catch(err => console.log(err));
+        }
+      );
+      if (res.msg == "ok") {
+        data = res.data;
+        let { dinner_id, canteen_id } = res.data;
+        await this.getEditDinnerList(canteen_id);
+        this.$set(this.editFormdata, "dinner_id", data.dinner_id);
+        await this.getEditCategoryList(dinner_id);
+        this.$set(this.editFormdata, "m_id", data.menu_id);
+      }
     },
     handleClose(done) {
       this.fileList = new Array();
@@ -412,9 +396,9 @@ export default {
         data
       );
       if (res.msg === "ok") {
-        this.editVisible = false;
+        this.handleClose();
         this.editFormData = {};
-        this.fetchList(this.current_page);
+        await this.fetchList(this.current_page);
       }
     },
     openNewType() {
@@ -465,13 +449,13 @@ export default {
         cancelButtonText: "取消",
         type: "warning"
       })
-        .then(() => {
-          $axios
+        .then(async () => {
+          await $axios
             .post("http://canteen.tonglingok.com/api/v1/food/handel", {
               id: item.id
             })
-            .then(() => {
-              this.fetchList(this.page);
+            .then(async () => {
+              await this.fetchList(this.page);
               this.$message({
                 type: "success",
                 message: "删除成功!"

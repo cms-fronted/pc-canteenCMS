@@ -123,7 +123,6 @@ export default {
       await $axios
         .get("http://canteen.tonglingok.com/api/v1/departments/recharge")
         .then(res => {
-          console.log(res);
           this.departmentList = res.data;
           if (this.departmentList.length > 1) {
             this.departmentList.unshift({ id: 0, name: "全部" });

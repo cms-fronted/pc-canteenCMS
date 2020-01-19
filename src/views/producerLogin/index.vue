@@ -100,12 +100,14 @@ export default {
       });
     },
     _login() {
+      localStorage.setItem("isProducer", "");
       this.$store
         .dispatch("user/_producerLogin", this.ruleForm)
         .then(res => {
           console.log(res);
-          if (!res.code == "200") {
+          if (res.msg !== "ok") {
             this.refresh();
+            this.$message.error(res.msg);
           } else {
             this.$router.push("/canteen/manage");
             if (this.notifyObj) {

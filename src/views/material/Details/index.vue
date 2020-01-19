@@ -119,7 +119,7 @@ export default {
   components: { Pagination },
   computed: {
     companiesVisible() {
-      return this.grade !== 3;
+      return this.grade != 3;
     }
   },
   data() {
@@ -150,7 +150,7 @@ export default {
       await this.getCompanies();
       await this.queryList(1);
     } else {
-      await this.getCanteenOptions(0);
+      await this.getCanteenOptions();
       await this.queryList(1);
     }
   },
@@ -164,10 +164,11 @@ export default {
         this.queryForm.company_ids = this.companyOptions[0].id;
         this.canteenOptions = [{ name: "全部", id: 0 }];
         this.queryForm.canteen_ids = this.canteenOptions[0].id;
+        await this.getCanteenOptions(this.canteenOptions[0].id);
       }
     },
     async getCanteenOptions(c_id) {
-      let company_id = c_id || "";
+      let company_id = c_id || localStorage.getItem("company_id");
       this.canteenOptions = [{ name: "全部", id: 0 }];
       this.queryForm.canteen_ids = 0;
       if (Number(company_id)) {
@@ -212,9 +213,7 @@ export default {
         delete form.canteen_ids;
       }
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/materials/food?page=${page}&size=${
-          this.size
-        }`,
+        `http://canteen.tonglingok.com/api/v1/materials/food?page=${page}&size=${this.size}`,
         form
       );
       if (res.msg === "ok") {
@@ -224,7 +223,6 @@ export default {
       }
     },
     openMaterialDialog(row, type) {
-      console.log(row);
       this.materialForm.id = row.id;
       if (type == "edit") {
         this.materialForm = Object.assign({}, row);
@@ -271,7 +269,7 @@ export default {
       if (res.msg === "ok") {
         this.closeMaterialDialog();
         this.$message.success("操作成功！");
-        this.queryList(this.current_page);
+        await this.queryList(this.current_page);
       }
     },
     closeMaterialDialog() {
@@ -294,7 +292,7 @@ export default {
             }
           );
           if (res.msg === "ok") {
-            this.queryList(this.current_page);
+            await this.queryList(this.current_page);
             this.$message({
               type: "success",
               message: "删除成功!"

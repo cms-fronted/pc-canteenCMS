@@ -100,13 +100,15 @@ export default {
       });
     },
     _login() {
+      localStorage.setItem("isProducer", "");
       this.$store
         .dispatch("user/_login", this.ruleForm)
         .then(res => {
-          if (!res.code == "200") {
-            this.refresh();
+          console.log(res);
+          if (res.msg != 'ok') {
+            // this.refresh();
+            this.$message.error(res.msg)
           } else {
-            console.log(this.$route.query.route);
             this.$router.push("/order");
             if (this.notifyObj) {
               this.notifyObj.close();

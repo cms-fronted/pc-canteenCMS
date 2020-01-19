@@ -227,7 +227,7 @@ export default {
   },
   computed: {
     companiesVisible() {
-      return this.grade !== 3;
+      return this.grade != 3;
     }
   },
   methods: {
@@ -254,31 +254,27 @@ export default {
         })
         .catch(err => console.log(err));
     },
-    getLocationList(company_id) {
+    async getLocationList(company_id) {
       this.menuForm.c_id = "";
       this.menuForm.dinner_id = "";
       this.menuForm.m_id = "";
       this.locationList = [{ name: "全部", id: 0 }];
       this.canteen_id = 0;
+      let res;
       if (!isNaN(company_id)) {
         if (company_id) {
-          $axios
-            .get(
-              `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
-            )
-            .then(res => {
-              this.locationList = unshiftAllOptions(Array.from(res.data));
-              this.canteen_id = this.locationList[0].id;
-            })
-            .catch(err => console.log(err));
+          res = await $axios.get(
+            `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
+          );
         } else {
-          $axios
-            .get("http://canteen.tonglingok.com/api/v1/managerCanteens")
-            .then(res => {
-              this.locationList = unshiftAllOptions(Array.from(res.data));
-              this.canteen_id = this.locationList[0].id;
-            })
-            .catch(err => console.log(err));
+          res = await $axios.get(
+            "http://canteen.tonglingok.com/api/v1/managerCanteens"
+          );
+          this.company_id = localStorage.company_id;
+        }
+        if (res.msg == "ok") {
+          this.locationList = unshiftAllOptions(Array.from(res.data));
+          this.canteen_id = this.locationList[0].id;
         }
       } else {
         this.locationList = [{ name: "全部", id: 0 }];
@@ -287,15 +283,13 @@ export default {
         this.dinnersList = [];
       }
     },
-    getDinnersList(canteen_id) {
-      $axios
-        .get(
-          `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
-        )
-        .then(res => {
-          this.dinnerList = Array.from(res.data);
-        })
-        .catch(err => console.log(err));
+    async getDinnersList(canteen_id) {
+      const res = await $axios.get(
+        `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
+      );
+      if (res.msg == "ok") {
+        this.dinnerList = Array.from(res.data);
+      }
     },
     removeInput(item) {
       var index = this.listObj.indexOf(item);
@@ -315,10 +309,12 @@ export default {
       }
       if (!!this.listObj[len - 1].category) {
         let newCatogry = this.listObj[len - 1];
-        if(this.detail.find(item => {
-          return item.category === newCatogry.category
-        })){
-          return this.$message.error("该菜类已存在，请勿重复添加")
+        if (
+          this.detail.find(item => {
+            return item.category === newCatogry.category;
+          })
+        ) {
+          return this.$message.error("该菜类已存在，请勿重复添加");
         }
         this.listObj[len - 1].disabled = true;
         this.detail.push({
@@ -351,8 +347,8 @@ export default {
       if (res.msg === "ok") {
         this.$message.success("操作成功");
         this.detail = [];
-        this.fetchTableList();
-        this.closeNewMenu();
+        await this.fetchTableList();
+        await this.closeNewMenu();
       } else {
         this.$message.error(res.msg);
       }
@@ -363,36 +359,20 @@ export default {
     },
     async fetchTableList(page) {
       page = typeof page == "number" ? page : 1;
-      await $axios
-        .get(
-          `http://canteen.tonglingok.com/api/v1/menus/company?company_id=${this.company_id}&canteen_id=${this.canteen_id}&size=${this.size}&page=${page}`
-        )
-        .then(res => {
-          let _data = Array.from(res.data.data);
-          this.total = res.data.total;
-          let _list = [];
-          _data.forEach(i => {
-            if (i.dinner.length) {
-              //如果设置了菜类明细
-              i.dinner.forEach(j => {
-                if (j.menus.length) {
-                  //如果设置了菜类状态和可选数量
-                  j.menus.forEach(k => {
-                    _list.push({
-                      grade: i.company.grade,
-                      company_name: i.company.name,
-                      company_id: i.company.id,
-                      canteen_name: i.name,
-                      canteen_id: i.id,
-                      category_name: j.name, //早餐，午餐，晚餐
-                      category: k.category, //荤菜，素菜，汤
-                      dinner_id: j.id,
-                      menu_id: k.id,
-                      status: k.status,
-                      number: k.count
-                    });
-                  });
-                } else {
+      const res = await $axios.get(
+        `http://canteen.tonglingok.com/api/v1/menus/company?company_id=${this.company_id}&canteen_id=${this.canteen_id}&size=${this.size}&page=${page}`
+      );
+      if (res.msg == "ok") {
+        let _data = Array.from(res.data.data);
+        this.total = res.data.total;
+        let _list = [];
+        _data.forEach(i => {
+          if (i.dinner.length) {
+            //如果设置了菜类明细
+            i.dinner.forEach(j => {
+              if (j.menus.length) {
+                //如果设置了菜类状态和可选数量
+                j.menus.forEach(k => {
                   _list.push({
                     grade: i.company.grade,
                     company_name: i.company.name,
@@ -400,41 +380,54 @@ export default {
                     canteen_name: i.name,
                     canteen_id: i.id,
                     category_name: j.name, //早餐，午餐，晚餐
-                    dinner_id: j.id
+                    category: k.category, //荤菜，素菜，汤
+                    dinner_id: j.id,
+                    menu_id: k.id,
+                    status: k.status,
+                    number: k.count
                   });
-                }
-              });
-            } else {
-              _list.push({
-                grade: i.company.grade,
-                company_name: i.company.name,
-                company_id: i.company.id,
-                canteen_name: i.name
-              });
-            }
-          });
-          this.tableList = Array.from(_list);
-          this.rowspan(0, "grade");
-          this.rowspan(1, "company_name");
-          this.rowspan(2, "canteen_name");
-          this.rowspan(3, "category_name");
-        })
-        .catch(err => console.log(err));
+                });
+              } else {
+                _list.push({
+                  grade: i.company.grade,
+                  company_name: i.company.name,
+                  company_id: i.company.id,
+                  canteen_name: i.name,
+                  canteen_id: i.id,
+                  category_name: j.name, //早餐，午餐，晚餐
+                  dinner_id: j.id
+                });
+              }
+            });
+          } else {
+            _list.push({
+              grade: i.company.grade,
+              company_name: i.company.name,
+              company_id: i.company.id,
+              canteen_name: i.name
+            });
+          }
+        });
+        this.tableList = Array.from(_list);
+        this.rowspan(0, "grade");
+        this.rowspan(1, "company_name");
+        this.rowspan(2, "canteen_name");
+        this.rowspan(3, "category_name");
+      }
     },
-    getCanteenDetail(canteen_id) {
-      $axios
-        .get(
-          `http://canteen.tonglingok.com/api/v1/menus/canteen?canteen_id=${canteen_id}`
-        )
-        .then(res => (this.canteen_detail = Array.from(res.data)))
-        .catch(err => console.log(err));
+    async getCanteenDetail(canteen_id) {
+      const res = await $axios.get(
+        `http://canteen.tonglingok.com/api/v1/menus/canteen?canteen_id=${canteen_id}`
+      );
+      if (res.msg == "ok") {
+        this.canteen_detail = Array.from(res.data);
+      }
     },
     _edit(val) {
       this.editForm = Object.assign({}, val);
       this.editVisible = true;
     },
     _delete(row) {
-      console.log(row);
       let detail = [{ id: row.menu_id, state: 2 }];
       detail = JSON.stringify(detail);
       let formdata = {
@@ -442,7 +435,6 @@ export default {
         d_id: row.dinner_id,
         detail: detail
       };
-      console.log(formdata);
       this.$confirm("此操作将永久删除该配置, 是否继续?", "提示", {
         confirmButtonText: "确定",
         cancelButtonText: "取消",
@@ -453,13 +445,12 @@ export default {
             "http://canteen.tonglingok.com/api/v1/menu/save",
             formdata
           );
-          console.log("test");
           if (res.msg === "ok") {
             this.$message({
               type: "success",
               message: "删除成功!"
             });
-            this.fetchTableList();
+            await this.fetchTableList();
           }
         })
         .catch(() => {
@@ -491,7 +482,7 @@ export default {
       );
       if (res.msg === "ok") {
         this.$message.success("操作成功!");
-        this.fetchTableList();
+        await this.fetchTableList();
         this._editClose();
       }
     },

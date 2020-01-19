@@ -116,7 +116,7 @@ export default {
   components: { Pagination },
   computed: {
     companiesVisible() {
-      return this.grade !== 3;
+      return this.grade != 3;
     }
   },
   watch: {
@@ -160,7 +160,7 @@ export default {
       await this.getCompanies();
       await this.queryList(1);
     } else {
-      await this.getCanteenOptions(0);
+      await this.getCanteenOptions();
       await this.queryList(1);
     }
   },
@@ -176,7 +176,7 @@ export default {
       }
     },
     async getCanteenOptions(c_id) {
-      let company_id = c_id || "";
+      let company_id = c_id || localStorage.getItem("company_id");
       this.canteenOptions = [];
       this.queryForm.canteen_id = "";
       if (Number(company_id)) {
@@ -216,9 +216,7 @@ export default {
     async queryList(page) {
       page = page || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/materialsStatistic?page=${page}&size=${
-          this.size
-        }`,
+        `http://canteen.tonglingok.com/api/v1/order/materialsStatistic?page=${page}&size=${this.size}`,
         this.queryForm
       );
       if (res.msg === "ok") {

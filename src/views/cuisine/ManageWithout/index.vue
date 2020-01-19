@@ -105,22 +105,22 @@
       :before-close="handleClose"
     >
       <el-form ref="editForm" :model="editFormdata" label-width="80px">
-        <el-form-item label="类型" prop="m_id">
-          <el-select v-model="editFormdata.m_id" disabled>
-            <el-option
-              v-for="item in editCategoryList"
-              :key="item.id"
-              :label="item.name"
-              :value="item.id"
-            />
-          </el-select>
-        </el-form-item>
         <el-form-item label="餐次" prop="dinner_id">
           <el-select v-model="editFormdata.dinner_id" disabled>
             <el-option
               v-for="item in editDinnersList"
               :label="item.name"
               :key="item.id"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="类型" prop="m_id">
+          <el-select v-model="editFormdata.m_id" disabled>
+            <el-option
+              v-for="item in editCategoryList"
+              :key="item.id"
+              :label="item.name"
               :value="item.id"
             />
           </el-select>
@@ -220,15 +220,15 @@ export default {
   },
   computed: {
     companiesVisible() {
-      return this.grade !== 3;
+      return this.grade != 3;
     }
   },
   methods: {
-    fetchList(p) {
+    async fetchList(p) {
       let page = Number(p) || 1;
       let queryForm = this.queryForm;
       let { m_id, dinner_id, canteen_id, company_id } = queryForm;
-      $axios
+      await $axios
         .get(`http://canteen.tonglingok.com/api/v1/foods`, {
           f_type: 1,
           page: page,
@@ -373,9 +373,9 @@ export default {
         data = res.data;
         let { dinner_id, canteen_id } = res.data;
         await this.getEditDinnerList(canteen_id);
+        this.$set(this.editFormdata, "dinner_id", data.dinner_id);
         await this.getEditCategoryList(dinner_id);
-        this.editFormdata.dinner_id = data.dinner_id;
-        this.editFormdata.m_id = data.menu_id;
+        this.$set(this.editFormdata, "m_id", data.menu_id);
       }
     },
     handleClose(done) {
@@ -393,9 +393,9 @@ export default {
         data
       );
       if (res.msg === "ok") {
-        this.editVisible = false;
+        this.handleClose();
         this.editFormData = {};
-        this.fetchList(this.current_page);
+        await this.fetchList(this.current_page);
       }
     },
     openNewType() {

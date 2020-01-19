@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="菜品管理"
+    title="新增"
     :visible.sync="isOpen"
     class="diaForm"
     width="40%"

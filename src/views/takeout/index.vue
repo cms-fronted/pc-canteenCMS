@@ -251,7 +251,7 @@ export default {
       return !!this.queryForm.ordering_date && !!this.queryForm.company_ids;
     },
     companiesVisible() {
-      return this.grade !== 3;
+      return this.grade != 3;
     }
   },
   watch: {
@@ -371,6 +371,5 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.takeout {
-}
+
 </style>

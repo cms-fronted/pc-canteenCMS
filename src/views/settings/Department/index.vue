@@ -514,7 +514,7 @@ export default {
       }
     },
     companiesVisible() {
-      return this.grade !== 3;
+      return this.grade != 3;
     }
   },
   created() {
