@@ -379,7 +379,7 @@ export default {
   },
   computed: {
     companiesVisible() {
-      return this.grade !== 3;
+      return this.grade != 3;
     }
   },
   async created() {
@@ -568,26 +568,22 @@ export default {
     },
     //提交消费策略设置修改请求
     async changeSetting() {
-      if(!this.detail.length) {
+      if (!this.detail.length) {
         return this.$message.error("消费设置不能为空");
       }
       this.editSettingForm.consumption_count = this.detail.length;
       this.editSettingForm.detail = JSON.stringify(this.detail);
-      await $axios
-        .post(
-          "http://canteen.tonglingok.com/api/v1/canteen/consumptionStrategy/update",
-          this.editSettingForm
-        )
-        .then(res => {
-          if (res.msg === "ok") {
-            this.$message.success("修改成功");
-            this.queryList();
-          } else {
-            this.$message.error(res.msg);
-          }
-          this._closeEditSettingDialog();
-        })
-        .catch(err => console.log(err));
+      const res = await $axios.post(
+        "http://canteen.tonglingok.com/api/v1/canteen/consumptionStrategy/update",
+        this.editSettingForm
+      );
+      if (res.msg === "ok") {
+        this.$message.success("修改成功");
+        this.queryList();
+      } else {
+        this.$message.error(res.msg);
+      }
+      this._closeEditSettingDialog();
     },
     //处理合并数据
     // objectSpanMethod({ row, column, rowIndex, columnIndex }) {
@@ -603,7 +599,7 @@ export default {
     handleData() {
       let _data = [];
       this.budgetList.forEach(i => {
-        if (i.detail.length!==0) {
+        if (i.detail) {
           i.detail.forEach(j => {
             j.strategy.forEach(k => {
               _data.push({
@@ -625,7 +621,6 @@ export default {
             });
           });
         } else {
-          console.log(i);
           _data.push({
             id: i.id,
             canteen: i.canteen.name,
@@ -641,8 +636,6 @@ export default {
         }
       });
       this.dataList = _data;
-      console.log(this.budgetList)
-      console.log(this.dataList);
     },
 
     rowspan(idx, prop) {

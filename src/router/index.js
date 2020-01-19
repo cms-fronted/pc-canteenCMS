@@ -868,7 +868,6 @@ router.beforeEach(async (to, from, next) => {
       } else {
         try {
           const { roles } = await store.dispatch("user/_getUserModules");
-          console.log(roles);
           const addRoutes = await store.dispatch(
             "permission/getAsyncRoutes",
             roles

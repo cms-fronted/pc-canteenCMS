@@ -186,7 +186,7 @@ export default {
   },
   computed: {
     companiesVisible() {
-      return this.grade !== 3;
+      return this.grade != 3;
     }
   },
   components: { Pagination },

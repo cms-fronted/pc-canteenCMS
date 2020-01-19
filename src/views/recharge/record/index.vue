@@ -162,7 +162,7 @@ export default {
   },
   computed: {
     companiesVisible() {
-      return this.grade !== 3;
+      return this.grade != 3;
     }
   },
   watch: {
@@ -203,23 +203,20 @@ export default {
     },
     async fetchAdminList() {
       // module_id 暂时固定为14
-      await $axios
-        .get(
-          "http://canteen.tonglingok.com/api/v1/wallet/recharge/admins?module_id=14"
-        )
-        .then(res => {
-          console.log(res);
-          this.adminList = res.data;
-          if (this.adminList.length > 1) {
-            this.adminList.unshift({
-              id: 0,
-              role: "全部"
-            });
-          }
-        });
-      this.formdata.admin_id = this.adminList[0].id.catch(err =>
-        console.log(err)
+      const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/wallet/recharge/admins?module_id=" +
+          localStorage.getItem("m_id")
       );
+      if (res.msg == "ok") {
+        this.adminList = res.data;
+        if (this.adminList.length > 1) {
+          this.adminList.unshift({
+            id: 0,
+            role: "全部"
+          });
+        }
+        this.formdata.admin_id = this.adminList[0].id;
+      }
     },
     async exportFile() {
       await this.$exportExcel(

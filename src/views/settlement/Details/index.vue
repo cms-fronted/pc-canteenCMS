@@ -292,7 +292,7 @@ export default {
       return !!!this.formdata.date;
     },
     companiesVisible() {
-      return this.grade !== 3;
+      return this.grade != 3;
     }
   },
   watch: {

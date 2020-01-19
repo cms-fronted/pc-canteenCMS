@@ -129,13 +129,13 @@ export default {
       await this.getCompanies();
       await this.queryList(1);
     } else {
-      this.getLocationList();
+      await this.getLocationList();
       await this.queryList(1);
     }
   },
   computed: {
     companiesVisible() {
-      return this.grade !== 3;
+      return this.grade != 3;
     },
     isDisabled() {
       return !!!this.formdata.date;
@@ -164,19 +164,18 @@ export default {
       }
     },
     async getCompanies() {
-      await $axios
-        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
-        .then(res => {
-          if (res.msg === "ok") {
-            let arr = res.data;
-            let companiesList = getAllOptions(flatten(arr));
-            this.companyOptions = companiesList;
-            this.formdata.company_ids = this.companyOptions[0].id;
-            this.canteenOptions = [{ name: "全部", id: 0 }];
-            this.formdata.canteen_id = 0;
-          }
-        })
-        .catch(err => console.log(err));
+      const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/admin/companies"
+      );
+      if (res.msg == "ok") {
+        let arr = res.data;
+        let companiesList = getAllOptions(flatten(arr));
+        this.companyOptions = companiesList;
+        this.formdata.company_ids = this.companyOptions[0].id;
+        this.canteenOptions = [{ name: "全部", id: 0 }];
+        this.formdata.canteen_id = 0;
+        await this.getLocationList(this.companyOptions[0].id);
+      }
     },
     async getLocationList(company_id) {
       let res;
@@ -188,6 +187,7 @@ export default {
         res = await $axios.get(
           "http://canteen.tonglingok.com/api/v1/managerCanteens"
         );
+        this.formdata.company_ids = localStorage.getItem('company_id');
       }
       if (res.msg === "ok") {
         this.canteenOptions = unshiftAllOptions(Array.from(res.data));
@@ -203,9 +203,7 @@ export default {
     async queryList(page) {
       page = typeof page == "number" ? page : 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/orderStatistic?page=${page}&size=${
-          this.size
-        }`,
+        `http://canteen.tonglingok.com/api/v1/order/orderStatistic?page=${page}&size=${this.size}`,
         this.formdata
       );
       if (res.msg === "ok") {

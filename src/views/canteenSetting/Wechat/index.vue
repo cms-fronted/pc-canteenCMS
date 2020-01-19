@@ -103,7 +103,7 @@ export default {
   },
   computed: {
     companiesVisible() {
-      return this.grade !== 3;
+      return this.grade != 3;
     }
   },
   methods: {
@@ -134,7 +134,6 @@ export default {
             `http://canteen.tonglingok.com/api/v1/categories?page=${this.page}&size=10`
           )
           .then(res => {
-            console.log(res);
             this.tableList = Array.from(res.data.data);
             this.total = res.data.total;
           })

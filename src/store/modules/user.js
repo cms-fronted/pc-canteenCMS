@@ -6,11 +6,12 @@ import { stat } from "fs";
 const state = {
   token: localStorage.getItem("token") ? localStorage.getItem("token") : "", // 认证凭证'
   userName: "",
-  grade: "",
+  grade: localStorage.getItem("grade") ? localStorage.getItem("grade") : "",
   role: "",
   roles: [],
   introduce: "",
-  isProducer: ""
+  isProducer: localStorage.getItem("isProducer") ? localStorage.getItem("isProducer") : "",
+  company_id: localStorage.getItem("company_id") ? localStorage.getItem("company_id") : ""
 };
 const mutations = {
   SET_TOKEN(state, val) {
@@ -29,9 +30,11 @@ const mutations = {
   },
   SET_GRADE(state, val) {
     state.grade = val;
+    localStorage.setItem("grade", val);
   },
   DEL_GRADE(state) {
     state.grade = "";
+    localStorage.removeItem("grade");
   },
   SET_ROLES(state, payload) {
     state.roles = payload;
@@ -44,9 +47,20 @@ const mutations = {
   },
   SET_PRODUCER(state, val) {
     state.isProducer = val;
+    localStorage.setItem("isProducer", val);
   },
   DEL_PRODUCER(state) {
     state.isProducer = "";
+    localStorage.removeItem("isProducer");
+
+  },
+  SET_COMPANYID(state, val) {
+    state.company_id = val;
+    localStorage.setItem("company_id", val)
+  },
+  DEL_COMPANYID(state) {
+    state.company_id = '';
+    localStorage.removeItem("company_id");
   }
 };
 const actions = {
@@ -58,10 +72,13 @@ const actions = {
           if (res.code == "200") {
             commit("SET_TOKEN", res.data.token);
             commit("SET_ROLE", res.data.role);
+            commit("SET_ROLES", []);
             commit("SET_GRADE", res.data.grade);
             commit("SET_NAME", res.data.userName);
+            commit("SET_COMPANYID", res.data.company_id);
             resolve(res);
           }
+          resolve(res)
         })
         .catch(error => {
           reject(error);
@@ -81,6 +98,7 @@ const actions = {
             localStorage.setItem("isProducer", 1);
             resolve(res);
           }
+          resolve(res);
         })
         .catch(error => {
           reject(error);
@@ -108,6 +126,7 @@ const actions = {
         }
       });
     }
+    localStorage.clear();
   },
   _getUserModules({ commit }) {
     let roles = null;
@@ -119,7 +138,12 @@ const actions = {
         .then(res => {
           if (res.msg === "ok") {
             let data = treeToArr(res.data);
-            roles = data.map(item => item.url);
+            roles = data.map(item => {
+              if(item.name === '充值记录明细'){
+                localStorage.setItem('m_id', item.m_id)
+              }
+              return item.url
+            });
             commit("SET_ROLES", roles);
           }
           resolve({ roles });

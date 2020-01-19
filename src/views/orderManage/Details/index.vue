@@ -169,7 +169,7 @@ export default {
     if (this.companiesVisible) {
       await this.getCompanies();
     } else {
-      this.getLocationList();
+      await this.getLocationList();
     }
     await this.queryList(1);
   },
@@ -178,7 +178,7 @@ export default {
       return !!!this.formdata.date;
     },
     companiesVisible() {
-      return this.grade !== 3;
+      return this.grade != 3;
     }
   },
   watch: {
@@ -194,7 +194,7 @@ export default {
     }
   },
   methods: {
-    getList(val) {
+    async getList(val) {
       if (String(val).includes(",")) {
         this.departmentList = [{ name: "全部", id: 0 }];
         this.dinnersList = [{ name: "全部", id: 0 }];
@@ -203,8 +203,8 @@ export default {
         this.formdata.canteen_id = 0;
         this.formdata.dinner_id = 0;
       } else {
-        this.getDepartmentList(val);
-        this.getLocationList(val);
+        await this.getDepartmentList(val);
+        await this.getLocationList(val);
       }
     },
     async getCompanies() {
@@ -252,25 +252,21 @@ export default {
           .catch(err => console.log(err));
       }
     },
-    getLocationList(company_id) {
+    async getLocationList(company_id) {
+      let res;
       if (company_id) {
-        $axios
-          .get(
-            `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
-          )
-          .then(res => {
-            this.locationList = unshiftAllOptions(Array.from(res.data));
-            this.formdata.canteen_id = this.locationList[0].id;
-          })
-          .catch(err => console.log(err));
+        res = await $axios.get(
+          `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
+        );
       } else {
-        $axios
-          .get("http://canteen.tonglingok.com/api/v1/managerCanteens")
-          .then(res => {
-            this.locationList = unshiftAllOptions(Array.from(res.data));
-            this.formdata.canteen_id = this.locationList[0].id;
-          })
-          .catch(err => console.log(err));
+        res = await $axios.get(
+          "http://canteen.tonglingok.com/api/v1/managerCanteens"
+        );
+        this.formdata.company_ids = localStorage.getItem("company_id");
+      }
+      if (res.msg == "ok") {
+        this.locationList = unshiftAllOptions(Array.from(res.data));
+        this.formdata.canteen_id = this.locationList[0].id;
       }
     },
     async exportFile() {
@@ -320,7 +316,4 @@ export default {
 };
 </script>
 
-<style lang="scss" scpoed>
-.order-manage-details {
-}
-</style>
+<style lang="scss" scpoed></style>

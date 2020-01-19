@@ -48,8 +48,8 @@
           >{{items.name}}</el-checkbox>
       </el-checkbox-group>-->
     </div>
-    <div style="textAlign: center">
-      <el-button @click="confirm" :disabled="confirmed">确定</el-button>
+    <div style="textAlign: center" v-if="isShow">
+      <el-button @click="confirm" :disabled="isConfirm">确定</el-button>
     </div>
   </el-card>
 </template>
@@ -57,7 +57,7 @@
 <script>
 import { treeToArr } from "@/utils/flatternArr";
 export default {
-  props: ["modules", "isConfirm", "disabled"],
+  props: ["modules", "isConfirm", "disabled", "isShow"],
   data() {
     return {
       title: "模块明细",
@@ -81,11 +81,11 @@ export default {
       },
       immediate: true
     },
-    isConfirm: {
-      handler(val) {
-        this.confirmed = val;
-      }
-    }
+    // isConfirm: {
+    //   handler(val) {
+    //     this.confirmed = val;
+    //   }
+    // }
   },
   methods: {
     handleModules(val) {

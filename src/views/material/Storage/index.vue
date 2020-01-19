@@ -170,7 +170,7 @@ export default {
       token: state => state.user.token
     }),
     companiesVisible() {
-      return this.grade !== 3;
+      return this.grade != 3;
     }
   },
   watch: {
@@ -189,7 +189,7 @@ export default {
     if (this.companiesVisible) {
       await this.getCompanies();
     } else {
-      await this.getCanteenOptions(0);
+      await this.getCanteenOptions();
     }
     await this.queryList(1);
   },
@@ -205,7 +205,7 @@ export default {
       }
     },
     async getCanteenOptions(c_id) {
-      let company_id = c_id || "";
+      let company_id = c_id || localStorage.getItem("company_id");
       const res = await $axios.get(
         `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
       );
@@ -225,9 +225,7 @@ export default {
     async queryList(page) {
       page = page || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/material/reports?page=${page}&size=${
-          this.size
-        }`,
+        `http://canteen.tonglingok.com/api/v1/order/material/reports?page=${page}&size=${this.size}`,
         this.queryForm
       );
       if (res.msg === "ok") {
@@ -239,9 +237,7 @@ export default {
     async getDetailList(page) {
       page = page || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/material/report?page=${page}&size=${
-          this.detailSize
-        }&id=${this.detailForm.id}`
+        `http://canteen.tonglingok.com/api/v1/order/material/report?page=${page}&size=${this.detailSize}&id=${this.detailForm.id}`
       );
       if (res.msg === "ok") {
         this.detailData = Array.from(res.data.list.data);

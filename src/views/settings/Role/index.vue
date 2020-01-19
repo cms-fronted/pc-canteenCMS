@@ -73,7 +73,9 @@
                 <el-button type="text" size="mini" @click="_edit(scoped.row)"
                   >编辑</el-button
                 >
-                <el-button type="text" size="mini">删除</el-button>
+                <el-button type="text" size="mini" @click="_delete(scoped.row)"
+                  >删除</el-button
+                >
               </span>
             </template>
           </el-table-column>
@@ -169,6 +171,7 @@
             @getModules="(modules, checkAll) => getRoleRules(modules, checkAll)"
             :isConfirm="isConfirmRules"
             :disabled="false"
+            :isShow="true"
           ></show-modules>
         </el-col>
       </el-row>
@@ -198,7 +201,7 @@ export default {
       queryForm: {},
       roleForm: {
         canteens: [],
-        rules: ["12", "13", "14"]
+        rules: []
       },
       companyOptions: [],
       canteenGroup: [],
@@ -216,7 +219,7 @@ export default {
   },
   computed: {
     companiesVisible() {
-      return this.grade !== 3;
+      return this.grade != 3;
     }
   },
   methods: {
@@ -265,11 +268,14 @@ export default {
     },
     openNewRoleDialog() {
       this.newRoleDialogVisible = true;
+      this.roleForm = { canteens: [], rules: [] };
+      this.isConfirmRules = false;
     },
     closeNewRoleDialog() {
       this.isEdit = false;
+      this.roleForm = { canteens: [], rules: [] };
       // this.roleForm = {};
-      // this.modules = [];
+      this.modules = [];
       this.newRoleDialogVisible = false;
     },
     async selectCompany(id) {
@@ -309,12 +315,15 @@ export default {
         );
       }
       if (res.msg === "ok") {
-        this.$message.success("新增角色成功");
+        this.$message.success("操作成功");
         await this.fetchList();
         this.newRoleDialogVisible = false;
+      } else {
+        this.$message.error(res.msg);
       }
     },
     async _edit(row) {
+      this.isConfirmRules = false;
       this.isEdit = true;
       this.roleForm = Object.assign({}, row);
       let id = row.id;
@@ -382,6 +391,32 @@ export default {
         `http://canteen.tonglingok.com/api/v1/role?id=${id}`
       );
       return res;
+    },
+    async _delete(row) {
+      this.$confirm("此操作将删除员工" + row.username + ", 是否继续?", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(async () => {
+          const res = await $axios.post(
+            "http://canteen.tonglingok.com/api/v1/role/handel",
+            {
+              id: row.id,
+              state: 3
+            }
+          );
+          if (res.msg === "ok") {
+            this.$message.success("删除成功");
+            await this.fetchList();
+          }
+        })
+        .catch(() => {
+          this.$message({
+            type: "info",
+            message: "已取消删除"
+          });
+        });
     }
   }
 };

@@ -4,7 +4,7 @@
     <el-divider />
     <div class="main">
       <div class="main-header">
-        <el-button type="primary" @click="() => addEnterprise({}, {})"
+        <el-button type="primary" v-if='grade!=3' @click="() => addEnterprise({}, {})"
           >新增一级企业</el-button
         >
       </div>
@@ -208,6 +208,7 @@ export default {
   data() {
     return {
       loading: null,
+      grade: localStorage.getItem('grade'),
       editEnterpriseDialogVisible: false,
       addCanteenVisible: false,
       addEnterpriseVisible: false,
@@ -251,8 +252,8 @@ export default {
       payConfigForm: {}
     };
   },
-  created() {
-    this.fetchCompanyList();
+  async created() {
+    await this.fetchCompanyList();
   },
   watch: {
     filterText(val) {
@@ -271,27 +272,30 @@ export default {
       if (!value) return true;
       return data.name.indexOf(value) !== -1;
     },
-    getComsumptionLoc(id) {
+    async getComsumptionLoc(id) {
       this.shopLocData = [];
-      $axios
-        .get(
-          `http://canteen.tonglingok.com/api/v1/company/consumptionLocation?company_id=${id}`
-        )
-        .then(res => {
-          this.canteensLocData = Array.from(res.data.canteen);
-          if (res.data.shop) {
-            this.shopLocData.push(res.data.shop);
-          }
-        })
-        .catch(err => console.log(err));
+      const res = await $axios.get(
+        `http://canteen.tonglingok.com/api/v1/company/consumptionLocation?company_id=${id}`
+      );
+      if (res.msg == "ok") {
+        this.canteensLocData = Array.from(res.data.canteen);
+        if (res.data.shop) {
+          this.shopLocData.push(res.data.shop);
+        }
+      }
     },
-    fetchCompanyList() {
-      $axios
-        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
-        .then(res => {
-          this.companyList = Array.from(res.data);
-        })
-        .catch(err => console.log(err));
+    async fetchCompanyList() {
+      const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/admin/companies"
+      );
+      if (res.msg == "ok") {
+        this.companyList = [];
+        if(res.data instanceof Object) {
+            this.companyList.push(res.data)
+          } else {
+            this.companyList = Array.from(res.data);
+        }
+      }
     },
     addCanteen() {
       this.canteenDialogTitle = "新增饭堂";
@@ -320,7 +324,6 @@ export default {
       let formdata = Object.assign({}, this.payConfigForm, {
         company_id: this.company_id
       });
-      console.log(formdata);
       const res = await $axios.post(
         "http://canteen.tonglingok.com/api/v1/company/wxConfig/save"
       );
@@ -337,8 +340,16 @@ export default {
       this.addShopVisible = val;
     },
     addEnterprise(node, data) {
-      this.parent.name = data.name;
-      this.parent.id = data.id;
+      let arr = Object.keys(data);
+      console.log(arr);
+      if (arr.length) {
+        this.parent.name = data.name;
+        this.parent.id = data.id;
+      } else {
+        this.parent.name = "";
+        this.parent.id = localStorage.getItem("company_id");
+        console.log(1);
+      }
       this.addEnterpriseVisible = true;
     },
     async editEnterpriseDialog(node, data) {
@@ -356,22 +367,24 @@ export default {
     },
     async _addEnterprise() {
       this.loading = Loading.service({ text: "拼命加载中..." });
-      await $axios
-        .post("http://canteen.tonglingok.com/api/v1/company/save", {
+      const res = await $axios.post(
+        "http://canteen.tonglingok.com/api/v1/company/save",
+        {
           parent_id: this.parent.id || 0,
           name: this.enterpriseForm.name
-        })
-        .then(res => {
-          this.fetchCompanyList();
-          this.addEnterpriseVisible = false;
-          this.$message.success(
-            `添加成功，企业账号为:${res.data.company_id}-admin`
-          );
-          this.$refs.newEnterprise.resetFields();
-          this.parent.id = "";
-          this.parent_name = "";
-        })
-        .catch(err => console.log(err));
+        }
+      );
+      if (res.msg == "ok") {
+        this.addEnterpriseVisible = false;
+        await this.fetchCompanyList();
+        this.$message.success(
+          `添加成功，企业账号为:${res.data.company_id}-admin`
+        );
+        this.$refs.newEnterprise.resetFields();
+        this.parent.id = "";
+        this.parent_name = "";
+      }
+
       this.loading.close();
     },
     async getCanteenConfig(id) {

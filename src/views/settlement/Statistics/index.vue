@@ -286,7 +286,7 @@ export default {
       return !!!this.formdata.date;
     },
     companiesVisible() {
-      return this.grade !== 3;
+      return this.grade != 3;
     }
   },
   watch: {
@@ -326,19 +326,20 @@ export default {
       }
     },
     async getCompanies() {
-      await $axios
-        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
-        .then(res => {
-          let arr = res.data;
-          let companiesList = getAllOptions(flatten(arr));
-          this.companiesList = companiesList;
-          this.departmentList = [{ name: "全部", id: 0 }];
-          this.locationList = [{ name: "全部", id: 0 }];
-          this.formdata.department_id = 0;
-          this.formdata.canteen_id = 0;
-          this.formdata.company_ids = this.companiesList[0].id;
-        })
-        .catch(err => console.log(err));
+      const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/admin/companies"
+      );
+      if (res.msg === "ok") {
+        let arr = res.data;
+        let companiesList = getAllOptions(flatten(arr));
+        this.companiesList = companiesList;
+        this.departmentList = [{ name: "全部", id: 0 }];
+        this.locationList = [{ name: "全部", id: 0 }];
+        this.formdata.department_id = 0;
+        this.formdata.canteen_id = 0;
+        this.formdata.company_ids = this.companiesList[0].id;
+        await this.getLocationList(this.formdata.company_ids);
+      }
     },
 
     async getDepartmentListWithoutCid() {
@@ -346,7 +347,7 @@ export default {
         "http://canteen.tonglingok.com/api/v1/admin/departments"
       );
       if (res.msg === "ok") {
-        this.departmentList = unshiftAllOptions(Aarray.from(res.data));
+        this.departmentList = unshiftAllOptions(Array.from(res.data));
         this.formdata.department_id = this.departmentList[0].id;
       }
     },
@@ -372,7 +373,7 @@ export default {
           `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
         );
       } else {
-        res = $axios.get(
+        res = await $axios.get(
           "http://canteen.tonglingok.com/api/v1/managerCanteens"
         );
       }
@@ -409,9 +410,7 @@ export default {
         delete this.formdata.company_ids;
       }
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/consumptionStatistic?page=${page}&size=${
-          this.size
-        }`,
+        `http://canteen.tonglingok.com/api/v1/order/consumptionStatistic?page=${page}&size=${this.size}`,
         this.formdata
       );
       if (res.msg === "ok") {

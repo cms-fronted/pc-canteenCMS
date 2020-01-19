@@ -84,7 +84,7 @@ export default {
           category: row.category === 1 ? 2 : 1
         }
       );
-      if (res.msg === ok) {
+      if (res.msg === "ok") {
         this.$message.success("修改成功");
         await this.getModuleWithoutSystem();
       } else {
