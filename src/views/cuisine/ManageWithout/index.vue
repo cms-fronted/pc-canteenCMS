@@ -6,11 +6,7 @@
       <div class="main">
         <div class="main-header">
           <el-form :inline="true" label-width="60px" :model="queryForm">
-            <el-form-item
-              label="公司"
-              prop="company_ids"
-              v-if="companiesVisible"
-            >
+            <el-form-item label="公司" prop="company_ids" v-if="companiesVisible">
               <el-select
                 v-model="queryForm.company_id"
                 placeholder="请选择企业"
@@ -26,10 +22,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="消费地点" label-width="80px" prop="canteen_id">
-              <el-select
-                v-model="queryForm.canteen_id"
-                @change="getDinnersList"
-              >
+              <el-select v-model="queryForm.canteen_id" @change="getDinnersList">
                 <el-option
                   v-for="item in locationList"
                   :label="item.name"
@@ -39,10 +32,7 @@
               </el-select>
             </el-form-item>
             <el-form-item label="餐次" prop="dinner_id">
-              <el-select
-                v-model="queryForm.dinner_id"
-                @change="getCategoryList"
-              >
+              <el-select v-model="queryForm.dinner_id" @change="getCategoryList">
                 <el-option
                   v-for="item in dinnersList"
                   :label="item.name"
@@ -62,9 +52,7 @@
               </el-select>
             </el-form-item>
             <el-button type="primary" @click="fetchList">查询</el-button>
-            <el-button @click="addCuisine" :disabled="locationList.length === 0"
-              >新增</el-button
-            >
+            <el-button @click="addCuisine" :disabled="locationList.length === 0">新增</el-button>
           </el-form>
         </div>
         <div class="main-content">
@@ -86,9 +74,7 @@
                 <li class="list">主厨:{{ item.chef }}</li>
               </ul>
               <div class="btns">
-                <el-button type="danger" plain @click="handleDelete(item)"
-                  >删除</el-button
-                >
+                <el-button type="danger" plain @click="handleDelete(item)">删除</el-button>
                 <el-button type="primary" @click="_edit(item)">编辑</el-button>
               </div>
             </div>
@@ -377,19 +363,20 @@ export default {
       this.editVisible = true;
       this.editFormdata = { ...item };
       delete this.editFormdata.img_url;
-      await $axios
-        .get("http://canteen.tonglingok.com/api/v1/food", {
+      const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/food",
+        {
           id: item.id
-        })
-        .then(res => {
-          data = res.data;
-          let { dinner_id, canteen_id } = res.data;
-          this.getEditDinnerList(canteen_id);
-          this.getEditCategoryList(dinner_id);
-          this.editFormdata.dinner_id = data.dinner_id;
-          this.editFormdata.m_id = data.menu_id;
-        })
-        .catch(err => console.log(err));
+        }
+      );
+      if (res.msg == "ok") {
+        data = res.data;
+        let { dinner_id, canteen_id } = res.data;
+        await this.getEditDinnerList(canteen_id);
+        await this.getEditCategoryList(dinner_id);
+        this.editFormdata.dinner_id = data.dinner_id;
+        this.editFormdata.m_id = data.menu_id;
+      }
     },
     handleClose(done) {
       this.fileList = new Array();
