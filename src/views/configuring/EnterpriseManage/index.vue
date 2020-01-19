@@ -4,7 +4,10 @@
     <el-divider />
     <div class="main">
       <div class="main-header">
-        <el-button type="primary" v-if='grade!=3' @click="() => addEnterprise({}, {})"
+        <el-button
+          type="primary"
+          v-if="grade != 3"
+          @click="() => addEnterprise({}, {})"
           >新增一级企业</el-button
         >
       </div>
@@ -208,7 +211,7 @@ export default {
   data() {
     return {
       loading: null,
-      grade: localStorage.getItem('grade'),
+      grade: localStorage.getItem("grade"),
       editEnterpriseDialogVisible: false,
       addCanteenVisible: false,
       addEnterpriseVisible: false,
@@ -290,10 +293,11 @@ export default {
       );
       if (res.msg == "ok") {
         this.companyList = [];
-        if(res.data instanceof Object) {
-            this.companyList.push(res.data)
-          } else {
-            this.companyList = Array.from(res.data);
+        if (res.data instanceof Object) {
+          this.companyList.push(res.data);
+        } 
+        if (res.data instanceof Array) {
+          this.companyList = Array.from(res.data);
         }
       }
     },
@@ -341,14 +345,12 @@ export default {
     },
     addEnterprise(node, data) {
       let arr = Object.keys(data);
-      console.log(arr);
       if (arr.length) {
         this.parent.name = data.name;
         this.parent.id = data.id;
       } else {
         this.parent.name = "";
         this.parent.id = localStorage.getItem("company_id");
-        console.log(1);
       }
       this.addEnterpriseVisible = true;
     },

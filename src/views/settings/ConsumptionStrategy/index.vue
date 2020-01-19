@@ -119,7 +119,7 @@
       @close="closeSettingDialog"
     >
       <el-form :model="newSettingForm" ref="newSettingForm" label-width="100px">
-        <el-form-item label="公司" prop="company_id">
+        <el-form-item label="公司" prop="company_id" v-if="companiesVisible">
           <el-select
             v-model="newSettingForm.company_id"
             @change="getDialogCanteenList"
@@ -388,6 +388,7 @@ export default {
       await this.getRoleType();
       await this.queryList(1);
     } else {
+      await this.getRoleType();
       await this.getCanteenList();
       await this.queryList(1);
     }
@@ -420,6 +421,7 @@ export default {
           .get("http://canteen.tonglingok.com/api/v1/managerCanteens")
           .then(res => {
             this.canteenList = Array.from(res.data);
+            this.dialogCanteenList = Array.from(res.data);
             this.queryForm.c_id = this.canteenList[0].id;
           })
           .catch(err => console.log(err));
@@ -462,38 +464,26 @@ export default {
         .then(res => (this.roleTypeList = Array.from(res.data.data)));
     },
     async _addNewSetting() {
+      let res;
       if (this.isEdit) {
         this.newSettingForm.detail = JSON.stringify(this.newSettingForm.detail);
-        await $axios
-          .post(
-            "http://canteen.tonglingok.com/api/v1/canteen/consumptionStrategy/update",
-            this.newSettingForm
-          )
-          .then(res => {
-            if (res.msg === "ok") {
-              this.closeSettingDialog();
-            } else {
-              this.$message.error(res.msg);
-            }
-          })
-          .catch(err => console.log(err));
+        res = await $axios.post(
+          "http://canteen.tonglingok.com/api/v1/canteen/consumptionStrategy/update",
+          this.newSettingForm
+        );
       } else {
-        await $axios
-          .post(
-            "http://canteen.tonglingok.com/api/v1/canteen/consumptionStrategy/save",
-            this.newSettingForm
-          )
-          .then(res => {
-            if (res.msg === "ok") {
-              this.$message.success("添加成功");
-              this.queryList();
-            } else {
-              this.$message.error(res.msg);
-            }
-            this.closeSettingDialog();
-          })
-          .catch(err => console.log(err));
+        res = await $axios.post(
+          "http://canteen.tonglingok.com/api/v1/canteen/consumptionStrategy/save",
+          this.newSettingForm
+        );
       }
+      if (res.msg == "ok") {
+        this.$message.success("添加成功");
+        await this.queryList();
+      } else {
+        this.$message.error(res.msg);
+      }
+      this.closeSettingDialog();
     },
     closeSettingDialog() {
       this.settingDialogVisible = false;
@@ -579,7 +569,7 @@ export default {
       );
       if (res.msg === "ok") {
         this.$message.success("修改成功");
-        this.queryList();
+        await this.queryList();
       } else {
         this.$message.error(res.msg);
       }
