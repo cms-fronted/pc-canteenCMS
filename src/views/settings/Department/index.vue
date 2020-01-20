@@ -517,14 +517,14 @@ export default {
       return this.grade != 3;
     }
   },
-  created() {
+  async created() {
     // this.fetchList();
-    this.getRoleType();
+    await this.getRoleType();
     if (this.companyOptions) {
-      this.fetchDepartmentTreeData();
-      this.getCompanies();
+      //  await this.fetchDepartmentTreeData();
+      await this.getCompanies();
     } else {
-      this.getDepartmentListWithoutCid();
+      await this.getDepartmentListWithoutCid();
     }
   },
   methods: {
@@ -589,7 +589,8 @@ export default {
         this.companyOptions = flatten(res.data);
         this.queryForm.c_id = this.companyOptions[0].id;
         this.c_id = this.companyOptions[0].id;
-        this.fetchDepartmentTreeData();
+        await this.fetchDepartmentTreeData(this.c_id);
+        await this.getCanteenOptions(this.c_id);
       }
     },
     async getDepartmentListWithoutCid() {
@@ -643,8 +644,8 @@ export default {
       }
     },
     async selectCompany(c_id) {
-      await this.getCanteenOptions(c_id);
       await this.fetchDepartmentTreeData(c_id);
+      await this.getCanteenOptions(c_id);
       this.c_id = c_id;
       this.d_id = "";
       this.addFormData.company_id = c_id;
@@ -920,8 +921,8 @@ export default {
     handleSuccess(res, file, fileList) {
       if (res.msg === "ok") {
         this.$message({
-          message:"上传成功",
-          type:"success",
+          message: "上传成功",
+          type: "success",
           duration: 1000
         });
         if (res.data && res.data.fail) {

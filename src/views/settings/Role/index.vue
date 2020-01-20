@@ -353,7 +353,6 @@ export default {
       }
     },
     getRoleRules(modules, checkAll) {
-      console.log(modules, checkAll);
       this.isConfirmRules = true;
       let allModules = treeToArr(this.modules);
       let checked = [];
