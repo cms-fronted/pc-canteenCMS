@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="菜品管理"
+    title="新增菜品"
     :visible.sync="isOpen"
     class="diaForm"
     width="40%"
@@ -28,7 +28,7 @@
     >
       <el-form-item label="饭堂名称" prop="canteen_id">
         <el-select
-          v-model="formdata.canteen_id"
+          v-model="formdata.c_id"
           placeholder="请选择"
           style="width:120px"
           @change="getDinnersList"
@@ -149,7 +149,7 @@ export default {
       hideUpload: false,
       formdata: {
         f_type: 1,
-        canteen_id: "",
+        c_id: "",
         dinner_id: "",
         m_id: "",
         name: "",
@@ -173,15 +173,20 @@ export default {
     }
   },
   methods: {
-    _add() {
-      this.formdata = { c_id: this.c_id, ...this.formdata };
-      $axios
-        .post("http://canteen.tonglingok.com/api/v1/food/save", this.formdata)
-        .then(res => {
-          this.$refs.addUpload.clearFiles();
-          this.handleClose();
-        })
-        .catch(err => console.log(err));
+    async _add() {
+      this.formdata = { ...this.formdata };
+      const res = await $axios.post(
+        "http://canteen.tonglingok.com/api/v1/food/save",
+        this.formdata
+      );
+      if (res.msg == "ok") {
+        this.$refs.addUpload.clearFiles();
+        this.handleClose();
+        this.$message.success("操作成功！")
+        await this.$emit("_add");
+      } else {
+        this.$message.error(res.msg);
+      }
     },
     getDinnersList(canteen_id) {
       this.formdata.dinner_id = "";

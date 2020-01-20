@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    title="菜品管理"
+    title="新增"
     :visible.sync="isOpen"
     class="diaForm"
     width="40%"
@@ -189,17 +189,20 @@ export default {
     }
   },
   methods: {
-    _add() {
+    async _add() {
       this.formdata = { ...this.formdata };
       this.formdata.material = JSON.stringify(this.material);
-      $axios
-        .post("http://canteen.tonglingok.com/api/v1/food/save", this.formdata)
-        .then(res => {
-          this.$message.success("操作成功！");
-          this.$emit("updateList");
-          this.handleClose();
-        })
-        .catch(err => console.log(err));
+      const res = await $axios.post(
+        "http://canteen.tonglingok.com/api/v1/food/save",
+        this.formdata
+      );
+      if (res.msg == "ok") {
+        this.$message.success("操作成功！");
+        this.handleClose();
+        await this.$emit("updateList");
+      } else {
+        this.$message.error(res.msg);
+      }
     },
     _addMaterial() {
       this.material.push({ ...this.materialForm });

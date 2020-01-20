@@ -32,7 +32,7 @@
           <el-upload
             class="upload-excel"
             ref="upload"
-            :limit="1"
+            :limit="100"
             :headers="header"
             :show-file-list="false"
             accept=".xls, .xlsx"
@@ -86,8 +86,8 @@
                     type="text"
                     @click="handleNodeClick(data, $event)"
                     > -->
-                    {{ node.label }}
-                    <!-- </el-button
+                  {{ node.label }}
+                  <!-- </el-button
                   > -->
                 </span>
                 <span class="btns-text">
@@ -588,7 +588,7 @@ export default {
       if (res.msg === "ok") {
         this.companyOptions = flatten(res.data);
         this.queryForm.c_id = this.companyOptions[0].id;
-        this.c_id =this.companyOptions[0].id;
+        this.c_id = this.companyOptions[0].id;
         this.fetchDepartmentTreeData();
       }
     },
@@ -782,7 +782,6 @@ export default {
       this.isEditStaff = false;
     },
     async _addNewStaff() {
-
       if (!this.isEditStaff) {
         //新增员工
         this.addFormData.company_id = this.c_id;
@@ -920,7 +919,23 @@ export default {
     },
     handleSuccess(res, file, fileList) {
       if (res.msg === "ok") {
-        this.$message.success("操作成功");
+        this.$message({
+          message:"上传成功",
+          type:"success",
+          duration: 1000
+        });
+        if (res.data && res.data.fail) {
+          res.data.fail.forEach(item => {
+            setTimeout(() => {
+              this.$message({
+                message: `${item.name}新增失败,${item.msg}`,
+                type: "error",
+                duration: 1000,
+                showClose: true
+              });
+            }, 1000);
+          });
+        }
       } else {
         this.$message.error("请上传正确模板文件");
       }
