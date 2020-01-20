@@ -80,7 +80,7 @@ export default {
         this.handleModules(val);
       },
       immediate: true
-    },
+    }
     // isConfirm: {
     //   handler(val) {
     //     this.confirmed = val;

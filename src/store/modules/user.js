@@ -10,8 +10,12 @@ const state = {
   role: "",
   roles: [],
   introduce: "",
-  isProducer: localStorage.getItem("isProducer") ? localStorage.getItem("isProducer") : "",
-  company_id: localStorage.getItem("company_id") ? localStorage.getItem("company_id") : ""
+  isProducer: localStorage.getItem("isProducer")
+    ? localStorage.getItem("isProducer")
+    : "",
+  company_id: localStorage.getItem("company_id")
+    ? localStorage.getItem("company_id")
+    : ""
 };
 const mutations = {
   SET_TOKEN(state, val) {
@@ -52,14 +56,13 @@ const mutations = {
   DEL_PRODUCER(state) {
     state.isProducer = "";
     localStorage.removeItem("isProducer");
-
   },
   SET_COMPANYID(state, val) {
     state.company_id = val;
-    localStorage.setItem("company_id", val)
+    localStorage.setItem("company_id", val);
   },
   DEL_COMPANYID(state) {
-    state.company_id = '';
+    state.company_id = "";
     localStorage.removeItem("company_id");
   }
 };
@@ -78,7 +81,7 @@ const actions = {
             commit("SET_COMPANYID", res.data.company_id);
             resolve(res);
           }
-          resolve(res)
+          resolve(res);
         })
         .catch(error => {
           reject(error);
@@ -139,10 +142,10 @@ const actions = {
           if (res.msg === "ok") {
             let data = treeToArr(res.data);
             roles = data.map(item => {
-              if(item.name === '充值记录明细'){
-                localStorage.setItem('m_id', item.m_id)
+              if (item.name === "充值记录明细") {
+                localStorage.setItem("m_id", item.m_id);
               }
-              return item.url
+              return item.url;
             });
             commit("SET_ROLES", roles);
           }

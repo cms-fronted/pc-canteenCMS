@@ -360,7 +360,9 @@ export default {
     async fetchTableList(page) {
       page = typeof page == "number" ? page : 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/menus/company?company_id=${this.company_id}&canteen_id=${this.canteen_id}&size=${this.size}&page=${page}`
+        `http://canteen.tonglingok.com/api/v1/menus/company?company_id=${
+          this.company_id
+        }&canteen_id=${this.canteen_id}&size=${this.size}&page=${page}`
       );
       if (res.msg == "ok") {
         let _data = Array.from(res.data.data);

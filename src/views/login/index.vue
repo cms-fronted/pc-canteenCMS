@@ -105,9 +105,9 @@ export default {
         .dispatch("user/_login", this.ruleForm)
         .then(res => {
           console.log(res);
-          if (res.msg != 'ok') {
+          if (res.msg != "ok") {
             // this.refresh();
-            this.$message.error(res.msg)
+            this.$message.error(res.msg);
           } else {
             this.$router.push("/order");
             if (this.notifyObj) {

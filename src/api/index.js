@@ -65,7 +65,7 @@ $axios.interceptors.response.use(
               redirect: router.currentRoute.fullPath
             }
           });
-          localStorage.clear()
+          localStorage.clear();
           break;
         case 404:
           Message.error("网络请求不存在");

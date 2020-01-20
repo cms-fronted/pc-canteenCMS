@@ -8,7 +8,7 @@
           type="primary"
           v-if="grade != 3"
           @click="() => addEnterprise({}, {})"
-          >新增一级企业</el-button
+          >{{ globalCid ? "新增下属企业" : "新增一级企业" }}</el-button
         >
       </div>
       <div class="main-content">
@@ -211,6 +211,7 @@ export default {
   data() {
     return {
       loading: null,
+      globalCid: localStorage.getItem("company_id"), //全局企业id
       grade: localStorage.getItem("grade"),
       editEnterpriseDialogVisible: false,
       addCanteenVisible: false,
@@ -295,7 +296,7 @@ export default {
         this.companyList = [];
         if (res.data instanceof Object) {
           this.companyList.push(res.data);
-        } 
+        }
         if (res.data instanceof Array) {
           this.companyList = Array.from(res.data);
         }

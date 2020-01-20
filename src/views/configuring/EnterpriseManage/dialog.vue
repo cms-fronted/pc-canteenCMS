@@ -334,7 +334,7 @@
 </template>
 <script>
 import $axios from "@/api/index";
-import {Loading} from "element-ui";
+import { Loading } from "element-ui";
 import { treeToArr } from "@/utils/flatternArr";
 const weekOptions = [
   { label: "周一", value: 0 },
@@ -443,7 +443,7 @@ export default {
       return val.replace(/(^\s*)|(\s*$)/g, "");
     },
     async addCanteen() {
-      let loading = Loading.service({ text: "拼命加载中" })
+      let loading = Loading.service({ text: "拼命加载中" });
       await $axios
         .post("http://canteen.tonglingok.com/api/v1/canteen/save", {
           canteens: this.trim(this.canteens),
@@ -462,7 +462,7 @@ export default {
         .catch(err => {
           console.log(err);
         });
-        loading.close()
+      loading.close();
     },
     _addDinner() {
       //添加餐次信息

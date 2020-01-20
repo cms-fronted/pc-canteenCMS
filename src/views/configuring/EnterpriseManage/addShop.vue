@@ -226,7 +226,10 @@ export default {
         this.machineForm.machine_type = "shop";
         console.log(this.machineForm);
         $axios
-          .post("http://canteen.tonglingok.com/api/v1/canteen/saveMachine", this.machineForm)
+          .post(
+            "http://canteen.tonglingok.com/api/v1/canteen/saveMachine",
+            this.machineForm
+          )
           .then(res => {
             this.$emit(
               "updateMachineTable",

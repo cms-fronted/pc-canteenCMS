@@ -103,7 +103,11 @@
           </div>
         </el-col>
         <el-col :span="18">
-          <show-modules :modules="modules" :disabled="true" :isShow="false"></show-modules>
+          <show-modules
+            :modules="modules"
+            :disabled="true"
+            :isShow="false"
+          ></show-modules>
           <el-card class="box-card" body-style="paddingBottom: 5px">
             <div slot="header" class="clearfix">
               <span>硬件列表</span>

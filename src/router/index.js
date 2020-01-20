@@ -103,7 +103,7 @@ export const currencyRoutes = [
         }
       }
     ]
-  },
+  }
   // {
   //   path: "/takeOut",
   //   redirect: "/takeOut/index",
@@ -454,7 +454,6 @@ export const producerRoutes = [
       icon: "el-icon-coffee"
     },
     children: [
-   
       {
         path: "manage",
         name: "Canteen-manage",
@@ -488,7 +487,7 @@ export const producerRoutes = [
         }
       }
     ]
-  },
+  }
 ];
 export const asyncRoutes = [
   {
@@ -620,7 +619,7 @@ export const asyncRoutes = [
         meta: {
           title: "进销统计报表(管)"
         }
-      },
+      }
       // {
       //   path: "manage",
       //   name: "Canteen-manage",
@@ -831,7 +830,7 @@ export const asyncRoutes = [
       }
     ]
   },
-  { path: '*', redirect: '/404', hidden: true }
+  { path: "*", redirect: "/404", hidden: true }
 ];
 
 const createRouter = () => {

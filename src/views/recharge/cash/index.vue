@@ -120,7 +120,7 @@ export default {
         {"id": 365,"company": "一级企业","department": "部门A","code": "0080808","username": "肖工","phone": "13411111132","card_num":"234"}, */
       ],
       dialogFormVisible: false,
-      limit: 100,
+      limit: 1000,
       total: 0,
       current_page: 1
     };

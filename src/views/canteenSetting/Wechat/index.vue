@@ -121,7 +121,9 @@ export default {
       if (this.companiesVisible) {
         await $axios
           .get(
-            `http://canteen.tonglingok.com/api/v1/categories?c_id=${this.company_id}&page=${this.page}&size=10`
+            `http://canteen.tonglingok.com/api/v1/categories?c_id=${
+              this.company_id
+            }&page=${this.page}&size=10`
           )
           .then(res => {
             this.tableList = Array.from(res.data.data);
@@ -131,7 +133,9 @@ export default {
       } else {
         await $axios
           .get(
-            `http://canteen.tonglingok.com/api/v1/categories?page=${this.page}&size=10`
+            `http://canteen.tonglingok.com/api/v1/categories?page=${
+              this.page
+            }&size=10`
           )
           .then(res => {
             this.tableList = Array.from(res.data.data);

@@ -182,7 +182,7 @@ export default {
       if (res.msg == "ok") {
         this.$refs.addUpload.clearFiles();
         this.handleClose();
-        this.$message.success("操作成功！")
+        this.$message.success("操作成功！");
         await this.$emit("_add");
       } else {
         this.$message.error(res.msg);

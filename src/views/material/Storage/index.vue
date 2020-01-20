@@ -225,7 +225,9 @@ export default {
     async queryList(page) {
       page = page || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/material/reports?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/order/material/reports?page=${page}&size=${
+          this.size
+        }`,
         this.queryForm
       );
       if (res.msg === "ok") {
@@ -237,7 +239,9 @@ export default {
     async getDetailList(page) {
       page = page || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/material/report?page=${page}&size=${this.detailSize}&id=${this.detailForm.id}`
+        `http://canteen.tonglingok.com/api/v1/order/material/report?page=${page}&size=${
+          this.detailSize
+        }&id=${this.detailForm.id}`
       );
       if (res.msg === "ok") {
         this.detailData = Array.from(res.data.list.data);

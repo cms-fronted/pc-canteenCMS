@@ -410,7 +410,9 @@ export default {
         delete this.formdata.company_ids;
       }
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/consumptionStatistic?page=${page}&size=${this.size}`,
+        `http://canteen.tonglingok.com/api/v1/order/consumptionStatistic?page=${page}&size=${
+          this.size
+        }`,
         this.formdata
       );
       if (res.msg === "ok") {

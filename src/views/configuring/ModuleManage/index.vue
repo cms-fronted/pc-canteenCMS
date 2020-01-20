@@ -18,7 +18,9 @@
             :value="item.id"
           ></el-option>
         </el-select>
-        <el-button @click="getModuleWithoutSystem" style="margin-left:10px">查询</el-button>
+        <el-button @click="getModuleWithoutSystem" style="margin-left:10px"
+          >查询</el-button
+        >
       </div>
       <div class="main-content">
         <el-table :data="modulesList">

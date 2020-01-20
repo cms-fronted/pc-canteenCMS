@@ -230,10 +230,7 @@ export default {
     },
     openEditModuleDialog(data) {
       this.editModuleVisible = true;
-      this.editModuleForm = Object.assign(
-        {},
-        { name: data.name, id: data.id}
-      );
+      this.editModuleForm = Object.assign({}, { name: data.name, id: data.id });
     },
     closeEditModuleDialog() {
       this.editModuleVisible = false;
