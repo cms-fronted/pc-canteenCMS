@@ -92,7 +92,7 @@
       :visible.sync="newRoleDialogVisible"
       width="60%"
       center
-      title="新增角色"
+      :title="isEdit ?'编辑角色' :'新增角色'"
       @close="closeNewRoleDialog"
     >
       <el-row :gutter="20">
@@ -118,7 +118,7 @@
                 ></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="可见饭堂" prop="canteen" v-if="!isEdit">
+            <el-form-item label="可见饭堂" prop="canteen"  v-if="!isEdit">
               <el-checkbox-group v-model="roleForm.canteens">
                 <el-checkbox
                   class="canteenCheckbox"
@@ -213,9 +213,11 @@ export default {
       isConfirmRules: false
     };
   },
-  created() {
-    this.getCompanies();
-    this.fetchList();
+  async created() {
+    if(!this.grade) {
+    await this.getCompanies();
+    }
+    await this.fetchList();
   },
   computed: {
     companiesVisible() {
@@ -233,7 +235,7 @@ export default {
       }
     },
     async fetchList(page) {
-      page = page || 1;
+      page = Number(page) || 1;
       const res = await $axios.get(
         "http://canteen.tonglingok.com/api/v1/roles?page=" +
           page +
@@ -303,6 +305,7 @@ export default {
       this.roleForm.canteens = JSON.stringify(newCanteen);
       this.roleForm.rules = this.roleForm.rules.toString();
       if (this.isEdit) {
+        console.log(this.roleForm);
         this.roleForm.canteen = []; //没有字段不传
         res = await $axios.post(
           "http://canteen.tonglingok.com/api/v1/role/update",
@@ -325,7 +328,10 @@ export default {
     async _edit(row) {
       this.isConfirmRules = false;
       this.isEdit = true;
-      this.roleForm = Object.assign({}, row);
+      await this.getCanteenList(row.company_id);
+      let canteens = [];
+      row.canteen.forEach((item)=> canteens.push({id:item.admin_id, name:item.canteen_name}));
+      this.roleForm = Object.assign({}, row, {canteens});
       let id = row.id;
       const res = await this.getEditRole(id);
       if (res.msg === "ok") {

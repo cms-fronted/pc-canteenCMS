@@ -615,30 +615,27 @@ export default {
       this.machineForm = Object.assign({}, row);
       this.addMachineVisible = true;
     },
-    _submitMachineInfo() {
+    async _submitMachineInfo() {
       //新增硬件
       if (!this.isEditMachine) {
         this.machineForm.belong_id = this.formdata.id || this.canteen_id;
         this.machineForm.company_id = this.company_id;
         this.machineForm.machine_type = "canteen";
-        console.log(this.machineForm);
-        $axios
-          .post(
-            "http://canteen.tonglingok.com/api/v1/canteen/saveMachine",
-            this.machineForm
-          )
-          .then(res => {
-            if (res.msg === "ok") {
-              this.$emit(
-                "updateMachineTable",
-                { id: this.canteen_id || this.formdata.id },
-                "canteen"
-              );
-              this.$message.success("添加成功");
-            }
-            this.closeMachineDialog();
-          })
-          .catch(err => console.log(err));
+        const res = await $axios.post(
+          "http://canteen.tonglingok.com/api/v1/canteen/saveMachine",
+          this.machineForm
+        );
+        if (res.msg === "ok") {
+          await this.$emit(
+            "updateMachineTable",
+            { id: this.canteen_id || this.formdata.id },
+            "canteen"
+          );
+          this.$message.success("添加成功");
+        } else {
+          this.$message.error(res.msg);
+        }
+        this.closeMachineDialog();
       } else {
         $axios
           .post(

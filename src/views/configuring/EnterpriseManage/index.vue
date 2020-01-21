@@ -42,11 +42,13 @@
                     </span>
                     <span class="btns-text">
                       <el-button
+                        v-if="node.level != 1 || grade == 1"
                         type="text"
                         size="mini"
                         @click="() => editEnterpriseDialog(node, data)"
                         >编辑</el-button
                       >
+
                       <el-button
                         type="text"
                         size="mini"
@@ -417,7 +419,7 @@ export default {
       this.editForm = val;
       this.canteenDialogTitle = "编辑饭堂";
       const data = await this.getCanteenConfig(id);
-      this.getMachineList(val, "canteen");
+      await this.getMachineList(val, "canteen");
       if (data.msg === "ok") {
         this.editForm.dinnersList = data.dinners;
       }
@@ -429,7 +431,7 @@ export default {
       this.editForm = val;
       this.isEdit = true;
       this.shopDialogTitle = "编辑小卖部";
-      this.getMachineList(val, "shop");
+      await this.getMachineList(val, "shop");
       this.addShopVisible = true;
     },
     async getMachineList(val, type) {
