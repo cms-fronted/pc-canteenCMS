@@ -101,7 +101,7 @@
             >
           </template>
         </el-table-column>
-        <el-table-column label="操作" width="80px">
+        <el-table-column label="操作">
           <template slot-scope="scoped">
             <span>
               <el-button type="text" @click="_editSetting(scoped.row)"
@@ -302,11 +302,56 @@
               >
             </template>
           </el-table-column>
+          <el-table-column labell="操作">
+            <template slot-scope="scoped">
+              <el-button type="text" @click="_editStrategy(scoped.row)"
+                >编辑</el-button
+              >
+              <el-button
+                type="text"
+                @click="_delete(scoped.row)"
+                style="margin-left:10px"
+                >删除</el-button
+              >
+            </template>
+          </el-table-column>
         </el-table>
       </el-card>
       <span slot="footer" class="dialog-footer">
         <el-button @click="_closeEditSettingDialog">取 消</el-button>
         <el-button type="primary" @click="changeSetting">确 定</el-button>
+      </span>
+    </el-dialog>
+
+    <el-dialog :visible="strategyDetailVisible" append-to-body width="30%">
+      <el-form :model="rowDetailForm">
+        <el-form-item label="次数类型">
+          <p>第{{ rowDetailForm.number }}次</p>
+        </el-form-item>
+        <el-form-item :label="rowDetailForm.status | consumptionType">
+          <span>
+            标准金额
+            <el-input
+              style="width:100px"
+              size="mini"
+              type="number"
+              v-model="rowDetailForm.money"
+            />
+          </span>
+          <span>
+            附加金额
+            <el-input
+              style="width:100px"
+              size="mini"
+              type="number"
+              v-model="rowDetailForm.sub_money"
+            />
+          </span>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="_cloeseRowDtailDialog">取 消</el-button>
+        <el-button type="primary" @click="_changeRowDetail">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -323,7 +368,9 @@ export default {
       settingDialogVisible: false,
       changeSettingVisible: false,
       addCountVisible: false,
+      strategyDetailVisible: false,
       isEdit: false,
+      strategyRowIndex: null,
       queryForm: {
         company_id: "",
         c_id: ""
@@ -339,6 +386,7 @@ export default {
         unordered_meals: ""
       },
       editSettingForm: {},
+      rowDetailForm: {},
       detail: [],
       detailStrategy: [],
       countDetailForm: {},
@@ -627,7 +675,81 @@ export default {
       });
       this.dataList = _data;
     },
+    _editStrategy(row) {
+      console.log(this.detailStrategy);
+      this.rowDetailForm = Object.assign({}, row);
+      this.strategyDetailVisible = true;
+      this.strategyRowIndex = this.detailStrategy.findIndex(item => {
+        return item.status === row.status && item.number == row.number;
+      });
 
+      // this.$set(this.detailStrategy,index, {
+      //   number:row.number,
+      //   status: row.status,
+      //   sub_money:5,
+      //   money:55
+      // })
+    },
+    _changeRowDetail() {
+      const obj = this.rowDetailForm;
+      obj.number = this.detailStrategy[this.strategyRowIndex].number;
+      this.$set(this.detailStrategy, this.strategyRowIndex, obj);
+      this.getDetail();
+      this._cloeseRowDtailDialog();
+    },
+    _cloeseRowDtailDialog() {
+      this.strategyDetailVisible = false;
+      this.rowDetailForm = {};
+      this.strategyRowIndex = null;
+    },
+    _delete(row) {
+      this.detailStrategy = this.detailStrategy.filter(
+        item => item.number !== row.number
+      );
+this.getDetail()
+      // let detailArr = [];
+      // this.detailStrategy.forEach((item, index) => {
+      //   let number = Math.ceil((index + 1) / 3);
+      //   item.number = number;
+      // });
+      // for (let i = 1; i <= this.detailStrategy.length / 3; i++) {
+      //   detailArr.push({ number: i, strategy: [] });
+      // }
+      // detailArr.forEach(i => {
+      //   this.detailStrategy.forEach(j => {
+      //     if (i.number === j.number) {
+      //       i.strategy.push({
+      //         status: j.status,
+      //         sub_money: j.sub_money,
+      //         money: j.money
+      //       });
+      //     }
+      //   });
+      // });
+      // this.detail = detailArr;
+    },
+    getDetail() {
+         let detailArr = [];
+      this.detailStrategy.forEach((item, index) => {
+        let number = Math.ceil((index + 1) / 3);
+        item.number = number;
+      });
+      for (let i = 1; i <= this.detailStrategy.length / 3; i++) {
+        detailArr.push({ number: i, strategy: [] });
+      }
+      detailArr.forEach(i => {
+        this.detailStrategy.forEach(j => {
+          if (i.number === j.number) {
+            i.strategy.push({
+              status: j.status,
+              sub_money: j.sub_money,
+              money: j.money
+            });
+          }
+        });
+      });
+      this.detail = detailArr;
+    },
     rowspan(idx, prop) {
       this.spanArr[idx] = [];
       this.position = 0;
