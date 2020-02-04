@@ -276,6 +276,7 @@ export default {
         this.queryForm.dinner_id = 0;
         this.categoryList = [{ name: "全部", id: 0 }];
         this.queryForm.m_id = 0;
+        await this.getLocationList(this.companyList[0].id);
       }
     },
     async getLocationList(company_id) {

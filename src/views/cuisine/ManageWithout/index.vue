@@ -260,21 +260,22 @@ export default {
         .catch(err => console.log(err));
     },
     async getCompanies() {
-      await $axios
-        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
-        .then(res => {
-          let arr = res.data;
-          let companiesList = flatten(arr);
-          this.companyList = getAllOptions(companiesList);
-          this.queryForm.company_id = this.companyList[0].id;
-          this.locationList = [{ name: "全部", id: 0 }];
-          this.queryForm.canteen_id = 0;
-          this.dinnersList = [{ name: "全部", id: 0 }];
-          this.queryForm.dinner_id = 0;
-          this.categoryList = [{ name: "全部", id: 0 }];
-          this.queryForm.m_id = 0;
-        })
-        .catch(err => console.log(err));
+      const res = await $axios.get(
+        "http://canteen.tonglingok.com/api/v1/admin/companies"
+      );
+      if (res.msg === "ok") {
+        let arr = res.data;
+        let companiesList = flatten(arr);
+        this.companyList = getAllOptions(companiesList);
+        this.queryForm.company_id = this.companyList[0].id;
+        this.locationList = [{ name: "全部", id: 0 }];
+        this.queryForm.canteen_id = 0;
+        this.dinnersList = [{ name: "全部", id: 0 }];
+        this.queryForm.dinner_id = 0;
+        this.categoryList = [{ name: "全部", id: 0 }];
+        this.queryForm.m_id = 0;
+        await this.getLocationList(this.companyList[0].id);
+      }
     },
     async getLocationList(company_id) {
       let res = null;

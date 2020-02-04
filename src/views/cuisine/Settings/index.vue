@@ -71,7 +71,7 @@
                 style="margin:2px"
                 type="danger"
                 @click="_delete(scope.row)"
-                >Delete</el-button
+                >删除</el-button
               >
             </template>
           </el-table-column>
