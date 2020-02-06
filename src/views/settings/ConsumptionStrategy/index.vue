@@ -380,7 +380,7 @@ export default {
   methods: {
     async getCompanies() {
       await $axios
-        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
+        .get("https://tonglingok.com/canteen/api/v1/admin/companies")
         .then(res => {
           let arr = res.data;
           this.companiesList = flatten(arr);
@@ -393,7 +393,7 @@ export default {
       if (company_id) {
         await $axios
           .get(
-            `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
+            `https://tonglingok.com/canteen/api/v1/canteens?company_id=${company_id}`
           )
           .then(res => {
             this.canteenList = Array.from(res.data);
@@ -402,7 +402,7 @@ export default {
           .catch(err => console.log(err));
       } else {
         await $axios
-          .get("http://canteen.tonglingok.com/api/v1/managerCanteens")
+          .get("https://tonglingok.com/canteen/api/v1/managerCanteens")
           .then(res => {
             this.canteenList = Array.from(res.data);
             this.dialogCanteenList = Array.from(res.data);
@@ -416,7 +416,7 @@ export default {
       this.newSettingForm.t_id = "";
       await $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/company/consumptionLocation?company_id=${company_id}`
+          `https://tonglingok.com/canteen/api/v1/company/consumptionLocation?company_id=${company_id}`
         )
         .then(res => {
           this.dialogCanteenList = Array.from(res.data.canteen);
@@ -427,7 +427,7 @@ export default {
       page = Number(page) || 1;
       let data = await $axios
         .get(
-          "http://canteen.tonglingok.com/api/v1/canteen/consumptionStrategy",
+          "https://tonglingok.com/canteen/api/v1/canteen/consumptionStrategy",
           {
             c_id: this.queryForm.c_id,
             page: page,
@@ -444,7 +444,7 @@ export default {
     },
     async getRoleType() {
       await $axios
-        .get("http://canteen.tonglingok.com/api/v1/role/types")
+        .get("https://tonglingok.com/canteen/api/v1/role/types")
         .then(res => (this.roleTypeList = Array.from(res.data.data)));
     },
     async _addNewSetting() {
@@ -452,12 +452,12 @@ export default {
       if (this.isEdit) {
         this.newSettingForm.detail = JSON.stringify(this.newSettingForm.detail);
         res = await $axios.post(
-          "http://canteen.tonglingok.com/api/v1/canteen/consumptionStrategy/update",
+          "https://tonglingok.com/canteen/api/v1/canteen/consumptionStrategy/update",
           this.newSettingForm
         );
       } else {
         res = await $axios.post(
-          "http://canteen.tonglingok.com/api/v1/canteen/consumptionStrategy/save",
+          "https://tonglingok.com/canteen/api/v1/canteen/consumptionStrategy/save",
           this.newSettingForm
         );
       }
@@ -548,7 +548,7 @@ export default {
       this.editSettingForm.consumption_count = this.detail.length;
       this.editSettingForm.detail = JSON.stringify(this.detail);
       const res = await $axios.post(
-        "http://canteen.tonglingok.com/api/v1/canteen/consumptionStrategy/update",
+        "https://tonglingok.com/canteen/api/v1/canteen/consumptionStrategy/update",
         this.editSettingForm
       );
       if (res.msg === "ok") {

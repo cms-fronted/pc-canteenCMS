@@ -13,48 +13,33 @@
             prefix-icon="el-icon-search"
             style="width:180px"
           ></el-input>
-          <el-button
-            type="primary"
-            @click="fetchPersonnelList"
-            style="margin-left:10px"
-            >查询</el-button
-          >
+          <el-button type="primary" @click="fetchPersonnelList" style="margin-left:10px">查询</el-button>
           <span class="content-header">充值金额</span>
-          <el-input
-            v-model="money"
-            placeholder="请输入"
-            style="width:180px"
-          ></el-input>
+          <el-input v-model="money" placeholder="请输入" style="width:180px"></el-input>
           <span class="content-header">备注</span>
-          <el-input
-            v-model="remark"
-            placeholder="请输入"
-            style="width:180px"
-          ></el-input>
-          <el-button type="primary" @click="recharge" style="margin-left:10px"
-            >充值</el-button
-          >
+          <el-input v-model="remark" placeholder="请输入" style="width:180px"></el-input>
+          <el-button type="primary" @click="recharge" style="margin-left:10px">充值</el-button>
           <!-- <el-button type="primary" @click="batchRecharge">批量充值</el-button> -->
           <el-upload
             class="upload-excel upload"
             ref="upload"
             :limit="limit"
             :headers="header"
-            accept=".xls,.xlsx"
-            action="http://canteen.tonglingok.com/api/v1/wallet/recharge/upload"
+            accept=".xls, .xlsx"
+            action="https://tonglingok.com/canteen/api/v1/wallet/recharge/upload"
             :show-file-list="false"
             :on-success="handleSuccess"
             name="cash"
           >
-            <el-button type="primary" style="margin-left:10px"
-              >批量充值</el-button
-            >
+            <el-button type="primary" style="margin-left:10px">批量充值</el-button>
           </el-upload>
+          <el-button @click="downloadTemplate" style="margin-left:10px">模板下载</el-button>
         </div>
         <div class="total" v-show="total > 0">
-          <span
-            >共有 <strong>{{ total }}</strong> 条记录</span
-          >
+          <span>
+            共有
+            <strong>{{ total }}</strong> 条记录
+          </span>
         </div>
         <div class="main-content clearfix">
           <div class="department-tree">
@@ -74,7 +59,7 @@
               border
               @selection-change="handleSelectionChange"
             >
-              <el-table-column type="selection" width="55"> </el-table-column>
+              <el-table-column type="selection" width="55"></el-table-column>
               <el-table-column label="公司" prop="company"></el-table-column>
               <el-table-column label="部门" prop="department"></el-table-column>
               <el-table-column label="员工编号" prop="code"></el-table-column>
@@ -144,10 +129,10 @@ export default {
       }
     },
     async fetchDepartmentList() {
-      // 先默认获取 c_id为2的公司的部门列表 到时需要修改成 http://canteen.tonglingok.com/api/v1/departments/recharge
-      // get("http://canteen.tonglingok.com/api/v1/departments?c_id=2") http://canteen.tonglingok.com/api/v1/departments/recharge
+      // 先默认获取 c_id为2的公司的部门列表 到时需要修改成 https://tonglingok.com/canteen/api/v1/departments/recharge
+      // get("https://tonglingok.com/canteen/api/v1/departments?c_id=2") https://tonglingok.com/canteen/api/v1/departments/recharge
       await $axios
-        .get("http://canteen.tonglingok.com/api/v1/departments/recharge")
+        .get("https://tonglingok.com/canteen/api/v1/departments/recharge")
         .then(res => {
           // console.log(res)
           this.departmentList = res.data;
@@ -171,9 +156,9 @@ export default {
     fetchPersonnelList(val) {
       $axios
         .get(
-          "http://canteen.tonglingok.com/api/v1/department/staffs/recharge",
+          "https://tonglingok.com/canteen/api/v1/department/staffs/recharge",
           {
-            page: Number(val)||1,
+            page: Number(val) || 1,
             size: 10,
             department_id: this.department_id,
             key: this.key
@@ -193,8 +178,11 @@ export default {
       });
     },
     recharge() {
+      if (!this.money) {
+        return this.$message.error("请输入充值金额");
+      }
       $axios
-        .post("http://canteen.tonglingok.com/api/v1/wallet/recharge/cash", {
+        .post("https://tonglingok.com/canteen/api/v1/wallet/recharge/cash", {
           money: this.money,
           remark: this.remark,
           detail: JSON.stringify(this.detail)
@@ -208,6 +196,11 @@ export default {
       // this.$refs.upload.clearFiles();
       this.sendMessage(res.msg);
     },
+    downloadTemplate() {
+      window.open(
+        "http://canteen.tonglingok.com/static/excel/template/批量现金充值模板.xlsx"
+      );
+    }
     // getList(val) {
     //   this.current_page = val;
     //   this.fetchTableList(val);

@@ -196,7 +196,7 @@ export default {
   methods: {
     async getCompanies() {
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/admin/companies"
+        "https://tonglingok.com/canteen/api/v1/admin/companies"
       );
       if (res.msg === "ok") {
         this.companyOptions = flatten(res.data);
@@ -207,7 +207,7 @@ export default {
     async getCanteenOptions(c_id) {
       let company_id = c_id || localStorage.getItem("company_id");
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
+        `https://tonglingok.com/canteen/api/v1/canteens?company_id=${company_id}`
       );
       if (res.msg === "ok") {
         this.canteenOptions = Array.from(res.data);
@@ -218,14 +218,14 @@ export default {
     async exportFile(row) {
       let id = row.id;
       this.$exportExcel(
-        "http://canteen.tonglingok.com/api/v1/material/exportMaterialReports",
+        "https://tonglingok.com/canteen/api/v1/material/exportMaterialReports",
         { report_id: id }
       );
     },
     async queryList(page) {
       page = page || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/material/reports?page=${page}&size=${
+        `https://tonglingok.com/canteen/api/v1/order/material/reports?page=${page}&size=${
           this.size
         }`,
         this.queryForm
@@ -239,7 +239,7 @@ export default {
     async getDetailList(page) {
       page = page || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/material/report?page=${page}&size=${
+        `https://tonglingok.com/canteen/api/v1/order/material/report?page=${page}&size=${
           this.detailSize
         }&id=${this.detailForm.id}`
       );
@@ -273,7 +273,7 @@ export default {
       })
         .then(async () => {
           const res = await $axios.post(
-            "http://canteen.tonglingok.com/api/v1/order/material/report/delete",
+            "https://tonglingok.com/canteen/api/v1/order/material/report/delete",
             {
               id
             }

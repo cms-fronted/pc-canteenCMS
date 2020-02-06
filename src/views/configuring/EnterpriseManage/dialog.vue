@@ -445,7 +445,7 @@ export default {
     async addCanteen() {
       let loading = Loading.service({ text: "拼命加载中" });
       await $axios
-        .post("http://canteen.tonglingok.com/api/v1/canteen/save", {
+        .post("https://tonglingok.com/canteen/api/v1/canteen/save", {
           canteens: this.trim(this.canteens),
           c_id: this.company_id
         })
@@ -502,7 +502,7 @@ export default {
           .then(async () => {
             this.dataTable = this.dataTable.filter(item => item !== row);
             const res = await $axios.post(
-              "http://canteen.tonglingok.com/api/v1/canteen/dinner/delete",
+              "https://tonglingok.com/canteen/api/v1/canteen/dinner/delete",
               {
                 dinner_id: row.id
               }
@@ -549,8 +549,8 @@ export default {
         data.c_id = this.canteen_id;
       }
       const url = !this.isEdit
-        ? "http://canteen.tonglingok.com/api/v1/canteen/configuration/save"
-        : "http://canteen.tonglingok.com/api/v1/canteen/configuration/update";
+        ? "https://tonglingok.com/canteen/api/v1/canteen/configuration/save"
+        : "https://tonglingok.com/canteen/api/v1/canteen/configuration/update";
       $axios
         .post(url, data)
         .then(res => {
@@ -592,7 +592,7 @@ export default {
       })
         .then(async () => {
           const res = await $axios.post(
-            "http://canteen.tonglingok.com/api/v1/canteen/deleteMachine",
+            "https://tonglingok.com/canteen/api/v1/canteen/deleteMachine",
             { id }
           );
           if (res.msg === "ok") {
@@ -622,7 +622,7 @@ export default {
         this.machineForm.company_id = this.company_id;
         this.machineForm.machine_type = "canteen";
         const res = await $axios.post(
-          "http://canteen.tonglingok.com/api/v1/canteen/saveMachine",
+          "https://tonglingok.com/canteen/api/v1/canteen/saveMachine",
           this.machineForm
         );
         if (res.msg === "ok") {
@@ -639,7 +639,7 @@ export default {
       } else {
         $axios
           .post(
-            "http://canteen.tonglingok.com/api/v1/canteen/updateMachine",
+            "https://tonglingok.com/canteen/api/v1/canteen/updateMachine",
             this.machineForm
           )
           .then(res => {

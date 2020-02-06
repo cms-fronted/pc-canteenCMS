@@ -493,11 +493,12 @@ export const asyncRoutes = [
   {
     path: "/takeOut",
     redirect: "/takeOut/index",
+    name:"TakeOut",
     component: Layout,
     children: [
       {
         path: "index",
-        name: "TakeOut",
+        name: "TakeOut-index",
         component: () => import("@/views/takeout"),
         meta: {
           title: "外卖管理",

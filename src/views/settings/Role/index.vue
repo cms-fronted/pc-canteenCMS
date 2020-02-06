@@ -92,7 +92,7 @@
       :visible.sync="newRoleDialogVisible"
       width="60%"
       center
-      :title="isEdit ?'编辑角色' :'新增角色'"
+      :title="isEdit ? '编辑角色' : '新增角色'"
       @close="closeNewRoleDialog"
     >
       <el-row :gutter="20">
@@ -118,7 +118,7 @@
                 ></el-option>
               </el-select>
             </el-form-item>
-            <el-form-item label="可见饭堂" prop="canteen"  v-if="!isEdit">
+            <el-form-item label="可见饭堂" prop="canteens">
               <el-checkbox-group v-model="roleForm.canteens">
                 <el-checkbox
                   class="canteenCheckbox"
@@ -194,7 +194,6 @@ export default {
   data() {
     return {
       grade: store.getters.grade,
-      grade: 3,
       modulesDialogType: "role",
       isEdit: false,
       newRoleDialogVisible: false,
@@ -205,6 +204,7 @@ export default {
       },
       companyOptions: [],
       canteenGroup: [],
+      haveCanteen: [],
       datatable: [],
       current_page: 1,
       total: 0,
@@ -214,8 +214,8 @@ export default {
     };
   },
   async created() {
-    if(!this.grade) {
-    await this.getCompanies();
+    if (this.grade !== 3) {
+      await this.getCompanies();
     }
     await this.fetchList();
   },
@@ -227,7 +227,7 @@ export default {
   methods: {
     async getCompanies() {
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/admin/companies",
+        "https://tonglingok.com/canteen/api/v1/admin/companies",
         this.queryForm
       );
       if (res.msg === "ok") {
@@ -237,7 +237,7 @@ export default {
     async fetchList(page) {
       page = Number(page) || 1;
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/roles?page=" +
+        "https://tonglingok.com/canteen/api/v1/roles?page=" +
           page +
           "&size=" +
           this.size,
@@ -252,7 +252,7 @@ export default {
     async getCanteenList(c_id) {
       let company_id = c_id || "";
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/company/consumptionLocation?company_id=${company_id}`
+        `https://tonglingok.com/canteen/api/v1/company/consumptionLocation?company_id=${company_id}`
       );
       if (res.msg === "ok") {
         this.canteenGroup = Array.from(res.data.canteen);
@@ -261,14 +261,18 @@ export default {
     },
     async getCanteenModules(company_id) {
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/modules/canteen/withoutSystem?company_id=${company_id}`
+        `https://tonglingok.com/canteen/api/v1/modules/canteen/withoutSystem?company_id=${company_id}`
       );
       if (res.msg === "ok") {
         this.modules = Array.from(res.data);
       }
       return res;
     },
-    openNewRoleDialog() {
+    async openNewRoleDialog() {
+      // if (this.grade == 3) {
+      //   let c_id = localStorage.getItem("company_id");
+      //   await this.getCanteenList(c_id);
+      // }
       this.newRoleDialogVisible = true;
       this.roleForm = { canteens: [], rules: [] };
       this.isConfirmRules = false;
@@ -276,7 +280,6 @@ export default {
     closeNewRoleDialog() {
       this.isEdit = false;
       this.roleForm = { canteens: [], rules: [] };
-      // this.roleForm = {};
       this.modules = [];
       this.newRoleDialogVisible = false;
     },
@@ -291,29 +294,63 @@ export default {
       let canteens = [];
       let res = null;
       let newCanteen = [];
+      delete this.roleForm.phone;
+      delete this.roleForm.company;
+      delete this.roleForm.company_id;
+      delete this.roleForm.create_time;
       if (!this.isConfirmRules) {
         this.$message.warning("请先确定角色模块");
         return;
       }
-      canteens = this.roleForm.canteens ? this.roleForm.canteens : [];
-      canteens.forEach(item => {
-        newCanteen.push({
-          c_id: item.id,
-          name: item.name
-        });
-      });
-      this.roleForm.canteens = JSON.stringify(newCanteen);
       this.roleForm.rules = this.roleForm.rules.toString();
+      if (!this.roleForm.rules) {
+        delete this.roleForm.rules;
+      }
       if (this.isEdit) {
-        console.log(this.roleForm);
+        let canteensChecked = this.roleForm.canteens;
+        let haveCanteenId = this.haveCanteen.map(item => item.canteen_id);
+        canteensChecked = canteensChecked.map(item => item.id);
+        let add = [];
+        let cancel = [];
+        this.haveCanteen.forEach(item => {
+          if (!canteensChecked.includes(item.canteen_id)) {
+            cancel.push(item.id);
+          }
+        });
+        canteensChecked.forEach(id => {
+          if (haveCanteenId.indexOf(id) === -1) {
+            let addCanteen = this.roleForm.canteens.filter(
+              item => item.id === id
+            );
+            add.push({
+              c_id: addCanteen[0].id,
+              name: addCanteen[0].name
+            });
+          }
+        });
+        cancel = Array.from(new Set(cancel)).toString();
+        canteens.push({
+          add,
+          cancel
+        });
+
+        this.roleForm.canteens = JSON.stringify(canteens[0]);
         this.roleForm.canteen = []; //没有字段不传
         res = await $axios.post(
-          "http://canteen.tonglingok.com/api/v1/role/update",
+          "https://tonglingok.com/canteen/api/v1/role/update",
           this.roleForm
         );
       } else {
+        canteens = this.roleForm.canteens ? this.roleForm.canteens : [];
+        canteens.forEach(item => {
+          newCanteen.push({
+            c_id: item.id,
+            name: item.name
+          });
+        });
+        this.roleForm.canteens = JSON.stringify(newCanteen);
         res = await $axios.post(
-          "http://canteen.tonglingok.com/api/v1/role/save",
+          "https://tonglingok.com/canteen/api/v1/role/save",
           this.roleForm
         );
       }
@@ -330,8 +367,21 @@ export default {
       this.isEdit = true;
       await this.getCanteenList(row.company_id);
       let canteens = [];
-      row.canteen.forEach((item)=> canteens.push({id:item.admin_id, name:item.canteen_name}));
-      this.roleForm = Object.assign({}, row, {canteens});
+      //当前可见饭堂
+      this.roleForm = Object.assign({}, row, { canteens });
+      let canteenChecked = row.canteen.map(item => item.canteen_id);
+      canteenChecked.filter(id => {
+        this.canteenGroup.forEach(item => {
+          if (item.id === id) {
+            this.roleForm.canteens.push(item);
+          }
+        });
+      });
+      this.haveCanteen = row.canteen;
+      this.roleForm = Object.assign({}, this.roleForm);
+      // row.canteen.forEach(item =>
+      //   canteens.push({ id: item.canteen_id, name: item.canteen_name })
+      // );
       let id = row.id;
       const res = await this.getEditRole(id);
       if (res.msg === "ok") {
@@ -347,7 +397,7 @@ export default {
         state = 1;
       }
       const res = await $axios.post(
-        "http://canteen.tonglingok.com/api/v1/role/handel",
+        "https://tonglingok.com/canteen/api/v1/role/handel",
         {
           id: row.id,
           state: state
@@ -393,7 +443,7 @@ export default {
     },
     async getEditRole(id) {
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/role?id=${id}`
+        `https://tonglingok.com/canteen/api/v1/role?id=${id}`
       );
       return res;
     },
@@ -405,7 +455,7 @@ export default {
       })
         .then(async () => {
           const res = await $axios.post(
-            "http://canteen.tonglingok.com/api/v1/role/handel",
+            "https://tonglingok.com/canteen/api/v1/role/handel",
             {
               id: row.id,
               state: 3

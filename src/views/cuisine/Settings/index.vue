@@ -21,11 +21,7 @@
           />
         </el-select>
         <span class="content-header">消费地点：</span>
-        <el-select
-          v-model="canteen_id"
-          placeholder="请选择"
-          style="width:150px"
-        >
+        <el-select v-model="canteen_id" placeholder="请选择" style="width:150px">
           <el-option
             v-for="item in locationList"
             :key="item.id"
@@ -33,17 +29,11 @@
             :value="item.id"
           />
         </el-select>
-        <el-button @click="AddVisible = true" style="margin-left:10px"
-          >新增</el-button
-        >
+        <el-button @click="AddVisible = true" style="margin-left:10px">新增</el-button>
         <el-button @click="fetchTableList(1)">查询</el-button>
       </div>
       <div class="main-content">
-        <el-table
-          style="width:100%"
-          :data="tableList"
-          :span-method="objectSpanMethod"
-        >
+        <el-table style="width:100%" :data="tableList" :span-method="objectSpanMethod">
           <el-table-column label="公司级别" prop="grade" />
           <el-table-column label="公司名称" prop="company_name" />
           <el-table-column label="消费地点" prop="canteen_name" />
@@ -52,27 +42,16 @@
           <el-table-column label="状态">
             <template slot-scope="scope">
               <el-radio-group v-model="scope.row.status" disabled>
-                <el-radio :label="1">固定</el-radio>
-                <el-radio :label="2">动态</el-radio>
+                <el-radio :label="1" style="margin:2px">固定</el-radio>
+                <el-radio :label="2" style="margin:2px">动态</el-radio>
               </el-radio-group>
             </template>
           </el-table-column>
           <el-table-column label="可选菜品" prop="number" />
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <el-button
-                size="mini"
-                style="margin:2px"
-                @click="_edit(scope.row)"
-                >编辑</el-button
-              >
-              <el-button
-                size="mini"
-                style="margin:2px"
-                type="danger"
-                @click="_delete(scope.row)"
-                >Delete</el-button
-              >
+              <el-button size="mini" style="margin:2px" @click="_edit(scope.row)">编辑</el-button>
+              <el-button size="mini" style="margin:2px" type="danger" @click="_delete(scope.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -84,18 +63,10 @@
         />
       </div>
     </div>
-    <el-dialog
-      :visible.sync="AddVisible"
-      title="新增菜单"
-      @close="closeNewMenu"
-    >
+    <el-dialog :visible.sync="AddVisible" title="新增菜单" @close="closeNewMenu">
       <el-form ref="addMenuForm" :model="menuForm" label-width="100px">
         <el-form-item label="饭堂">
-          <el-select
-            v-model="menuForm.c_id"
-            placeholder="请选择"
-            @change="getDinnersList"
-          >
+          <el-select v-model="menuForm.c_id" placeholder="请选择" @change="getDinnersList">
             <el-option
               v-for="item in locationList"
               :key="item.id"
@@ -115,16 +86,8 @@
           </el-select>
         </el-form-item>
         <el-form-item label="菜类">
-          <div
-            v-for="(item, index) in listObj"
-            :key="index"
-            style="margin:5px 0"
-          >
-            <el-input
-              v-model="item.category"
-              :disabled="item.disabled"
-              style="width:150px"
-            />
+          <div v-for="(item, index) in listObj" :key="index" style="margin:5px 0">
+            <el-input v-model="item.category" :disabled="item.disabled" style="width:150px" />
             <el-button
               @click.prevent="removeInput(item)"
               icon="el-icon-delete"
@@ -233,7 +196,7 @@ export default {
   methods: {
     async getCompanies() {
       await $axios
-        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
+        .get("https://tonglingok.com/canteen/api/v1/admin/companies")
         .then(res => {
           let arr = res.data;
           let allCompanies = [];
@@ -264,11 +227,11 @@ export default {
       if (!isNaN(company_id)) {
         if (company_id) {
           res = await $axios.get(
-            `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
+            `https://tonglingok.com/canteen/api/v1/canteens?company_id=${company_id}`
           );
         } else {
           res = await $axios.get(
-            "http://canteen.tonglingok.com/api/v1/managerCanteens"
+            "https://tonglingok.com/canteen/api/v1/managerCanteens"
           );
           this.company_id = localStorage.company_id;
         }
@@ -285,7 +248,7 @@ export default {
     },
     async getDinnersList(canteen_id) {
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
+        `https://tonglingok.com/canteen/api/v1/canteen/dinners?canteen_id=${canteen_id}`
       );
       if (res.msg == "ok") {
         this.dinnerList = Array.from(res.data);
@@ -341,7 +304,7 @@ export default {
     },
     async addNewMenu() {
       const res = await $axios.post(
-        "http://canteen.tonglingok.com/api/v1/menu/save",
+        "https://tonglingok.com/canteen/api/v1/menu/save",
         this.menuForm
       );
       if (res.msg === "ok") {
@@ -360,9 +323,7 @@ export default {
     async fetchTableList(page) {
       page = typeof page == "number" ? page : 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/menus/company?company_id=${
-          this.company_id
-        }&canteen_id=${this.canteen_id}&size=${this.size}&page=${page}`
+        `https://tonglingok.com/canteen/api/v1/menus/company?company_id=${this.company_id}&canteen_id=${this.canteen_id}&size=${this.size}&page=${page}`
       );
       if (res.msg == "ok") {
         let _data = Array.from(res.data.data);
@@ -419,7 +380,7 @@ export default {
     },
     async getCanteenDetail(canteen_id) {
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/menus/canteen?canteen_id=${canteen_id}`
+        `https://tonglingok.com/canteen/api/v1/menus/canteen?canteen_id=${canteen_id}`
       );
       if (res.msg == "ok") {
         this.canteen_detail = Array.from(res.data);
@@ -444,7 +405,7 @@ export default {
       })
         .then(async () => {
           const res = await $axios.post(
-            "http://canteen.tonglingok.com/api/v1/menu/save",
+            "https://tonglingok.com/canteen/api/v1/menu/save",
             formdata
           );
           if (res.msg === "ok") {
@@ -479,7 +440,7 @@ export default {
       detail = JSON.stringify(detail);
       let formdata = { c_id: canteen_id, d_id: dinner_id, detail: detail };
       const res = await $axios.post(
-        "http://canteen.tonglingok.com/api/v1/menu/save",
+        "https://tonglingok.com/canteen/api/v1/menu/save",
         formdata
       );
       if (res.msg === "ok") {
@@ -526,4 +487,8 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.flex-radio {
+  display: flex;
+}
+</style>

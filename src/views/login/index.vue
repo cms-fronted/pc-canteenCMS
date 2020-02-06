@@ -19,11 +19,11 @@
       </transition>
     </div>
     <div class="loginBox">
-      <h2 class="loginH2"><strong>Vue</strong> 云饭堂后台管理系统</h2>
+      <h2 class="loginH2">云饭堂后台管理系统</h2>
       <div class="loginCon">
         <div class="titleDiv">
-          <h3>Sign up now</h3>
-          <p>Enter your username and password to log on:</p>
+          <h3>马上登录</h3>
+          <p>请使用企业账号密码登录：</p>
           <i class="el-icon-key"></i>
         </div>
         <el-form ref="loginForm" :rules="rules" :model="ruleForm">

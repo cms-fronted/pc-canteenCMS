@@ -62,7 +62,7 @@ export default {
   methods: {
     async getCompanies() {
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/admin/companies"
+        "https://tonglingok.com/canteen/api/v1/admin/companies"
       );
       if (res.msg === "ok") {
         this.companyOptions = flatten(res.data);
@@ -71,7 +71,7 @@ export default {
     },
     async getModuleWithoutSystem() {
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/modules/canteen/withoutSystem?company_id=" +
+        "https://tonglingok.com/canteen/api/v1/modules/canteen/withoutSystem?company_id=" +
           this.c_id
       );
       if (res.msg === "ok") {
@@ -80,7 +80,7 @@ export default {
     },
     async changeCategory(row) {
       const res = await $axios.post(
-        "http://canteen.tonglingok.com/api/v1/canteen/module/category",
+        "https://tonglingok.com/canteen/api/v1/canteen/module/category",
         {
           c_m_id: row.c_m_id,
           category: row.category === 1 ? 2 : 1

@@ -132,7 +132,7 @@ export default {
   methods: {
     async getSupplierList() {
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/company/suppliers"
+        "https://tonglingok.com/canteen/api/v1/company/suppliers"
       );
       if (res.msg === "ok") {
         this.supplierOptions = unshiftAllOptions(Array.from(res.data));
@@ -141,14 +141,14 @@ export default {
     },
     async exportFile() {
       await this.$exportExcel(
-        "http://canteen.tonglingok.com/api/v1/shop/order/exportSalesReport/manager",
+        "https://tonglingok.com/canteen/api/v1/shop/order/exportSalesReport/manager",
         this.formdata
       );
     },
     async queryList(page) {
       page = typeof page == Number ? page : 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/shop/salesReport/manager?page=${page}&size=${
+        `https://tonglingok.com/canteen/api/v1/shop/salesReport/manager?page=${page}&size=${
           this.size
         }`,
         this.formdata

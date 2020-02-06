@@ -281,7 +281,7 @@ export default {
     async getComsumptionLoc(id) {
       this.shopLocData = [];
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/company/consumptionLocation?company_id=${id}`
+        `https://tonglingok.com/canteen/api/v1/company/consumptionLocation?company_id=${id}`
       );
       if (res.msg == "ok") {
         this.canteensLocData = Array.from(res.data.canteen);
@@ -292,7 +292,7 @@ export default {
     },
     async fetchCompanyList() {
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/admin/companies"
+        "https://tonglingok.com/canteen/api/v1/admin/companies"
       );
       if (res.msg == "ok") {
         this.companyList = [];
@@ -332,7 +332,7 @@ export default {
         company_id: this.company_id
       });
       const res = await $axios.post(
-        "http://canteen.tonglingok.com/api/v1/company/wxConfig/save"
+        "https://tonglingok.com/canteen/api/v1/company/wxConfig/save"
       );
       if (res.msg === "ok") {
         this.$message.success("新增支付信息成功");
@@ -373,7 +373,7 @@ export default {
     async _addEnterprise() {
       this.loading = Loading.service({ text: "拼命加载中..." });
       const res = await $axios.post(
-        "http://canteen.tonglingok.com/api/v1/company/save",
+        "https://tonglingok.com/canteen/api/v1/company/save",
         {
           parent_id: this.parent.id || 0,
           name: this.enterpriseForm.name
@@ -396,7 +396,7 @@ export default {
       let data = null;
       await $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/canteen/configuration?c_id=${id}`
+          `https://tonglingok.com/canteen/api/v1/canteen/configuration?c_id=${id}`
         )
         .then(res => {
           data = res.data;
@@ -406,7 +406,7 @@ export default {
     },
     async getSystemModules(id) {
       const res = $axios.get(
-        "http://canteen.tonglingok.com/api/v1/modules/canteen/withSystem",
+        "https://tonglingok.com/canteen/api/v1/modules/canteen/withSystem",
         {
           c_id: id
         }
@@ -437,7 +437,7 @@ export default {
     async getMachineList(val, type) {
       let data;
       await $axios
-        .get("http://canteen.tonglingok.com/api/v1/machines", {
+        .get("https://tonglingok.com/canteen/api/v1/machines", {
           belong_id: val.id,
           machine_type: type,
           page: 1,

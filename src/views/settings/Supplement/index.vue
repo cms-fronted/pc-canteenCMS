@@ -7,31 +7,23 @@
         <div class="main-header">
           <!--          <div class="select-title">-->
           <span class="content-header">人员信息</span>
-          <el-input
-            class="filter-input"
-            v-model="key"
-            placeholder="输入人员信息"
-            style="width:200px"
-          ></el-input>
-          <el-button type="primary" @click="queryList" style="margin-left:10px"
-            >查询</el-button
-          >
+          <el-input class="filter-input" v-model="key" placeholder="输入人员信息" style="width:200px"></el-input>
+          <el-button type="primary" @click="queryList" style="margin-left:10px">查询</el-button>
           <el-upload
             class="upload-excel upload"
             ref="upload"
             :limit="limit"
             :headers="header"
             :show-file-list="false"
-            accept=".xls,.xlsx"
-            action="http://canteen.tonglingok.comhttp://canteen.tonglingok.com/api/v1/wallet/supplement/upload"
+            accept=".xls, .xlsx"
+            action="http://canteen.tonglingok.comhttps://tonglingok.com/canteen/api/v1/wallet/supplement/upload"
             :on-success="handleSuccess"
             :on-error="handleError"
             name="supplement"
           >
-            <el-button type="primary" style="margin-left:10px"
-              >批量补录</el-button
-            >
+            <el-button type="primary" style="margin-left:10px">批量补录</el-button>
           </el-upload>
+          <el-button style="margin-left:10px" @click="downloadTemplate">模板下载</el-button>
           <!--          </div>-->
         </div>
         <div class="main-content">
@@ -41,7 +33,7 @@
             border
             @selection-change="handleSelectionChange"
           >
-            <el-table-column type="selection" width="55"> </el-table-column>
+            <el-table-column type="selection" width="55"></el-table-column>
             <el-table-column label="公司" prop="company"></el-table-column>
             <!-- <el-table-column label="归属饭堂" prop="canteen"></el-table-column> -->
             <el-table-column label="部门" prop="department"></el-table-column>
@@ -97,11 +89,7 @@
                 ></el-date-picker>
               </el-form-item>
               <el-form-item label="消费餐次">
-                <el-select
-                  v-model="formdata.dinner_id"
-                  style="width:200px"
-                  placeholder="请选择消费餐次"
-                >
+                <el-select v-model="formdata.dinner_id" style="width:200px" placeholder="请选择消费餐次">
                   <el-option
                     v-for="item in dinnersList"
                     :key="item.id"
@@ -111,16 +99,10 @@
                 </el-select>
               </el-form-item>
               <el-form-item label="消费金额">
-                <el-input
-                  placeholder="请输入消费金额"
-                  v-model="formdata.money"
-                ></el-input>
+                <el-input placeholder="请输入消费金额" v-model="formdata.money"></el-input>
               </el-form-item>
               <el-form-item label="备注">
-                <el-input
-                  placeholder="请输入备注"
-                  v-model="formdata.remark"
-                ></el-input>
+                <el-input placeholder="请输入备注" v-model="formdata.remark"></el-input>
               </el-form-item>
               <div class="radio-area">
                 <el-radio v-model="formdata.type" label="1">补充</el-radio>
@@ -129,9 +111,7 @@
             </el-form>
             <div class="btn-area">
               <el-button type="primary">取消</el-button>
-              <el-button type="primary" @click="confirmSupplement"
-                >确定</el-button
-              >
+              <el-button type="primary" @click="confirmSupplement">确定</el-button>
             </div>
           </div>
         </div>
@@ -208,9 +188,7 @@ export default {
       console.log(this.current_page);
       $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/department/staffs/recharge?page=${
-            this.current_page
-          }&size=10&department_id=0&key=${this.key}`
+          `https://tonglingok.com/canteen/api/v1/department/staffs/recharge?page=${this.current_page}&size=10&department_id=0&key=${this.key}`
         )
         .then(res => {
           this.tableData = Array.from(res.data.data);
@@ -219,7 +197,7 @@ export default {
     },
     getCompanies() {
       $axios
-        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
+        .get("https://tonglingok.com/canteen/api/v1/admin/companies")
         .then(res => {
           let arr = res.data;
           let allCompanies = [];
@@ -237,7 +215,7 @@ export default {
       if (company_id) {
         $axios
           .get(
-            `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
+            `https://tonglingok.com/canteen/api/v1/canteens?company_id=${company_id}`
           )
           .then(res => {
             this.canteenList = Array.from(res.data);
@@ -245,7 +223,7 @@ export default {
           .catch(err => console.log(err));
       } else {
         $axios
-          .get("http://canteen.tonglingok.com/api/v1/managerCanteens")
+          .get("https://tonglingok.com/canteen/api/v1/managerCanteens")
           .then(res => {
             this.canteenList = Array.from(res.data);
           })
@@ -257,7 +235,7 @@ export default {
       if (canteen_id) {
         $axios
           .get(
-            `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
+            `https://tonglingok.com/canteen/api/v1/canteen/dinners?canteen_id=${canteen_id}`
           )
           .then(res => {
             this.dinnersList = Array.from(res.data);
@@ -275,7 +253,7 @@ export default {
     confirmSupplement() {
       $axios
         .post(
-          "http://canteen.tonglingok.com/api/v1/wallet/supplement",
+          "https://tonglingok.com/canteen/api/v1/wallet/supplement",
           this.formdata
         )
         .then(res => {
@@ -294,6 +272,11 @@ export default {
     },
     handleError(res) {
       // console.log(res)
+    },
+    downloadTemplate() {
+      window.open(
+        "http://canteen.tonglingok.com/static/excel/template/补录管理模板.xlsx"
+      );
     }
   }
 };

@@ -133,7 +133,7 @@ export default {
   methods: {
     async getCategoryOptions() {
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/company/categories"
+        "https://tonglingok.com/canteen/api/v1/company/categories"
       );
       if (res.msg === "ok") {
         this.categoryOptions = unshiftAllOptions(Array.from(res.data));
@@ -142,14 +142,14 @@ export default {
     },
     /*    async getProductsId(id) {
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/shop/supplier/products?category_id=${id}&page=1&size=1000`
+        `https://tonglingok.com/canteen/api/v1/shop/supplier/products?category_id=${id}&page=1&size=1000`
       );
       console.log(res);
     },*/
     async fetchList(page) {
       page = Number(page) || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/shop/order/statistic/supplier?page=${page}&size=${
+        `https://tonglingok.com/canteen/api/v1/shop/order/statistic/supplier?page=${page}&size=${
           this.size
         }`,
         this.queryform
@@ -166,13 +166,13 @@ export default {
     },
     async exportFile() {
       await this.$exportExcel(
-        "http://canteen.tonglingok.com/api/v1/shop/order/exportOrderStatistic/supplier",
+        "https://tonglingok.com/canteen/api/v1/shop/order/exportOrderStatistic/supplier",
         this.queryform
       );
     },
     async getProductsId() {
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/shop/supplierProducts/search"
+        "https://tonglingok.com/canteen/api/v1/shop/supplierProducts/search"
       );
       if (res.msg === "ok") {
         this.productOptions = unshiftAllOptions(Array.from(res.data));
@@ -183,7 +183,7 @@ export default {
       if (query != "") {
         this.loading = true;
         const res = await this.$axios({
-          url: `http://canteen.tonglingok.com/api/v1/shop/supplierProducts/search?product=${query}`,
+          url: `https://tonglingok.com/canteen/api/v1/shop/supplierProducts/search?product=${query}`,
           methods: "get",
           headers: { token: store.getters.token }
         });

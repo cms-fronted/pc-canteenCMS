@@ -85,7 +85,7 @@
       <el-form-item label="图片" prop="img_url">
         <div class="imgs">
           <el-upload
-            action="http://canteen.tonglingok.com/api/v1/image/upload"
+            action="https://tonglingok.com/canteen/api/v1/image/upload"
             list-type="picture-card"
             ref="addUpload"
             name="image"
@@ -176,7 +176,7 @@ export default {
     async _add() {
       this.formdata = { ...this.formdata };
       const res = await $axios.post(
-        "http://canteen.tonglingok.com/api/v1/food/save",
+        "https://tonglingok.com/canteen/api/v1/food/save",
         this.formdata
       );
       if (res.msg == "ok") {
@@ -193,7 +193,7 @@ export default {
       this.formdata.m_id = "";
       $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
+          `https://tonglingok.com/canteen/api/v1/canteen/dinners?canteen_id=${canteen_id}`
         )
         .then(res => {
           this.dinnerList = Array.from(res.data);
@@ -203,7 +203,7 @@ export default {
     getCategoryList(dinner_id) {
       $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/menus/dinner?dinner_id=${dinner_id}`
+          `https://tonglingok.com/canteen/api/v1/menus/dinner?dinner_id=${dinner_id}`
         )
         .then(res => (this.categoryList = Array.from(res.data)))
         .catch(err => console.log(err));

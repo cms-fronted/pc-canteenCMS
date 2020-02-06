@@ -66,7 +66,7 @@ export default {
   methods: {
     fetchCompanyList() {
       $axios
-        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
+        .get("https://tonglingok.com/canteen/api/v1/admin/companies")
         .then(res => {
           let arr = res.data;
           this.companyList = flatten(arr);
@@ -80,7 +80,7 @@ export default {
     addSupplier() {
       $axios
         .post(
-          "http://canteen.tonglingok.com/api/v1/supplier/save",
+          "https://tonglingok.com/canteen/api/v1/supplier/save",
           this.formdata
         )
         .then(res => {

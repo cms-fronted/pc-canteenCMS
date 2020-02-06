@@ -36,7 +36,7 @@
             :headers="header"
             :show-file-list="false"
             accept=".xls, .xlsx"
-            action="http://canteen.tonglingok.com/api/v1/department/staff/upload"
+            action="https://tonglingok.com/canteen/api/v1/department/staff/upload"
             :on-success="handleSuccess"
             :data="{ c_id: c_id }"
             name="staffs"
@@ -58,6 +58,7 @@
           <el-button type="primary" @click="openRoleTypeDialog"
             >新增类型</el-button
           >
+          <el-button @click="downloadTemplate">模板下载</el-button>
           <el-button @click="exportFile">导出</el-button>
         </el-form>
       </div>
@@ -583,7 +584,7 @@ export default {
     },
     async getCompanies() {
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/admin/companies"
+        "https://tonglingok.com/canteen/api/v1/admin/companies"
       );
       if (res.msg === "ok") {
         this.companyOptions = flatten(res.data);
@@ -595,7 +596,7 @@ export default {
     },
     async getDepartmentListWithoutCid() {
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/admin/departments"
+        "https://tonglingok.com/canteen/api/v1/admin/departments"
       );
       if (res.msg === "ok") {
         this.departmentList = unshiftAllOptions(Array.from(res.data));
@@ -603,7 +604,7 @@ export default {
     },
     async getRoleType() {
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/role/types"
+        "https://tonglingok.com/canteen/api/v1/role/types"
       );
       if (res.msg === "ok") {
         this.roleOptions = res.data.data;
@@ -612,7 +613,7 @@ export default {
     async fetchDepartmentTreeData(c_id) {
       c_id = c_id || this.queryForm.c_id || "";
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/departments?c_id=${c_id}`
+        `https://tonglingok.com/canteen/api/v1/departments?c_id=${c_id}`
       );
       if (res.msg === "ok") {
         this.treeData = Array.from(res.data);
@@ -621,7 +622,7 @@ export default {
     },
     async exportFile() {
       await this.$exportExcel(
-        "http://canteen.tonglingok.com/api/v1/export/staffs",
+        "https://tonglingok.com/canteen/api/v1/export/staffs",
         {
           company_id: this.c_id,
           department_id: this.d_id
@@ -631,7 +632,7 @@ export default {
     async fetchList(page) {
       page = Number(page) || this.current_page;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/staffs?page=${page}&size=${this.size}`,
+        `https://tonglingok.com/canteen/api/v1/staffs?page=${page}&size=${this.size}`,
         {
           c_id: this.c_id, //company_id,
           d_id: this.d_id //d_id,
@@ -661,7 +662,7 @@ export default {
     async getCanteenOptions(c_id) {
       let company_id = c_id || "";
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/company/consumptionLocation?company_id=${company_id}`
+        `https://tonglingok.com/canteen/api/v1/company/consumptionLocation?company_id=${company_id}`
       );
       if (res.msg === "ok") {
         this.canteenGroup = Array.from(res.data.canteen);
@@ -690,7 +691,7 @@ export default {
       if (!this.isEditDepartment) {
         //新增部门
         const res = await $axios.post(
-          "http://canteen.tonglingok.com/api/v1/department/save",
+          "https://tonglingok.com/canteen/api/v1/department/save",
           this.departmentForm
         );
         if (res.msg === "ok") {
@@ -703,7 +704,7 @@ export default {
       } else {
         //编辑部门
         const res = await $axios.post(
-          "http://canteen.tonglingok.com/api/v1/department/update",
+          "https://tonglingok.com/canteen/api/v1/department/update",
           this.departmentForm
         );
         if (res.msg === "ok") {
@@ -724,7 +725,7 @@ export default {
       })
         .then(async () => {
           const res = await $axios.post(
-            "http://canteen.tonglingok.com/api/v1/department/delete",
+            "https://tonglingok.com/canteen/api/v1/department/delete",
             {
               id: detail.id
             }
@@ -796,7 +797,7 @@ export default {
         });
         this.addFormData.canteens = JSON.stringify(_canteen);
         const res = await $axios.post(
-          "http://canteen.tonglingok.com/api/v1/department/staff/save",
+          "https://tonglingok.com/canteen/api/v1/department/staff/save",
           this.addFormData
         );
         if (res.msg === "ok") {
@@ -830,7 +831,7 @@ export default {
         this.addFormData.cancel_canteens = JSON.stringify(cancel);
         this.addFormData.canteens = JSON.stringify(add);
         const res = await $axios.post(
-          "http://canteen.tonglingok.com/api/v1/department/staff/update",
+          "https://tonglingok.com/canteen/api/v1/department/staff/update",
           this.addFormData
         );
         if (res.msg === "ok") {
@@ -849,7 +850,7 @@ export default {
       })
         .then(async () => {
           const res = await $axios.post(
-            "http://canteen.tonglingok.com/api/v1/department/staff/delete",
+            "https://tonglingok.com/canteen/api/v1/department/staff/delete",
             { id }
           );
           if (res.msg === "ok") {
@@ -876,7 +877,7 @@ export default {
     },
     async _comfirmSettingQR() {
       const res = await $axios.post(
-        "http://canteen.tonglingok.com/api/v1/staff/qrcode/save",
+        "https://tonglingok.com/canteen/api/v1/staff/qrcode/save",
         this.QRForm
       );
       console.log(res);
@@ -905,7 +906,7 @@ export default {
       let staff_id = this.cureentDepartment.id;
       let new_d_id = this.cureentDepartment.new_d_id;
       const res = await $axios.post(
-        "http://canteen.tonglingok.com/api/v1/department/staff/move",
+        "https://tonglingok.com/canteen/api/v1/department/staff/move",
         {
           id: staff_id,
           d_id: new_d_id
@@ -950,7 +951,7 @@ export default {
     },
     async _addRoleType() {
       const res = await $axios.post(
-        "http://canteen.tonglingok.com/api/v1/role/type/save",
+        "https://tonglingok.com/canteen/api/v1/role/type/save",
         this.roleTypeForm
       );
       if (res.msg === "ok") {
@@ -972,6 +973,9 @@ export default {
     },
     _print() {
       this.$print(this.$refs.print, { noPrint: ".el-button" });
+    },
+    downloadTemplate(){
+      window.open('http://canteen.tonglingok.com/static/excel/template/上传部门员工信息模板.xlsx')
     }
   }
 };
@@ -1008,5 +1012,9 @@ export default {
     flex: 1;
     display: block;
   }
+}
+.tree {
+  overflow-x: scroll;
+  overflow-y: hidden
 }
 </style>

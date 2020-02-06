@@ -157,7 +157,7 @@ export default {
   methods: {
     async getCompanies() {
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/admin/companies"
+        "https://tonglingok.com/canteen/api/v1/admin/companies"
       );
       if (res.msg === "ok") {
         this.companyOptions = getAllOptions(flatten(res.data));
@@ -173,7 +173,7 @@ export default {
       this.queryForm.canteen_ids = 0;
       if (Number(company_id)) {
         const res = await $axios.get(
-          `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
+          `https://tonglingok.com/canteen/api/v1/canteens?company_id=${company_id}`
         );
         if (res.msg === "ok") {
           this.canteenOptions = getAllOptions(Array.from(res.data));
@@ -184,7 +184,7 @@ export default {
     },
     async getDinnerOptions(canteen_id) {
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
+        `https://tonglingok.com/canteen/api/v1/canteen/dinners?canteen_id=${canteen_id}`
       );
       if (res.msg === "ok") {
         this.dinnerOptions = getAllOptions(Array.from(res.data));
@@ -199,7 +199,7 @@ export default {
         delete form.canteen_ids;
       }
       this.$exportExcel(
-        "http://canteen.tonglingok.com/api/v1/material/exportFoodMaterials",
+        "https://tonglingok.com/canteen/api/v1/material/exportFoodMaterials",
         form
       );
     },
@@ -213,7 +213,7 @@ export default {
         delete form.canteen_ids;
       }
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/materials/food?page=${page}&size=${
+        `https://tonglingok.com/canteen/api/v1/materials/food?page=${page}&size=${
           this.size
         }`,
         form
@@ -249,7 +249,7 @@ export default {
           }
         );
         res = await $axios.post(
-          "http://canteen.tonglingok.com/api/v1/food/material/update",
+          "https://tonglingok.com/canteen/api/v1/food/material/update",
           {
             id: f_id,
             material: JSON.stringify(materials)
@@ -261,7 +261,7 @@ export default {
           count: this.materialForm.count
         });
         res = await $axios.post(
-          "http://canteen.tonglingok.com/api/v1/food/material/update",
+          "https://tonglingok.com/canteen/api/v1/food/material/update",
           {
             id: f_id,
             material: JSON.stringify(materials)
@@ -287,7 +287,7 @@ export default {
       })
         .then(async () => {
           const res = await $axios.post(
-            "http://canteen.tonglingok.com/api/v1/food/material/update",
+            "https://tonglingok.com/canteen/api/v1/food/material/update",
             {
               id: row.f_id,
               material: JSON.stringify([{ id: row.id, state: 2 }])

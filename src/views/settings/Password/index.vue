@@ -61,7 +61,7 @@ export default {
     async modifyPsw() {
       await $axios
         .post(
-          "http://canteen.tonglingok.com/api/v1/role/passwd/update",
+          "https://tonglingok.com/canteen/api/v1/role/passwd/update",
           this.passwordForm
         )
         .then(res => {

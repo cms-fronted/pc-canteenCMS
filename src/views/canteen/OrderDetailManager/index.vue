@@ -310,7 +310,7 @@ export default {
     },
     async getCompanies() {
       await $axios
-        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
+        .get("https://tonglingok.com/canteen/api/v1/admin/companies")
         .then(async res => {
           let arr = res.data;
           let companiesList = flatten(arr);
@@ -322,7 +322,7 @@ export default {
     },
     async getDepartmentList(company_id) {
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/departments?c_id=${company_id}`
+        `https://tonglingok.com/canteen/api/v1/departments?c_id=${company_id}`
       );
       if (res.msg === "ok") {
         this.departmentList = unshiftAllOptions(Array.from(flatten(res.data)));
@@ -331,7 +331,7 @@ export default {
     },
     async getDepartmentListWithoutCid() {
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/admin/departments"
+        "https://tonglingok.com/canteen/api/v1/admin/departments"
       );
       if (res.msg === "ok") {
         this.departmentList = unshiftAllOptions(Array.from(res.data));
@@ -342,7 +342,7 @@ export default {
       page = typeof page === Number ? page : 1;
       // page = page || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/shop/order/statistic/manager?page=${page}&size=${
+        `https://tonglingok.com/canteen/api/v1/shop/order/statistic/manager?page=${page}&size=${
           this.size
         }`,
         this.formdata
@@ -361,7 +361,7 @@ export default {
     async checkDetail(row) {
       let id = row.order_id;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/shop/order/products?order_id=${id}`
+        `https://tonglingok.com/canteen/api/v1/shop/order/products?order_id=${id}`
       );
       if (res.msg === "ok") {
         this.detailForm = Object.assign({}, res.data);
@@ -373,7 +373,7 @@ export default {
       this.isPrint = true;
       let id = row.order_id;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/shop/order/products?order_id=${id}`
+        `https://tonglingok.com/canteen/api/v1/shop/order/products?order_id=${id}`
       );
       if (res.msg === "ok") {
         this.detailForm = Object.assign({}, res.data);
@@ -387,7 +387,7 @@ export default {
     },
     async exportFile() {
       await this.$exportExcel(
-        "http://canteen.tonglingok.com/api/v1/shop/order/exportOrderStatistic/manager",
+        "https://tonglingok.com/canteen/api/v1/shop/order/exportOrderStatistic/manager",
         this.formdata
       );
     }

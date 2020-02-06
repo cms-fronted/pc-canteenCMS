@@ -21,11 +21,7 @@
           />
         </el-select>
         <span class="content-header">消费地点：</span>
-        <el-select
-          v-model="canteen_id"
-          placeholder="请选择"
-          style="width:150px"
-        >
+        <el-select v-model="canteen_id" placeholder="请选择" style="width:150px">
           <el-option
             v-for="item in canteenList"
             :key="item.id"
@@ -42,6 +38,11 @@
         />
         <el-button type="primary" plain @click="fetchTableList">查询</el-button>
         <el-button type="primary" @click="deriveData">导出</el-button>
+        <el-button
+          type="primary"
+          @click="handleClick({ c_id: canteen_id }, '_add', '新增材料')"
+          style="margin-left:10px"
+        >添加</el-button>
         <el-upload
           class="upload-excel"
           ref="upload"
@@ -49,21 +50,14 @@
           :headers="header"
           :show-file-list="false"
           accept=".xls, .xlsx"
-          action="http://canteen.tonglingok.com/api/v1/material/upload"
+          action="https://tonglingok.com/canteen/api/v1/material/upload"
           :on-success="handleSuccess"
           :data="{ c_id: canteen_id }"
           name="materials"
         >
-          <el-button type="primary" style="margin-left:10px"
-            >批量导入</el-button
-          >
+          <el-button type="primary" style="margin-left:10px">批量导入</el-button>
         </el-upload>
-        <el-button
-          type="primary"
-          @click="handleClick({ c_id: canteen_id }, '_add', '新增材料')"
-          style="margin-left:10px"
-          >添加</el-button
-        >
+        <el-button style="margin-left:10px" @click="downloadTemplate">模板下载</el-button>
       </div>
       <!-- 共有{{total}}条记录 -->
       <div class="total" v-show="total > 0">
@@ -77,20 +71,12 @@
           <el-table-column prop="id" label="序号" width="200px" />
           <el-table-column prop="name" label="材料名称" />
           <el-table-column label="单价/元">
-            <template slot-scope="scope"
-              >{{ scope.row.price }}元/kg</template
-            >
+            <template slot-scope="scope">{{ scope.row.price }}元/kg</template>
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <el-button
-                size="mini"
-                @click="handleClick(scope.row, '_edit', '编辑材料')"
-                >编辑</el-button
-              >
-              <el-button size="mini" type="danger" @click="_delete(scope.row)"
-                >Delete</el-button
-              >
+              <el-button size="mini" @click="handleClick(scope.row, '_edit', '编辑材料')">编辑</el-button>
+              <el-button size="mini" type="danger" @click="_delete(scope.row)">Delete</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -175,7 +161,7 @@ export default {
     },
     async fetchCompanyList() {
       await $axios
-        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
+        .get("https://tonglingok.com/canteen/api/v1/admin/companies")
         .then(res => {
           this.companyList = getAllOptions(flatten(res.data));
           this.company_id = this.companyList[0].id;
@@ -191,7 +177,7 @@ export default {
         } else {
           await $axios
             .get(
-              `http://canteen.tonglingok.com/api/v1/canteens?company_id=${id}`
+              `https://tonglingok.com/canteen/api/v1/canteens?company_id=${id}`
             )
             .then(res => {
               this.canteenList = getAllOptions(flatten(res.data));
@@ -201,7 +187,7 @@ export default {
         }
       } else {
         await $axios
-          .get("http://canteen.tonglingok.com/api/v1/managerCanteens")
+          .get("https://tonglingok.com/canteen/api/v1/managerCanteens")
           .then(res => {
             this.canteenList = Array.from(res.data);
             this.canteen_id = this.canteenList[0].id;
@@ -213,9 +199,7 @@ export default {
       page = Number(page) || 1;
       await $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/materials?page=${page}&size=10&key=${
-            this.keyword
-          }&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
+          `https://tonglingok.com/canteen/api/v1/materials?page=${page}&size=10&key=${this.keyword}&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
         )
         .then(res => {
           this.tableData = res.data.data;
@@ -237,7 +221,7 @@ export default {
         type: "warning"
       }).then(() => {
         this.$axios
-          .post("http://canteen.tonglingok.com/api/v1/material/handel", {
+          .post("https://tonglingok.com/canteen/api/v1/material/handel", {
             id: row.id
           })
           .then(res => {
@@ -268,9 +252,7 @@ export default {
     async deriveData() {
       await $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/material/export?key=${
-            this.keyword
-          }&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
+          `https://tonglingok.com/canteen/api/v1/material/export?key=${this.keyword}&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
         )
         .then(res => {
           if (this.tableData.length > 0) {
@@ -290,6 +272,11 @@ export default {
     handleSuccess(res, file, fileList) {
       this.sendMessage(res.msg);
       this.fetchTableList(this.current_page);
+    },
+    downloadTemplate() {
+      window.open(
+        "http://canteen.tonglingok.com/static/excel/template/批量上传材料价格明细模板.xlsx"
+      );
     }
   },
   components: {

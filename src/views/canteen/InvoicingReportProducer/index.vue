@@ -119,7 +119,7 @@ export default {
     async queryList(page) {
       page = typeof page == Number ? page : 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/shop/salesReport/supplier?page=${page}&size=${
+        `https://tonglingok.com/canteen/api/v1/shop/salesReport/supplier?page=${page}&size=${
           this.size
         }`,
         this.formdata
@@ -133,7 +133,7 @@ export default {
     },
     async exportFile() {
       await this.$exportExcel(
-        "http://canteen.tonglingok.com/api/v1/shop/order/exportSalesReport/supplier",
+        "https://tonglingok.com/canteen/api/v1/shop/order/exportSalesReport/supplier",
         this.formdata
       );
     },

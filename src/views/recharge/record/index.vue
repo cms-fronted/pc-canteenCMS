@@ -23,10 +23,7 @@
                 </el-col>
                 <el-col :span="6">
                   <el-form-item label="姓名">
-                    <el-input
-                      placeholder="请输入姓名"
-                      v-model="formdata.username"
-                    />
+                    <el-input placeholder="请输入姓名" v-model="formdata.username" />
                   </el-form-item>
                 </el-col>
                 <el-col :span="6">
@@ -130,8 +127,8 @@ export default {
       recharge_wayList: [
         { id: "0", name: "全部", type: "all" },
         { id: "1", name: "现金", type: "cash" },
-        { id: "2", name: "微信", type: "weixin" },
-        { id: "3", name: "农行", type: "nonghang" }
+        { id: "2", name: "微信", type: "1" },
+        { id: "3", name: "农行", type: "2" }
       ],
       tableData: [
         /* {
@@ -181,7 +178,7 @@ export default {
   methods: {
     async getCompanies() {
       await $axios
-        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
+        .get("https://tonglingok.com/canteen/api/v1/admin/companies")
         .then(res => {
           let arr = res.data;
           let allCompanies = [];
@@ -204,23 +201,21 @@ export default {
     async fetchAdminList() {
       // module_id 暂时固定为14
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/wallet/recharge/admins?module_id=" +
+        "https://tonglingok.com/canteen/api/v1/wallet/recharge/admins?module_id=" +
           localStorage.getItem("m_id")
       );
       if (res.msg == "ok") {
         this.adminList = res.data;
-        if (this.adminList.length > 1) {
-          this.adminList.unshift({
-            id: 0,
-            role: "全部"
-          });
-        }
+        this.adminList.unshift({
+          id: 0,
+          role: "全部"
+        });
         this.formdata.admin_id = this.adminList[0].id;
       }
     },
     async exportFile() {
       await this.$exportExcel(
-        "http://canteen.tonglingok.com/api/v1/wallet/recharges/export",
+        "https://tonglingok.com/canteen/api/v1/wallet/recharges/export",
         this.formdata
       );
     },
@@ -228,7 +223,7 @@ export default {
       this.formdata.page = this.current_page;
       await $axios
         .get(
-          "http://canteen.tonglingok.com/api/v1/wallet/recharges",
+          "https://tonglingok.com/canteen/api/v1/wallet/recharges",
           this.formdata
         )
         .then(res => {

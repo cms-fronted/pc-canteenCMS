@@ -10,10 +10,7 @@
               <el-row>
                 <el-col :span="6">
                   <el-form-item label="部门">
-                    <el-select
-                      v-model="formdata.department_id"
-                      placeholder="请选择部门"
-                    >
+                    <el-select v-model="formdata.department_id" placeholder="请选择部门">
                       <el-option
                         v-for="item in departmentList"
                         :key="item.id"
@@ -25,59 +22,49 @@
                 </el-col>
                 <el-col :span="6">
                   <el-form-item label="人员信息">
-                    <el-input
-                      placeholder="请输入信息"
-                      v-model="formdata.user"
-                    ></el-input>
+                    <el-input placeholder="请输入信息" v-model="formdata.user"></el-input>
                   </el-form-item>
                 </el-col>
                 <el-col :span="6">
                   <el-form-item label="手机号码">
-                    <el-input
-                      placeholder="请输入手机号"
-                      v-model="formdata.phone"
-                    ></el-input>
+                    <el-input placeholder="请输入手机号" v-model="formdata.phone"></el-input>
                   </el-form-item>
                 </el-col>
               </el-row>
 
               <!-- <el-form-item label="余额">
                 <el-input placeholder="请输入余额" v-model="formdata.balance"></el-input>
-              </el-form-item> -->
+              </el-form-item>-->
             </el-form>
           </div>
           <div class="btn-area" :class="{ grade: grade === 2 }">
-            <el-button type="primary" @click="handleClear" v-if="grade === 2"
-              >一键清零</el-button
-            >
+            <el-button type="primary" @click="handleClear" v-if="grade === 2">一键清零</el-button>
             <el-button type="primary" @click="fetchTableList">查询</el-button>
             <el-button type="primary" @click="exportFile">导出</el-button>
           </div>
           <div class="clearfix"></div>
         </div>
         <div class="total" v-show="total > 0">
-          <span
-            >共有 <strong>{{ total }}</strong> 条记录</span
-          >
+          <span>
+            共有
+            <strong>{{ total }}</strong> 条记录
+          </span>
         </div>
         <div class="main-content">
           <el-table style="width:100%" :data="tableData" border>
             <!-- <el-table-column
               type="selection"
               width="55">
-            </el-table-column> -->
-            <el-table-column label="姓名" prop="name"></el-table-column>
-            <el-table-column
-              label="员工编号"
-              prop="employee_num"
-            ></el-table-column>
+            </el-table-column>-->
+            <el-table-column label="姓名" prop="username"></el-table-column>
+            <el-table-column label="员工编号" prop="code"></el-table-column>
             <el-table-column label="卡号" prop="card_num"></el-table-column>
             <el-table-column label="手机号码" prop="phone"></el-table-column>
             <el-table-column label="部门" prop="department"></el-table-column>
             <el-table-column label="余额" prop="balance"></el-table-column>
           </el-table>
           <pagination
-            v-show="total > 10"
+            v-if="total > 10"
             :total="total"
             :page.sync="current_page"
             @pagination="getList"
@@ -119,9 +106,9 @@ export default {
   },
   methods: {
     async fetchDepartmentList() {
-      // 正确接口，没数据：http://canteen.tonglingok.com/api/v1/departments/recharge 测试接口：http://canteen.tonglingok.com/api/v1/departments?c_id=2
+      // 正确接口，没数据：https://tonglingok.com/canteen/api/v1/departments/recharge 测试接口：https://tonglingok.com/canteen/api/v1/departments?c_id=2
       await $axios
-        .get("http://canteen.tonglingok.com/api/v1/departments/recharge")
+        .get("https://tonglingok.com/canteen/api/v1/departments/recharge")
         .then(res => {
           this.departmentList = res.data;
           if (this.departmentList.length > 1) {
@@ -133,7 +120,7 @@ export default {
     },
     async handleClear() {
       await $axios
-        .post("http://canteen.tonglingok.com/api/v1/wallet/clearBalance")
+        .post("https://tonglingok.com/canteen/api/v1/wallet/clearBalance")
         .then(res => {
           this.fetchTableList();
         })
@@ -141,7 +128,7 @@ export default {
     },
     async exportFile() {
       await this.$exportExcel(
-        "http://canteen.tonglingok.com/api/v1/wallet/users/balance/export",
+        "https://tonglingok.com/canteen/api/v1/wallet/users/balance/export",
         this.formdata
       );
     },
@@ -150,7 +137,7 @@ export default {
       // 返回的数据 res.data.data username code card_num phone department balance
       let { user, phone, department_id } = this.formdata;
       await $axios
-        .get("http://canteen.tonglingok.com/api/v1/wallet/users/balance", {
+        .get("https://tonglingok.com/canteen/api/v1/wallet/users/balance", {
           page: this.current_page,
           size: 10,
           user,
@@ -159,6 +146,7 @@ export default {
         })
         .then(res => {
           this.tableData = Array.from(res.data.data);
+          this.total = res.data.total;
         })
         .catch(err => console.log(err));
     },
