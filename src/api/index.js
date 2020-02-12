@@ -10,7 +10,7 @@ const $axios = axios.create({
   timeout: 30000,
   // 基础url，会在请求url中自动添加前置链接
   // baseURL: process.env.VUE_APP_BASE_API,
-  withCredentials: false
+  withCredentials: false,
 });
 Vue.prototype.$http = axios; // 并发请求
 // 在全局请求和响应拦截器中添加请求状态
@@ -27,6 +27,10 @@ $axios.interceptors.request.use(
     if (token) {
       config.headers.token = token; // 请求头部添加token
     }
+    // config.headers = {
+    //   'Pragma': 'no-cache',
+    //   'Cache-Control': 'no-cache'
+    // }
     return config;
   },
   error => {
@@ -53,7 +57,6 @@ $axios.interceptors.response.use(
     // if (loading) {
     //   loading.close();
     // }
-    console.log(error);
     if (error.response) {
       switch (error.response.status) {
         case 401:
@@ -101,7 +104,7 @@ export default {
     return $axios({
       method: "get",
       url,
-      params
+      params,
     });
   }
 };

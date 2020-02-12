@@ -1,3 +1,4 @@
+const TerserPlugin = require('terser-webpack-plugin');
 const IS_PROD = ["production", "prod"].includes(process.env.NODE_ENV);
 
 module.exports = {
@@ -13,7 +14,7 @@ module.exports = {
     historyApiFallback: true,
     proxy: {
       "/api": {
-        target: "http://canteen.tonglingok.com",
+        target: "https://tonglingok.com",
         ws: true,
         changeOrigin: true
       }
@@ -37,8 +38,23 @@ module.exports = {
               chunks: "all"
             }
           }
-        }
+        },
+        minimizer: [
+          new TerserPlugin({
+            terserOptions: {
+              ecma: undefined,
+              warnings: false,
+              parse: {},
+              compress: {
+                drop_console: true,
+                drop_debugger: false,
+                pure_funcs: ['console.log'] // 移除console
+              }
+            }
+          })
+        ]
       };
+
     }
   },
   chainWebpack: config => {

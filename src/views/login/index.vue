@@ -109,7 +109,7 @@ export default {
             // this.refresh();
             this.$message.error(res.msg);
           } else {
-            this.$router.push("/order");
+            this.$router.push("/order",()=>{});
             if (this.notifyObj) {
               this.notifyObj.close();
             }
