@@ -21,7 +21,11 @@
           />
         </el-select>
         <span class="content-header">消费地点：</span>
-        <el-select v-model="canteen_id" placeholder="请选择" style="width:150px">
+        <el-select
+          v-model="canteen_id"
+          placeholder="请选择"
+          style="width:150px"
+        >
           <el-option
             v-for="item in locationList"
             :key="item.id"
@@ -29,11 +33,17 @@
             :value="item.id"
           />
         </el-select>
-        <el-button @click="AddVisible = true" style="margin-left:10px">新增</el-button>
+        <el-button @click="AddVisible = true" style="margin-left:10px"
+          >新增</el-button
+        >
         <el-button @click="fetchTableList(1)">查询</el-button>
       </div>
       <div class="main-content">
-        <el-table style="width:100%" :data="tableList" :span-method="objectSpanMethod">
+        <el-table
+          style="width:100%"
+          :data="tableList"
+          :span-method="objectSpanMethod"
+        >
           <el-table-column label="公司级别" prop="grade" />
           <el-table-column label="公司名称" prop="company_name" />
           <el-table-column label="消费地点" prop="canteen_name" />
@@ -50,8 +60,19 @@
           <el-table-column label="可选菜品" prop="number" />
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <el-button size="mini" style="margin:2px" @click="_edit(scope.row)">编辑</el-button>
-              <el-button size="mini" style="margin:2px" type="danger" @click="_delete(scope.row)">删除</el-button>
+              <el-button
+                size="mini"
+                style="margin:2px"
+                @click="_edit(scope.row)"
+                >编辑</el-button
+              >
+              <el-button
+                size="mini"
+                style="margin:2px"
+                type="danger"
+                @click="_delete(scope.row)"
+                >删除</el-button
+              >
             </template>
           </el-table-column>
         </el-table>
@@ -63,10 +84,18 @@
         />
       </div>
     </div>
-    <el-dialog :visible.sync="AddVisible" title="新增菜单" @close="closeNewMenu">
+    <el-dialog
+      :visible.sync="AddVisible"
+      title="新增菜单"
+      @close="closeNewMenu"
+    >
       <el-form ref="addMenuForm" :model="menuForm" label-width="100px">
         <el-form-item label="饭堂">
-          <el-select v-model="menuForm.c_id" placeholder="请选择" @change="getDinnersList">
+          <el-select
+            v-model="menuForm.c_id"
+            placeholder="请选择"
+            @change="getDinnersList"
+          >
             <el-option
               v-for="item in locationList"
               :key="item.id"
@@ -86,8 +115,16 @@
           </el-select>
         </el-form-item>
         <el-form-item label="菜类">
-          <div v-for="(item, index) in listObj" :key="index" style="margin:5px 0">
-            <el-input v-model="item.category" :disabled="item.disabled" style="width:150px" />
+          <div
+            v-for="(item, index) in listObj"
+            :key="index"
+            style="margin:5px 0"
+          >
+            <el-input
+              v-model="item.category"
+              :disabled="item.disabled"
+              style="width:150px"
+            />
             <el-button
               @click.prevent="removeInput(item)"
               icon="el-icon-delete"
@@ -323,7 +360,9 @@ export default {
     async fetchTableList(page) {
       page = typeof page == "number" ? page : 1;
       const res = await $axios.get(
-        `https://tonglingok.com/canteen/api/v1/menus/company?company_id=${this.company_id}&canteen_id=${this.canteen_id}&size=${this.size}&page=${page}`
+        `https://tonglingok.com/canteen/api/v1/menus/company?company_id=${
+          this.company_id
+        }&canteen_id=${this.canteen_id}&size=${this.size}&page=${page}`
       );
       if (res.msg == "ok") {
         let _data = Array.from(res.data.data);

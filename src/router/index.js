@@ -493,7 +493,7 @@ export const asyncRoutes = [
   {
     path: "/takeOut",
     redirect: "/takeOut/index",
-    name:"TakeOut",
+    name: "TakeOut",
     component: Layout,
     children: [
       {

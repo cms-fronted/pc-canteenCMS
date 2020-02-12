@@ -632,7 +632,9 @@ export default {
     async fetchList(page) {
       page = Number(page) || this.current_page;
       const res = await $axios.get(
-        `https://tonglingok.com/canteen/api/v1/staffs?page=${page}&size=${this.size}`,
+        `https://tonglingok.com/canteen/api/v1/staffs?page=${page}&size=${
+          this.size
+        }`,
         {
           c_id: this.c_id, //company_id,
           d_id: this.d_id //d_id,
@@ -974,8 +976,10 @@ export default {
     _print() {
       this.$print(this.$refs.print, { noPrint: ".el-button" });
     },
-    downloadTemplate(){
-      window.open('http://canteen.tonglingok.com/static/excel/template/上传部门员工信息模板.xlsx')
+    downloadTemplate() {
+      window.open(
+        "http://canteen.tonglingok.com/static/excel/template/上传部门员工信息模板.xlsx"
+      );
     }
   }
 };
@@ -1015,6 +1019,6 @@ export default {
 }
 .tree {
   overflow-x: scroll;
-  overflow-y: hidden
+  overflow-y: hidden;
 }
 </style>

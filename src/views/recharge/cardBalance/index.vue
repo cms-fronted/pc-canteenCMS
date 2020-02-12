@@ -10,7 +10,10 @@
               <el-row>
                 <el-col :span="6">
                   <el-form-item label="部门">
-                    <el-select v-model="formdata.department_id" placeholder="请选择部门">
+                    <el-select
+                      v-model="formdata.department_id"
+                      placeholder="请选择部门"
+                    >
                       <el-option
                         v-for="item in departmentList"
                         :key="item.id"
@@ -22,12 +25,18 @@
                 </el-col>
                 <el-col :span="6">
                   <el-form-item label="人员信息">
-                    <el-input placeholder="请输入信息" v-model="formdata.user"></el-input>
+                    <el-input
+                      placeholder="请输入信息"
+                      v-model="formdata.user"
+                    ></el-input>
                   </el-form-item>
                 </el-col>
                 <el-col :span="6">
                   <el-form-item label="手机号码">
-                    <el-input placeholder="请输入手机号" v-model="formdata.phone"></el-input>
+                    <el-input
+                      placeholder="请输入手机号"
+                      v-model="formdata.phone"
+                    ></el-input>
                   </el-form-item>
                 </el-col>
               </el-row>
@@ -38,7 +47,9 @@
             </el-form>
           </div>
           <div class="btn-area" :class="{ grade: grade === 2 }">
-            <el-button type="primary" @click="handleClear" v-if="grade === 2">一键清零</el-button>
+            <el-button type="primary" @click="handleClear" v-if="grade === 2"
+              >一键清零</el-button
+            >
             <el-button type="primary" @click="fetchTableList">查询</el-button>
             <el-button type="primary" @click="exportFile">导出</el-button>
           </div>

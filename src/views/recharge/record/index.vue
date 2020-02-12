@@ -23,7 +23,10 @@
                 </el-col>
                 <el-col :span="6">
                   <el-form-item label="姓名">
-                    <el-input placeholder="请输入姓名" v-model="formdata.username" />
+                    <el-input
+                      placeholder="请输入姓名"
+                      v-model="formdata.username"
+                    />
                   </el-form-item>
                 </el-col>
                 <el-col :span="6">

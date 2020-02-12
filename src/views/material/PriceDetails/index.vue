@@ -21,7 +21,11 @@
           />
         </el-select>
         <span class="content-header">消费地点：</span>
-        <el-select v-model="canteen_id" placeholder="请选择" style="width:150px">
+        <el-select
+          v-model="canteen_id"
+          placeholder="请选择"
+          style="width:150px"
+        >
           <el-option
             v-for="item in canteenList"
             :key="item.id"
@@ -42,7 +46,8 @@
           type="primary"
           @click="handleClick({ c_id: canteen_id }, '_add', '新增材料')"
           style="margin-left:10px"
-        >添加</el-button>
+          >添加</el-button
+        >
         <el-upload
           class="upload-excel"
           ref="upload"
@@ -55,9 +60,13 @@
           :data="{ c_id: canteen_id }"
           name="materials"
         >
-          <el-button type="primary" style="margin-left:10px">批量导入</el-button>
+          <el-button type="primary" style="margin-left:10px"
+            >批量导入</el-button
+          >
         </el-upload>
-        <el-button style="margin-left:10px" @click="downloadTemplate">模板下载</el-button>
+        <el-button style="margin-left:10px" @click="downloadTemplate"
+          >模板下载</el-button
+        >
       </div>
       <!-- 共有{{total}}条记录 -->
       <div class="total" v-show="total > 0">
@@ -71,12 +80,20 @@
           <el-table-column prop="id" label="序号" width="200px" />
           <el-table-column prop="name" label="材料名称" />
           <el-table-column label="单价/元">
-            <template slot-scope="scope">{{ scope.row.price }}元/kg</template>
+            <template slot-scope="scope"
+              >{{ scope.row.price }}元/kg</template
+            >
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <el-button size="mini" @click="handleClick(scope.row, '_edit', '编辑材料')">编辑</el-button>
-              <el-button size="mini" type="danger" @click="_delete(scope.row)">Delete</el-button>
+              <el-button
+                size="mini"
+                @click="handleClick(scope.row, '_edit', '编辑材料')"
+                >编辑</el-button
+              >
+              <el-button size="mini" type="danger" @click="_delete(scope.row)"
+                >Delete</el-button
+              >
             </template>
           </el-table-column>
         </el-table>
@@ -199,7 +216,9 @@ export default {
       page = Number(page) || 1;
       await $axios
         .get(
-          `https://tonglingok.com/canteen/api/v1/materials?page=${page}&size=10&key=${this.keyword}&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
+          `https://tonglingok.com/canteen/api/v1/materials?page=${page}&size=10&key=${
+            this.keyword
+          }&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
         )
         .then(res => {
           this.tableData = res.data.data;
@@ -252,7 +271,9 @@ export default {
     async deriveData() {
       await $axios
         .get(
-          `https://tonglingok.com/canteen/api/v1/material/export?key=${this.keyword}&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
+          `https://tonglingok.com/canteen/api/v1/material/export?key=${
+            this.keyword
+          }&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
         )
         .then(res => {
           if (this.tableData.length > 0) {

@@ -51,7 +51,10 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="餐次">
-                <el-select v-model="queryForm.dinner_id" placeholder="请选择餐次">
+                <el-select
+                  v-model="queryForm.dinner_id"
+                  placeholder="请选择餐次"
+                >
                   <el-option
                     v-for="item in dinnersOptions"
                     :key="item.id"
@@ -76,14 +79,21 @@
           </el-row>
         </el-form>
         <div class="btn-area">
-          <el-button type="primary" @click="queryList" :disabled="isDisabled">查询</el-button>
+          <el-button type="primary" @click="queryList" :disabled="isDisabled"
+            >查询</el-button
+          >
           <el-button type="primary" @click="exportFile">导出</el-button>
           <el-button type="success" @click="deliverOrder">派单</el-button>
         </div>
         <div class="clearfix"></div>
       </div>
       <div class="main-content">
-        <el-table :data="tableData" border style="width:100%" @selection-change="saveOrderIds">
+        <el-table
+          :data="tableData"
+          border
+          style="width:100%"
+          @selection-change="saveOrderIds"
+        >
           <el-table-column type="selection" width="55" />
           <el-table-column label="订单ID" prop="order_id" />
           <el-table-column label="日期" prop="ordering_date" />
@@ -96,7 +106,8 @@
                 <el-button
                   type="text"
                   @click="openDetailDialog(scoped.row, 'check')"
-                >{{ scoped.row.dinner }}</el-button>
+                  >{{ scoped.row.dinner }}</el-button
+                >
               </span>
             </template>
           </el-table-column>
@@ -105,19 +116,19 @@
             <template slot-scope="scoped">
               <span>
                 {{
-                scoped.row.province +
-                scoped.row.area +
-                scoped.row.city +
-                scoped.row.address
+                  scoped.row.province +
+                    scoped.row.area +
+                    scoped.row.city +
+                    scoped.row.address
                 }}
               </span>
             </template>
           </el-table-column>
           <el-table-column label="状态">
             <template slot-scope="scoped">
-              <el-tag
-                :type="scoped.row.used === 1 ? 'success' : 'danger'"
-              >{{ scoped.row.used === 1 ? "已派单" : "未派单" }}</el-tag>
+              <el-tag :type="scoped.row.used === 1 ? 'success' : 'danger'">{{
+                scoped.row.used === 1 ? "已派单" : "未派单"
+              }}</el-tag>
             </template>
           </el-table-column>
           <el-table-column label="操作">
@@ -127,12 +138,18 @@
                   type="text"
                   small
                   @click="openDetailDialog(scoped.row)"
-                >打印小票</el-button>
+                  >打印小票</el-button
+                >
               </span>
             </template>
           </el-table-column>
         </el-table>
-        <pagination v-if="!tableData" :total="total" :page="current_page" @pagination="queryList" />
+        <pagination
+          v-if="!tableData"
+          :total="total"
+          :page="current_page"
+          @pagination="queryList"
+        />
       </div>
     </div>
     <el-dialog
@@ -146,15 +163,16 @@
       top="5vh"
     >
       <ul>
-        <li>收货人：{{ detailForm.address&& detailForm.address.name }}</li>
-        <li>手机号码：{{ detailForm.address&&detailForm.address.phone }}</li>
+        <li>收货人：{{ detailForm.address && detailForm.address.name }}</li>
+        <li>手机号码：{{ detailForm.address && detailForm.address.phone }}</li>
         <!--        <li>送货时间：{{ detailForm.address.name }}</li>-->
         <li>
           送货地址：{{
-          detailForm.address&& detailForm.address.province +
-          detailForm.address&& detailForm.address.city +
-          detailForm.address&& detailForm.address.area +
-          detailForm.address&& detailForm.address.address
+            detailForm.address &&
+              detailForm.address.province + detailForm.address &&
+              detailForm.address.city + detailForm.address &&
+              detailForm.address.area + detailForm.address &&
+              detailForm.address.address
           }}
         </li>
       </ul>
@@ -163,7 +181,9 @@
         <el-table-column label="菜品" prop="name"></el-table-column>
         <el-table-column label="数量" prop="count"></el-table-column>
         <el-table-column label="金额" prop="price">
-          <template slot-scope="scoped">{{ scoped.row.price ? scoped.row.price : "/" }}</template>
+          <template slot-scope="scoped">{{
+            scoped.row.price ? scoped.row.price : "/"
+          }}</template>
         </el-table-column>
       </el-table>
     </el-dialog>
@@ -319,7 +339,9 @@ export default {
       queryForm.canteen_id = queryForm.canteen_id ? queryForm.canteen_id : 0;
       queryForm.dinner_id = queryForm.dinner_id ? queryForm.dinner_id : 0;
       const res = await $axios.get(
-        `https://tonglingok.com/canteen/api/v1/order/takeoutStatistic?page=${page}&size=${this.size}`,
+        `https://tonglingok.com/canteen/api/v1/order/takeoutStatistic?page=${page}&size=${
+          this.size
+        }`,
         queryForm
       );
       if (res.msg === "ok") {
