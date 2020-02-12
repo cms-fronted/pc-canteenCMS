@@ -1,11 +1,5 @@
 <template>
-  <el-dialog
-    :visible.sync="isOpen"
-    width="40%"
-    center
-    title="编辑企业模块"
-    @close="closeDialog"
-  >
+  <el-dialog :visible.sync="isOpen" width="40%" center title="编辑企业模块" @close="closeDialog">
     <el-card class="box-card">
       <div>PC端</div>
       <div v-for="item in pcModules" :key="item.create_time">
@@ -13,8 +7,7 @@
           :indeterminate="isIndeterminate[item.id]"
           v-model="checkAll[item.id]"
           @change="checked => handleCheckAllChange(checked, item.id)"
-          >{{ item.name }}</el-checkbox
-        >
+        >{{ item.name }}</el-checkbox>
         <el-checkbox-group
           style="padding: 0 20px"
           @change="checked => handleCheckedModulesChange(checked, item.id)"
@@ -24,8 +17,7 @@
             v-for="items in item.items"
             :label="items.id"
             :key="items.create_time"
-            >{{ items.name }}</el-checkbox
-          >
+          >{{ items.name }}</el-checkbox>
         </el-checkbox-group>
       </div>
       <div>微信端</div>
@@ -34,8 +26,7 @@
           :indeterminate="isIndeterminate[item.id]"
           v-model="checkAll[item.id]"
           @change="checked => handleCheckAllChange(checked, item.id)"
-          >{{ item.name }}</el-checkbox
-        >
+        >{{ item.name }}</el-checkbox>
         <!-- <el-checkbox-group
           style="padding: 0 20px"
           @change="checked => handleCheckedModulesChange(checked,item.id)"
@@ -109,11 +100,15 @@ export default {
           //用于保存所有的一级模块下的 所有子模块的id
           [id]: []
         });
+        if (item.type == 2 && item.have == 1) {
+          this.checkAll[id] = true;
+        }
       });
       this.pcModules = val.filter(item => item.type === 1);
       this.WXModules = val.filter(item => item.type === 2);
       let PCarr = treeToArr(this.pcModules);
       let WXarr = treeToArr(this.WXModules);
+
       this.initCheckBox(
         PCarr,
         this.modulesCheckbox,
@@ -121,6 +116,7 @@ export default {
         this.checkAll,
         this.isIndeterminate
       );
+
       this.initCheckBox(
         WXarr,
         this.modulesCheckbox,
@@ -128,6 +124,7 @@ export default {
         this.checkAll,
         this.isIndeterminate
       );
+
       allModules.forEach(item => {
         if (item.have === 1) {
           this.defaultModules.push(item.id); //保存 该企业已有模块
