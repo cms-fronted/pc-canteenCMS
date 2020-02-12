@@ -272,7 +272,7 @@ export default {
   methods: {
     async getCompanyOptions() {
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/admin/companies"
+        "/api/v1/admin/companies"
       );
       if (res.msg === "ok") {
         this.companyOptions = getAllOptions(flatten(res.data));
@@ -292,11 +292,11 @@ export default {
       if (company_ids) {
         if (!Number(company_ids)) return;
         res = await $axios.get(
-          `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_ids}`
+          `/api/v1/canteens?company_id=${company_ids}`
         );
       } else {
         res = await $axios.get(
-          "http://canteen.tonglingok.com/api/v1/managerCanteens"
+          "/api/v1/managerCanteens"
         );
       }
       if (res.msg === "ok") {
@@ -308,7 +308,7 @@ export default {
       //饭堂不为全部时， 0 为全部
       if (canteen_id) {
         const res = await $axios.get(
-          `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
+          `/api/v1/canteen/dinners?canteen_id=${canteen_id}`
         );
         if (res.msg === "ok") {
           this.dinnersOptions = unshiftAllOptions(Array.from(res.data));
@@ -320,7 +320,7 @@ export default {
       queryForm.canteen_id = queryForm.canteen_id ? queryForm.canteen_id : 0;
       queryForm.dinner_id = queryForm.dinner_id ? queryForm.dinner_id : 0;
       await this.$exportExcel(
-        "http://canteen.tonglingok.com/api/v1/order/takeoutStatistic/export",
+        "/api/v1/order/takeoutStatistic/export",
         queryForm
       );
     },
@@ -330,7 +330,7 @@ export default {
       queryForm.canteen_id = queryForm.canteen_id ? queryForm.canteen_id : 0;
       queryForm.dinner_id = queryForm.dinner_id ? queryForm.dinner_id : 0;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/takeoutStatistic?page=${page}&size=${
+        `/api/v1/order/takeoutStatistic?page=${page}&size=${
           this.size
         }`,
         queryForm
@@ -344,7 +344,7 @@ export default {
     async openDetailDialog(row) {
       let id = row.order_id;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/info/print?order_id=${id}`
+        `/api/v1/order/info/print?order_id=${id}`
       );
       if (res.msg === "ok") {
         this.detailForm = res.data;
@@ -354,7 +354,7 @@ export default {
         }, 1000);
       }
       await $axios
-        .post("http://canteen.tonglingok.com/api/v1/order/used", { ids: id })
+        .post("/api/v1/order/used", { ids: id })
         .then(res => {
           if (res.msg === "ok") {
             this.$message.success("外卖订单完成");

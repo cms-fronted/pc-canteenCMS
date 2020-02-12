@@ -91,7 +91,7 @@ export default {
     },
     fetchCompanyList() {
       $axios
-        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
+        .get("/api/v1/admin/companies")
         .then(res => {
           let arr = res.data;
           this.companyList = flatten(arr);
@@ -105,14 +105,14 @@ export default {
       let data = this.formdata;
       if (this.type === "_add") {
         this.sendPostRequest(
-          "http://canteen.tonglingok.com/api/v1/category/save",
+          "/api/v1/category/save",
           data
         );
         this.$refs["addGoodsForm"].resetFields();
       } else {
         let { id, name } = data;
         this.sendPostRequest(
-          "http://canteen.tonglingok.com/api/v1/category/update",
+          "/api/v1/category/update",
           { id, name }
         );
         this.$refs["addGoodsForm"].resetFields();

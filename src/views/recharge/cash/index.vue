@@ -41,7 +41,7 @@
             :limit="limit"
             :headers="header"
             accept=".xls,.xlsx"
-            action="http://canteen.tonglingok.com/api/v1/wallet/recharge/upload"
+            action="/api/v1/wallet/recharge/upload"
             :show-file-list="false"
             :on-success="handleSuccess"
             name="cash"
@@ -144,10 +144,10 @@ export default {
       }
     },
     async fetchDepartmentList() {
-      // 先默认获取 c_id为2的公司的部门列表 到时需要修改成 http://canteen.tonglingok.com/api/v1/departments/recharge
-      // get("http://canteen.tonglingok.com/api/v1/departments?c_id=2") http://canteen.tonglingok.com/api/v1/departments/recharge
+      // 先默认获取 c_id为2的公司的部门列表 到时需要修改成 /api/v1/departments/recharge
+      // get("/api/v1/departments?c_id=2") /api/v1/departments/recharge
       await $axios
-        .get("http://canteen.tonglingok.com/api/v1/departments/recharge")
+        .get("/api/v1/departments/recharge")
         .then(res => {
           // console.log(res)
           this.departmentList = res.data;
@@ -171,7 +171,7 @@ export default {
     fetchPersonnelList(val) {
       $axios
         .get(
-          "http://canteen.tonglingok.com/api/v1/department/staffs/recharge",
+          "/api/v1/department/staffs/recharge",
           {
             page: Number(val)||1,
             size: 10,
@@ -194,7 +194,7 @@ export default {
     },
     recharge() {
       $axios
-        .post("http://canteen.tonglingok.com/api/v1/wallet/recharge/cash", {
+        .post("/api/v1/wallet/recharge/cash", {
           money: this.money,
           remark: this.remark,
           detail: JSON.stringify(this.detail)

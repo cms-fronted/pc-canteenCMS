@@ -208,7 +208,7 @@ export default {
       console.log(this.current_page);
       $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/department/staffs/recharge?page=${
+          `/api/v1/department/staffs/recharge?page=${
             this.current_page
           }&size=10&department_id=0&key=${this.key}`
         )
@@ -219,7 +219,7 @@ export default {
     },
     getCompanies() {
       $axios
-        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
+        .get("/api/v1/admin/companies")
         .then(res => {
           let arr = res.data;
           let allCompanies = [];
@@ -237,7 +237,7 @@ export default {
       if (company_id) {
         $axios
           .get(
-            `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
+            `/api/v1/canteens?company_id=${company_id}`
           )
           .then(res => {
             this.canteenList = Array.from(res.data);
@@ -245,7 +245,7 @@ export default {
           .catch(err => console.log(err));
       } else {
         $axios
-          .get("http://canteen.tonglingok.com/api/v1/managerCanteens")
+          .get("/api/v1/managerCanteens")
           .then(res => {
             this.canteenList = Array.from(res.data);
           })
@@ -257,7 +257,7 @@ export default {
       if (canteen_id) {
         $axios
           .get(
-            `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
+            `/api/v1/canteen/dinners?canteen_id=${canteen_id}`
           )
           .then(res => {
             this.dinnersList = Array.from(res.data);
@@ -275,7 +275,7 @@ export default {
     confirmSupplement() {
       $axios
         .post(
-          "http://canteen.tonglingok.com/api/v1/wallet/supplement",
+          "/api/v1/wallet/supplement",
           this.formdata
         )
         .then(res => {

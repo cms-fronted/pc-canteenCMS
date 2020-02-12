@@ -91,7 +91,7 @@ export default {
     async getCategoryList(company_id) {
       const res = await $axios.get(
         //原型没有选公司，不传company_id
-        "http://canteen.tonglingok.com/api/v1/company/categories"
+        "/api/v1/company/categories"
       );
       if (res.msg === "ok") {
         this.categoryOptions = unshiftAllOptions(Array.from(res.data));
@@ -100,7 +100,7 @@ export default {
     },
     async getSupplierList() {
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/company/suppliers"
+        "/api/v1/company/suppliers"
       );
       if (res.msg === "ok") {
         this.supplierOptions = unshiftAllOptions(Array.from(res.data));
@@ -110,7 +110,7 @@ export default {
     async queryList(page) {
       page = Number(page) || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/shop/cms/products?page=${page}&size=${
+        `/api/v1/shop/cms/products?page=${page}&size=${
           this.size
         }`,
         this.queryForm

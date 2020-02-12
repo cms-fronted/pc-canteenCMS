@@ -181,7 +181,7 @@ export default {
   methods: {
     async getCompanies() {
       await $axios
-        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
+        .get("/api/v1/admin/companies")
         .then(res => {
           let arr = res.data;
           let allCompanies = [];
@@ -204,7 +204,7 @@ export default {
     async fetchAdminList() {
       // module_id 暂时固定为14
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/wallet/recharge/admins?module_id=" +
+        "/api/v1/wallet/recharge/admins?module_id=" +
           localStorage.getItem("m_id")
       );
       if (res.msg == "ok") {
@@ -220,7 +220,7 @@ export default {
     },
     async exportFile() {
       await this.$exportExcel(
-        "http://canteen.tonglingok.com/api/v1/wallet/recharges/export",
+        "/api/v1/wallet/recharges/export",
         this.formdata
       );
     },
@@ -228,7 +228,7 @@ export default {
       this.formdata.page = this.current_page;
       await $axios
         .get(
-          "http://canteen.tonglingok.com/api/v1/wallet/recharges",
+          "/api/v1/wallet/recharges",
           this.formdata
         )
         .then(res => {

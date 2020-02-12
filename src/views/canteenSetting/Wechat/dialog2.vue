@@ -59,7 +59,7 @@ export default {
   methods: {
     fetchCompanyList() {
       $axios
-        .get("http://canteen.tonglingok.com/api/v1/companies")
+        .get("/api/v1/companies")
         .then(res => {
           this.companyList = Array.from(res.data.data);
         })
@@ -72,7 +72,7 @@ export default {
     ConfirmRevise() {
       $axios
         .post(
-          "http://canteen.tonglingok.com/api/v1/category/update",
+          "/api/v1/category/update",
           this.reviseForm
         )
         .then(res => {

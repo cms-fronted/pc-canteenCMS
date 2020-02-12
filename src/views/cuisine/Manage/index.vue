@@ -152,7 +152,7 @@
         <el-form-item style="display:block" label="图片">
           <el-upload
             ref="editUpload"
-            action="http://canteen.tonglingok.com/api/v1/image/upload"
+            action="/api/v1/image/upload"
             name="image"
             :file-list="fileList"
             list-type="picture-card"
@@ -244,7 +244,7 @@ export default {
       let queryForm = this.queryForm;
       let { m_id, dinner_id, canteen_id, company_id } = queryForm;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/foods`,
+        `/api/v1/foods`,
         {
           f_type: 2,
           page: page,
@@ -263,7 +263,7 @@ export default {
     },
     async getCompanies() {
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/admin/companies"
+        "/api/v1/admin/companies"
       );
       if (res.msg == "ok") {
         let arr = res.data;
@@ -284,16 +284,16 @@ export default {
       if (!isNaN(company_id)) {
         if (company_id) {
           res = await $axios.get(
-            `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
+            `/api/v1/canteens?company_id=${company_id}`
           );
         } else {
           //两种都可以
           res = await $axios.get(
-            "http://canteen.tonglingok.com/api/v1/managerCanteens"
+            "/api/v1/managerCanteens"
           );
           this.queryForm.company_id = localStorage.getItem("company_id");
           /*   $axios
-            .get(`http://canteen.tonglingok.com/api/v1/canteens?company_id=0`)
+            .get(`/api/v1/canteens?company_id=0`)
             .then(res => {
               this.diaLocationList = Array.from(res.data);
               this.locationList = getAllOptions(Array.from(res.data));
@@ -321,7 +321,7 @@ export default {
     async getDinnersList(canteen_id) {
       if (!isNaN(canteen_id)) {
         const res = await $axios.get(
-          `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
+          `/api/v1/canteen/dinners?canteen_id=${canteen_id}`
         );
         if (res.msg == "ok") {
           this.dinnersList = getAllOptions(Array.from(res.data));
@@ -338,7 +338,7 @@ export default {
     async getCategoryList(dinner_id) {
       if (!isNaN(dinner_id)) {
         const res = await $axios.get(
-          `http://canteen.tonglingok.com/api/v1/menus/dinner?dinner_id=${dinner_id}`
+          `/api/v1/menus/dinner?dinner_id=${dinner_id}`
         );
         if (res.msg == "ok") {
           this.categoryList = getAllOptions(Array.from(res.data));
@@ -351,7 +351,7 @@ export default {
     },
     async getEditDinnerList(canteen_id) {
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
+        `/api/v1/canteen/dinners?canteen_id=${canteen_id}`
       );
       if (res.msg == "ok") {
         this.editDinnersList = res.data;
@@ -359,7 +359,7 @@ export default {
     },
     async getEditCategoryList(dinner_id) {
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/menus/dinner?dinner_id=${dinner_id}`
+        `/api/v1/menus/dinner?dinner_id=${dinner_id}`
       );
       if (res.msg == "ok") {
         this.editCategoryList = Array.from(res.data);
@@ -382,7 +382,7 @@ export default {
       this.editFormdata = { ...item };
       delete this.editFormdata.img_url;
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/food",
+        "/api/v1/food",
         {
           id: item.id
         }
@@ -407,7 +407,7 @@ export default {
     async confirmEdit() {
       let data = this.editFormdata;
       const res = await $axios.post(
-        "http://canteen.tonglingok.com/api/v1/food/update",
+        "/api/v1/food/update",
         data
       );
       if (res.msg === "ok") {
@@ -466,7 +466,7 @@ export default {
       })
         .then(async () => {
           await $axios
-            .post("http://canteen.tonglingok.com/api/v1/food/handel", {
+            .post("/api/v1/food/handel", {
               id: item.id
             })
             .then(async () => {

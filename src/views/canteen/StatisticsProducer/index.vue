@@ -234,7 +234,7 @@ export default {
   methods: {
     async getCategoryOptions() {
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/company/categories"
+        "/api/v1/company/categories"
       );
       if (res.msg === "ok") {
         this.categoryOptions = unshiftAllOptions(Array.from(res.data));
@@ -243,7 +243,7 @@ export default {
     },
     async getProductsId(id) {
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/shop/supplierProducts/search"
+        "/api/v1/shop/supplierProducts/search"
       );
       if (res.msg === "ok") {
         this.productOptions = unshiftAllOptions(Array.from(res.data));
@@ -254,7 +254,7 @@ export default {
       if (query != "") {
         this.loading = true;
         const res = await $axios.get(
-          "http://canteen.tonglingok.com/api/v1/shop/supplierProducts/search?product=${query}"
+          "/api/v1/shop/supplierProducts/search?product=${query}"
         );
         if (res.msg === "ok") {
           this.productOptions = Array.from(res.data);
@@ -266,14 +266,14 @@ export default {
     },
     async exportFile() {
       await this.$exportExcel(
-        "http://canteen.tonglingok.com/api/v1/shop/order/exportConsumptionStatistic",
+        "/api/v1/shop/order/exportConsumptionStatistic",
         this.formdata
       );
     },
     async queryList(page) {
       page = Number(page) || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/shop/orderConsumption?page=${page}&size=${
+        `/api/v1/shop/orderConsumption?page=${page}&size=${
           this.size
         }`,
         this.formdata

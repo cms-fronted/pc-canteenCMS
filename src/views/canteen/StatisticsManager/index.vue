@@ -288,7 +288,7 @@ export default {
   methods: {
     async getCompanies() {
       await $axios
-        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
+        .get("/api/v1/admin/companies")
         .then(async res => {
           let arr = res.data;
           let companiesList = flatten(arr);
@@ -303,7 +303,7 @@ export default {
     async getDepartmentList(company_id) {
       await $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/departments?c_id=${company_id}`
+          `/api/v1/departments?c_id=${company_id}`
         )
         .then(res => {
           if (res.msg === "ok") {
@@ -321,7 +321,7 @@ export default {
     },
     async getDepartmentListWithoutCid() {
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/admin/departments"
+        "/api/v1/admin/departments"
       );
       if (res.msg === "ok") {
         this.departmentList = unshiftAllOptions(Aarray.from(res.data));
@@ -331,7 +331,7 @@ export default {
     async getCategoryOptions(company_id) {
       company_id = company_id || "";
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/company/categories",
+        "/api/v1/company/categories",
         {
           company_id: company_id
         }
@@ -347,7 +347,7 @@ export default {
     async getProductsId(company_id) {
       company_id = company_id || "";
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/shop/companyProducts/search?company_id=${company_id}`
+        `/api/v1/shop/companyProducts/search?company_id=${company_id}`
       );
       if (res.msg === "ok") {
         this.productOptions = unshiftAllOptions(Array.from(res.data));
@@ -362,7 +362,7 @@ export default {
       if (query != "") {
         this.loading = true;
         const res = await $axios.get(
-          `http://canteen.tonglingok.com/api/v1/shop/companyProducts/search?product=${query}`,
+          `/api/v1/shop/companyProducts/search?product=${query}`,
           {
             company_id: this.formdata.company_id || ""
           }
@@ -377,14 +377,14 @@ export default {
     },
     async exportFile() {
       await this.$exportExcel(
-        "http://canteen.tonglingok.com/api/v1/shop/order/exportConsumptionStatistic",
+        "/api/v1/shop/order/exportConsumptionStatistic",
         this.formdata
       );
     },
     async queryList(page) {
       page = typeof page == Number ? page : 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/shop/orderConsumption?page=${page}&size=${
+        `/api/v1/shop/orderConsumption?page=${page}&size=${
           this.size
         }`,
         this.formdata

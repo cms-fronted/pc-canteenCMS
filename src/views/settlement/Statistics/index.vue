@@ -327,7 +327,7 @@ export default {
     },
     async getCompanies() {
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/admin/companies"
+        "/api/v1/admin/companies"
       );
       if (res.msg === "ok") {
         let arr = res.data;
@@ -344,7 +344,7 @@ export default {
 
     async getDepartmentListWithoutCid() {
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/admin/departments"
+        "/api/v1/admin/departments"
       );
       if (res.msg === "ok") {
         this.departmentList = unshiftAllOptions(Array.from(res.data));
@@ -355,7 +355,7 @@ export default {
       if (company_id && Number(company_id)) {
         await $axios
           .get(
-            `http://canteen.tonglingok.com/api/v1/departments?c_id=${company_id}`
+            `/api/v1/departments?c_id=${company_id}`
           )
           .then(res => {
             let arr = res.data;
@@ -370,11 +370,11 @@ export default {
       let res = null;
       if (company_id && Number(company_id)) {
         res = await $axios.get(
-          `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
+          `/api/v1/canteens?company_id=${company_id}`
         );
       } else {
         res = await $axios.get(
-          "http://canteen.tonglingok.com/api/v1/managerCanteens"
+          "/api/v1/managerCanteens"
         );
       }
       if (res.msg === "ok") {
@@ -384,7 +384,7 @@ export default {
     },
     async getRoleType() {
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/role/types"
+        "/api/v1/role/types"
       );
       if (res.msg === "ok") {
         this.roleOptions = unshiftAllOptions(res.data.data);
@@ -396,7 +396,7 @@ export default {
         delete this.formdata.company_ids;
       }
       await this.$exportExcel(
-        "http://canteen.tonglingok.com/api/v1/order/consumptionStatistic/export",
+        "/api/v1/order/consumptionStatistic/export",
         this.formdata
       );
     },
@@ -410,7 +410,7 @@ export default {
         delete this.formdata.company_ids;
       }
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/consumptionStatistic?page=${page}&size=${
+        `/api/v1/order/consumptionStatistic?page=${page}&size=${
           this.size
         }`,
         this.formdata

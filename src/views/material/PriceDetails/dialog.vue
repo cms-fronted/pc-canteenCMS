@@ -72,14 +72,14 @@ export default {
       let data = this.formdata;
       if (this.type === "_add") {
         this.sendPostRequest(
-          "http://canteen.tonglingok.com/api/v1/material/save",
+          "/api/v1/material/save",
           data
         );
         this.$refs["addMaterialForm"].resetFields();
       } else {
         const { id, name, price, unit } = data;
         this.sendPostRequest(
-          "http://canteen.tonglingok.com/api/v1/material/update",
+          "/api/v1/material/update",
           { id, name, price, unit }
         );
       }

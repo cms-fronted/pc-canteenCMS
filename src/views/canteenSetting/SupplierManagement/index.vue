@@ -131,7 +131,7 @@ export default {
   methods: {
     async fetchCompanyList() {
       await $axios
-        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
+        .get("/api/v1/admin/companies")
         .then(res => {
           let arr = res.data;
           this.companyList = flatten(arr);
@@ -143,7 +143,7 @@ export default {
       if (this.companiesVisible) {
         await $axios
           .get(
-            `http://canteen.tonglingok.com/api/v1/suppliers?c_id=${
+            `/api/v1/suppliers?c_id=${
               this.company_id
             }&page=${this.page}&size=10`
           )
@@ -155,7 +155,7 @@ export default {
       } else {
         await $axios
           .get(
-            `http://canteen.tonglingok.com/api/v1/suppliers?page=${
+            `/api/v1/suppliers?page=${
               this.page
             }&size=10`
           )
@@ -183,7 +183,7 @@ export default {
       })
         .then(() => {
           $axios
-            .post("http://canteen.tonglingok.com/api/v1/supplier/delete", {
+            .post("/api/v1/supplier/delete", {
               id: this.currentSupplierId
             })
             .then(res => {
@@ -230,7 +230,7 @@ export default {
       this.reviseSupplierForm.pwd = this.pwd;
       $axios
         .post(
-          "http://canteen.tonglingok.com/api/v1/supplier/update",
+          "/api/v1/supplier/update",
           this.reviseSupplierForm
         )
         .then(res => {

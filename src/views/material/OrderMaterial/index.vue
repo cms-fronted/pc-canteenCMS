@@ -167,7 +167,7 @@ export default {
   methods: {
     async getCompanies() {
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/admin/companies"
+        "/api/v1/admin/companies"
       );
       if (res.msg === "ok") {
         this.companyOptions = flatten(res.data);
@@ -181,7 +181,7 @@ export default {
       this.queryForm.canteen_id = "";
       if (Number(company_id)) {
         const res = await $axios.get(
-          `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
+          `/api/v1/canteens?company_id=${company_id}`
         );
         if (res.msg === "ok") {
           this.canteenOptions = Array.from(res.data);
@@ -192,7 +192,7 @@ export default {
     },
     async getDinnerOptions(canteen_id) {
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
+        `/api/v1/canteen/dinners?canteen_id=${canteen_id}`
       );
       if (res.msg === "ok") {
         this.dinnerOptions = Array.from(res.data);
@@ -200,11 +200,11 @@ export default {
     },
     async exportFile() {
       this.$exportExcel(
-        "http://canteen.tonglingok.com/api/v1/material/exportOrderMaterials",
+        "/api/v1/material/exportOrderMaterials",
         this.queryForm
       );
       /*   const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/material/exportOrderMaterials",
+        "/api/v1/material/exportOrderMaterials",
         this.queryForm
       );
       if (res.msg === "ok") {
@@ -216,7 +216,7 @@ export default {
     async queryList(page) {
       page = page || 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/materialsStatistic?page=${page}&size=${
+        `/api/v1/order/materialsStatistic?page=${page}&size=${
           this.size
         }`,
         this.queryForm
@@ -239,7 +239,7 @@ export default {
       this.updateForm.materials = JSON.stringify(this.tableData);
       console.log(this.updateForm);
       const res = await $axios.post(
-        "http://canteen.tonglingok.com/api/v1/order/material/update",
+        "/api/v1/order/material/update",
         this.updateForm
       );
       if (res.msg === "ok") {

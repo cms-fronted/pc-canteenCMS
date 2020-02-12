@@ -209,7 +209,7 @@ export default {
     },
     async getCompanies() {
       await $axios
-        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
+        .get("/api/v1/admin/companies")
         .then(res => {
           if (res.msg === "ok") {
             let arr = res.data;
@@ -229,7 +229,7 @@ export default {
     getDepartmentList(company_id) {
       $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/departments?c_id=${company_id}`
+          `/api/v1/departments?c_id=${company_id}`
         )
         .then(res => {
           let arr = res.data;
@@ -243,7 +243,7 @@ export default {
       if (canteen_id) {
         $axios
           .get(
-            `http://canteen.tonglingok.com/api/v1/canteen/dinners?canteen_id=${canteen_id}`
+            `/api/v1/canteen/dinners?canteen_id=${canteen_id}`
           )
           .then(res => {
             this.dinnersList = unshiftAllOptions(Array.from(res.data));
@@ -256,11 +256,11 @@ export default {
       let res;
       if (company_id) {
         res = await $axios.get(
-          `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
+          `/api/v1/canteens?company_id=${company_id}`
         );
       } else {
         res = await $axios.get(
-          "http://canteen.tonglingok.com/api/v1/managerCanteens"
+          "/api/v1/managerCanteens"
         );
         this.formdata.company_ids = localStorage.getItem("company_id");
       }
@@ -271,7 +271,7 @@ export default {
     },
     async exportFile() {
       this.$exportExcel(
-        "http://canteen.tonglingok.com/api/v1/order/orderStatistic/detail/export",
+        "/api/v1/order/orderStatistic/detail/export",
         this.formdata
       );
     },
@@ -290,7 +290,7 @@ export default {
       } = this.formdata;
       await $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/order/orderStatistic/detail?page=${page}&size=${pageSize}`,
+          `/api/v1/order/orderStatistic/detail?page=${page}&size=${pageSize}`,
           {
             name: name,
             company_ids: company_ids,

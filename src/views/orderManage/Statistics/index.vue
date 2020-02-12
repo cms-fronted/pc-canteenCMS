@@ -165,7 +165,7 @@ export default {
     },
     async getCompanies() {
       const res = await $axios.get(
-        "http://canteen.tonglingok.com/api/v1/admin/companies"
+        "/api/v1/admin/companies"
       );
       if (res.msg == "ok") {
         let arr = res.data;
@@ -181,11 +181,11 @@ export default {
       let res;
       if (company_id) {
         res = await $axios.get(
-          `http://canteen.tonglingok.com/api/v1/canteens?company_id=${company_id}`
+          `/api/v1/canteens?company_id=${company_id}`
         );
       } else {
         res = await $axios.get(
-          "http://canteen.tonglingok.com/api/v1/managerCanteens"
+          "/api/v1/managerCanteens"
         );
         this.formdata.company_ids = localStorage.getItem('company_id');
       }
@@ -196,14 +196,14 @@ export default {
     },
     async exportFile() {
       await this.$exportExcel(
-        "http://canteen.tonglingok.com/api/v1/order/orderStatistic/export",
+        "/api/v1/order/orderStatistic/export",
         this.formdata
       );
     },
     async queryList(page) {
       page = typeof page == "number" ? page : 1;
       const res = await $axios.get(
-        `http://canteen.tonglingok.com/api/v1/order/orderStatistic?page=${page}&size=${this.size}`,
+        `/api/v1/order/orderStatistic?page=${page}&size=${this.size}`,
         this.formdata
       );
       if (res.msg === "ok") {

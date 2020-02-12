@@ -49,7 +49,7 @@
           :headers="header"
           :show-file-list="false"
           accept=".xls, .xlsx"
-          action="http://canteen.tonglingok.com/api/v1/material/upload"
+          action="/api/v1/material/upload"
           :on-success="handleSuccess"
           :data="{ c_id: canteen_id }"
           name="materials"
@@ -175,7 +175,7 @@ export default {
     },
     async fetchCompanyList() {
       await $axios
-        .get("http://canteen.tonglingok.com/api/v1/admin/companies")
+        .get("/api/v1/admin/companies")
         .then(res => {
           this.companyList = getAllOptions(flatten(res.data));
           this.company_id = this.companyList[0].id;
@@ -191,7 +191,7 @@ export default {
         } else {
           await $axios
             .get(
-              `http://canteen.tonglingok.com/api/v1/canteens?company_id=${id}`
+              `/api/v1/canteens?company_id=${id}`
             )
             .then(res => {
               this.canteenList = getAllOptions(flatten(res.data));
@@ -201,7 +201,7 @@ export default {
         }
       } else {
         await $axios
-          .get("http://canteen.tonglingok.com/api/v1/managerCanteens")
+          .get("/api/v1/managerCanteens")
           .then(res => {
             this.canteenList = Array.from(res.data);
             this.canteen_id = this.canteenList[0].id;
@@ -213,7 +213,7 @@ export default {
       page = Number(page) || 1;
       await $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/materials?page=${page}&size=10&key=${
+          `/api/v1/materials?page=${page}&size=10&key=${
             this.keyword
           }&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
         )
@@ -237,7 +237,7 @@ export default {
         type: "warning"
       }).then(() => {
         this.$axios
-          .post("http://canteen.tonglingok.com/api/v1/material/handel", {
+          .post("/api/v1/material/handel", {
             id: row.id
           })
           .then(res => {
@@ -268,7 +268,7 @@ export default {
     async deriveData() {
       await $axios
         .get(
-          `http://canteen.tonglingok.com/api/v1/material/export?key=${
+          `/api/v1/material/export?key=${
             this.keyword
           }&canteen_ids=${this.canteen_id}&company_ids=${this.company_id}`
         )

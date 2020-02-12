@@ -7,7 +7,7 @@
     "build": "vue-cli-service build"
   },
   "proxy": {
-    "/v1": "http://canteen.tonglingok.com/api/v1/"
+    "/v1": "/api/v1/"
   },
   "dependencies": {
     "@babel/polyfill": "^7.7.0",
