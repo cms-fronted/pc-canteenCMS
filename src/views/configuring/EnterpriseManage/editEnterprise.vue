@@ -71,8 +71,11 @@ export default {
     visible(val) {
       this.isOpen = val;
     },
-    modules(val) {
-      this.initData(val);
+    modules: {
+      handler(val) {
+        this.initData(val);
+      },
+      // immediate: true
     }
   },
   methods: {
@@ -107,8 +110,13 @@ export default {
       this.pcModules = val.filter(item => item.type === 1);
       this.WXModules = val.filter(item => item.type === 2);
       let PCarr = treeToArr(this.pcModules);
+      console.log(PCarr.map(item => item.name));
       let WXarr = treeToArr(this.WXModules);
-
+      allModules.forEach(item => {
+        if (item.have == 1) {
+          this.defaultModules.push(item.id); //保存 该企业已有模块
+        }
+      });
       this.initCheckBox(
         PCarr,
         this.modulesCheckbox,
@@ -124,12 +132,6 @@ export default {
         this.checkAll,
         this.isIndeterminate
       );
-
-      allModules.forEach(item => {
-        if (item.have === 1) {
-          this.defaultModules.push(item.id); //保存 该企业已有模块
-        }
-      });
     },
     initCheckBox(
       arr, //传入 pc端 / 微信 模块数组
@@ -212,6 +214,7 @@ export default {
           }
         });
       }
+
       modulesChecked.forEach(id => {
         if (defaultModules.indexOf(id) === -1) {
           //当前已选中 的每一个id 去与 默认模块钟的id匹配， 若找不到，则为新增
@@ -223,6 +226,7 @@ export default {
     },
     async _edit() {
       let { _add, _cancel } = this.handleData();
+      console.log(_add, _cancel);
       let add_modules = [];
       let formdata = {
         company_id: this.company_id,
@@ -243,6 +247,7 @@ export default {
         formdata.canteen.cancel_modules = _cancel.join(",");
       }
       formdata.canteen = JSON.stringify(formdata.canteen);
+      return;
       const url = "/api/v1/module/company/update";
       const res = await $axios.post(url, formdata);
       if (res.msg === "ok") {
