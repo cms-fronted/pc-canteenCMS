@@ -25,6 +25,7 @@ export function flatten(arr) {
   return result;
 }
 export function getAllOptions(target) {
+  if (target.length === 1) return target;
   let allId = target.map(el => el.id).join(",");
   target.unshift({
     id: allId,

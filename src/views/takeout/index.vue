@@ -281,6 +281,9 @@ export default {
         this.queryForm.dinner_id = 0;
         this.queryForm.canteen_id = 0;
         this.queryForm.department_id = 0;
+        if (this.companyOptions.length === 1) {
+          await this.getListOptions(this.companyOptions[0].id);
+        }
       }
     },
     async getListOptions(company_ids) {
@@ -290,10 +293,8 @@ export default {
       this.queryForm.dinner_id = 0;
       this.queryForm.canteen_id = 0;
       this.queryForm.department_id = 0;
-      if(this.queryForm.company_ids[company_ids] !== '全部') {
-        await this.getCanteenOptions(company_ids);
-        await this.getDepartmentOptions(company_ids);
-      }
+      await this.getCanteenOptions(company_ids);
+      await this.getDepartmentOptions(company_ids);
     },
     async getDepartmentOptions(company_ids) {
       const res = await $axios.get(
@@ -337,6 +338,8 @@ export default {
       }
     },
     async getDinnersOptions(canteen_id) {
+      this.dinnersOptions = [{ name: "全部", id: 0 }];
+      this.queryForm.dinner_id = 0;
       //饭堂不为全部时， 0 为全部
       if (canteen_id) {
         const res = await $axios.get(
