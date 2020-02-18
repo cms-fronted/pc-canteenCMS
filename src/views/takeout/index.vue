@@ -290,8 +290,10 @@ export default {
       this.queryForm.dinner_id = 0;
       this.queryForm.canteen_id = 0;
       this.queryForm.department_id = 0;
-      await this.getCanteenOptions(company_ids);
-      await this.getDepartmentOptions(company_ids);
+      if(this.queryForm.company_ids[company_ids] !== '全部') {
+        await this.getCanteenOptions(company_ids);
+        await this.getDepartmentOptions(company_ids);
+      }
     },
     async getDepartmentOptions(company_ids) {
       const res = await $axios.get(
