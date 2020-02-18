@@ -279,9 +279,18 @@ export default {
         this.queryForm.dinner_id = 0;
         this.queryForm.canteen_id = 0;
         this.queryForm.department_id = 0;
+        if(this.companyOptions.length === 1) {
+          await this.getListOptions( this.companyOptions[0].id)
+        }
       }
     },
     async getListOptions(company_ids) {
+      this.canteenOptions = [{ name: "全部", id: 0 }];
+      this.dinnersOptions = [{ name: "全部", id: 0 }];
+      this.departmentsOptions = [{ name: "全部", id: 0 }];
+      this.queryForm.dinner_id = 0;
+      this.queryForm.canteen_id = 0;
+      this.queryForm.department_id = 0;
       await this.getCanteenOptions(company_ids);
       await this.getDepartmentOptions(company_ids);
     },
