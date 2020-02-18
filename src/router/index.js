@@ -22,6 +22,14 @@ import getTitle from "@/utils/getTitle";
 
 export const currencyRoutes = [
   {
+    path: "/test",
+    component: () => import("@/views/test"),
+    hidden: true,
+    meta: {
+      title: '测试'
+    }
+  },
+  {
     path: "/",
     redirect: "/order"
   },

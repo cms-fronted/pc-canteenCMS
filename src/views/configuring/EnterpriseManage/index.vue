@@ -360,9 +360,9 @@ export default {
     async editEnterpriseDialog(node, data) {
       let id = data.id;
       this.company_id = id;
-      const modules = await this.getSystemModules(id);
-      if (modules.msg === "ok") {
-        this.modules = Array.from(modules.data);
+      const modulesRes = await this.getSystemModules(id);
+      if (modulesRes.msg === "ok") {
+        this.modules = Array.from(modulesRes.data);
       }
       this.editEnterpriseDialogVisible = true;
     },
