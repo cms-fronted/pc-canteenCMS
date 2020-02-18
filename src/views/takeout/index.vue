@@ -21,7 +21,7 @@
                 <el-select
                   filterable
                   v-model="queryForm.company_ids"
-                  @change="getCanteenOptions"
+                  @change="getListOptions"
                   placeholder="请选择公司"
                 >
                   <el-option
@@ -288,17 +288,17 @@ export default {
     async getDepartmentOptions(company_ids) {
       const res = await $axios.get(`/api/v1/departments?c_id=${company_ids}`);
       if (res.msg === "ok") {
-        this.departmentOptions = unshiftAllOptions(
+        this.departmentsOptions = unshiftAllOptions(
           Array.from(flatten(res.data))
         );
-        this.queryForm.department_id = this.departmentOptions[0].id;
+        this.queryForm.department_id = this.departmentsOptions[0].id;
       }
     },
     async getDepartmenOptionsWithoutCid() {
       const res = await $axios.get("/api/v1/admin/departments");
       if (res.msg === "ok") {
-        this.departmentOptions = unshiftAllOptions(Array.from(res.data));
-        this.queryForm.department_id = this.departmentOptions[0].id;
+        this.departmentsOptions = unshiftAllOptions(Array.from(res.data));
+        this.queryForm.department_id = this.departmentsOptions[0].id;
       }
     },
     async getCanteenOptions(company_ids) {
