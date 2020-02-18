@@ -112,6 +112,8 @@ export default {
       return data;
     },
     closeDialog() {
+      this.defaultChecked = [];
+      this.haveModules = [];
       this.$emit("closeDialog", false);
     },
 
