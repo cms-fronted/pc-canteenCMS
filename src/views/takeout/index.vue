@@ -51,10 +51,7 @@
             </el-col>
             <el-col :span="6">
               <el-form-item label="餐次">
-                <el-select
-                  v-model="queryForm.dinner_id"
-                  placeholder="请选择餐次"
-                >
+                <el-select v-model="queryForm.dinner_id" placeholder="请选择餐次">
                   <el-option
                     v-for="item in dinnersOptions"
                     :key="item.id"
@@ -71,29 +68,33 @@
               <el-form-item label="状态" prop="used">
                 <el-select v-model="queryForm.used">
                   <el-option label="全部" :value="3" />
-                  <el-option label="已派单" :value="1" />
-                  <el-option label="未派单" :value="2" />
+                  <el-option label="已打印" :value="1" />
+                  <el-option label="未打印" :value="2" />
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="6">
+              <el-form-item label="部门" prop="department">
+                <el-select v-model="queryForm.department_id">
+                  <el-option
+                    v-for="item in departmentsOptions"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
           </el-row>
         </el-form>
         <div class="btn-area">
-          <el-button type="primary" @click="queryList" :disabled="isDisabled"
-            >查询</el-button
-          >
+          <el-button type="primary" @click="queryList" :disabled="isDisabled">查询</el-button>
           <el-button type="primary" @click="exportFile">导出</el-button>
-          <el-button type="success" @click="deliverOrder">派单</el-button>
         </div>
         <div class="clearfix"></div>
       </div>
       <div class="main-content">
-        <el-table
-          :data="tableData"
-          border
-          style="width:100%"
-          @selection-change="saveOrderIds"
-        >
+        <el-table :data="tableData" border style="width:100%">
           <el-table-column type="selection" width="55" />
           <el-table-column label="订单ID" prop="order_id" />
           <el-table-column label="日期" prop="ordering_date" />
@@ -105,9 +106,8 @@
               <span>
                 <el-button
                   type="text"
-                  @click="openDetailDialog(scoped.row, 'check')"
-                  >{{ scoped.row.dinner }}</el-button
-                >
+                  @click="openDetailDialog(scoped.row.dinner)"
+                >{{ scoped.row.dinner }}</el-button>
               </span>
             </template>
           </el-table-column>
@@ -116,40 +116,30 @@
             <template slot-scope="scoped">
               <span>
                 {{
-                  scoped.row.province +
-                    scoped.row.area +
-                    scoped.row.city +
-                    scoped.row.address
+                scoped.row.province +
+                scoped.row.area +
+                scoped.row.city +
+                scoped.row.address
                 }}
               </span>
             </template>
           </el-table-column>
           <el-table-column label="状态">
             <template slot-scope="scoped">
-              <el-tag :type="scoped.row.used === 1 ? 'success' : 'danger'">{{
-                scoped.row.used === 1 ? "已派单" : "未派单"
-              }}</el-tag>
+              <el-tag
+                :type="scoped.row.used === 1 ? 'success' : 'warning'"
+              >{{ scoped.row.used === 1 ? "已派单" : "未派单" }}</el-tag>
             </template>
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scoped">
-              <span v-if="scoped.row.used == 2">
-                <el-button
-                  type="text"
-                  small
-                  @click="openDetailDialog(scoped.row)"
-                  >打印小票</el-button
-                >
+              <span v-if="scoped.row.used === 2">
+                <el-button type="success" size="small" @click="openDetailDialog(scoped.row)">打印小票</el-button>
               </span>
             </template>
           </el-table-column>
         </el-table>
-        <pagination
-          v-if="!tableData"
-          :total="total"
-          :page="current_page"
-          @pagination="queryList"
-        />
+        <pagination v-if="!tableData" :total="total" :page="current_page" @pagination="queryList" />
       </div>
     </div>
     <el-dialog
@@ -163,16 +153,15 @@
       top="5vh"
     >
       <ul>
-        <li>收货人：{{ detailForm.address && detailForm.address.name }}</li>
-        <li>手机号码：{{ detailForm.address && detailForm.address.phone }}</li>
+        <li>收货人：{{ detailForm.address.name }}</li>
+        <li>手机号码：{{ detailForm.address.phone }}</li>
         <!--        <li>送货时间：{{ detailForm.address.name }}</li>-->
         <li>
           送货地址：{{
-            detailForm.address &&
-              detailForm.address.province + detailForm.address &&
-              detailForm.address.city + detailForm.address &&
-              detailForm.address.area + detailForm.address &&
-              detailForm.address.address
+          detailForm.address.province +
+          detailForm.address.city +
+          detailForm.address.area +
+          detailForm.address.address
           }}
         </li>
       </ul>
@@ -181,9 +170,7 @@
         <el-table-column label="菜品" prop="name"></el-table-column>
         <el-table-column label="数量" prop="count"></el-table-column>
         <el-table-column label="金额" prop="price">
-          <template slot-scope="scoped">{{
-            scoped.row.price ? scoped.row.price : "/"
-          }}</template>
+          <template slot-scope="scoped">{{ scoped.row.price ? scoped.row.price : "/" }}</template>
         </el-table-column>
       </el-table>
     </el-dialog>
@@ -191,7 +178,7 @@
 </template>
 
 <script>
-import $axios from "@/api/index";
+import $axios from "@https://tonglingok.com/canteen/api/index";
 import Pagination from "@/components/Pagination";
 import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
 import moment from "moment";
@@ -206,13 +193,14 @@ export default {
         company_ids: null,
         dinner_id: "",
         canteen_id: "",
+        department_id: "",
         used: 3
       },
-      orderIds: "",
       tableData: [],
       canteenOptions: [],
       companyOptions: [],
       dinnersOptions: [],
+      departmentsOptions: [],
       detailForm: {
         id: 8,
         address_id: 1,
@@ -274,22 +262,43 @@ export default {
       await this.queryList(1);
     } else {
       await this.getCanteenOptions();
+      await this.getDepartmenOptionsWithoutCid();
       await this.queryList(1);
     }
   },
   components: { Pagination },
   methods: {
     async getCompanyOptions() {
-      const res = await $axios.get(
-        "https://tonglingok.com/canteen/api/v1/admin/companies"
-      );
+      const res = await $axios.get("https://tonglingok.com/canteen/api/v1/admin/companies");
       if (res.msg === "ok") {
         this.companyOptions = getAllOptions(flatten(res.data));
         this.queryForm.company_ids = this.companyOptions[0].id;
         this.canteenOptions = [{ name: "全部", id: 0 }];
         this.dinnersOptions = [{ name: "全部", id: 0 }];
+        this.departmentsOptions = [{ name: "全部", id: 0 }];
         this.queryForm.dinner_id = 0;
         this.queryForm.canteen_id = 0;
+        this.queryForm.department_id = 0;
+      }
+    },
+    async getListOptions(company_ids) {
+      await this.getCanteenOptions(company_ids);
+      await this.getDepartmentOptions(company_ids);
+    },
+    async getDepartmentOptions(company_ids) {
+      const res = await $axios.get(`https://tonglingok.com/canteen/api/v1/departments?c_id=${company_ids}`);
+      if (res.msg === "ok") {
+        this.departmentOptions = unshiftAllOptions(
+          Array.from(flatten(res.data))
+        );
+        this.queryForm.department_id = this.departmentOptions[0].id;
+      }
+    },
+    async getDepartmenOptionsWithoutCid() {
+      const res = await $axios.get("https://tonglingok.com/canteen/api/v1/admin/departments");
+      if (res.msg === "ok") {
+        this.departmentOptions = unshiftAllOptions(Array.from(res.data));
+        this.queryForm.department_id = this.departmentOptions[0].id;
       }
     },
     async getCanteenOptions(company_ids) {
@@ -300,13 +309,9 @@ export default {
       let res;
       if (company_ids) {
         if (!Number(company_ids)) return;
-        res = await $axios.get(
-          `https://tonglingok.com/canteen/api/v1/canteens?company_id=${company_ids}`
-        );
+        res = await $axios.get(`https://tonglingok.com/canteen/api/v1/canteens?company_id=${company_ids}`);
       } else {
-        res = await $axios.get(
-          "https://tonglingok.com/canteen/api/v1/managerCanteens"
-        );
+        res = await $axios.get("https://tonglingok.com/canteen/api/v1/managerCanteens");
       }
       if (res.msg === "ok") {
         this.canteenOptions = unshiftAllOptions(Array.from(res.data));
@@ -339,9 +344,7 @@ export default {
       queryForm.canteen_id = queryForm.canteen_id ? queryForm.canteen_id : 0;
       queryForm.dinner_id = queryForm.dinner_id ? queryForm.dinner_id : 0;
       const res = await $axios.get(
-        `https://tonglingok.com/canteen/api/v1/order/takeoutStatistic?page=${page}&size=${
-          this.size
-        }`,
+        `https://tonglingok.com/canteen/api/v1/order/takeoutStatistic?page=${page}&size=${this.size}`,
         queryForm
       );
       if (res.msg === "ok") {
@@ -350,47 +353,23 @@ export default {
         this.current_page = res.data.current_page;
       }
     },
-    async openDetailDialog(row, type) {
+    async openDetailDialog(row) {
       let id = row.order_id;
-      const res = await $axios.get(
-        `https://tonglingok.com/canteen/api/v1/order/info/print?order_id=${id}`
-      );
+      const res = await $axios.get(`https://tonglingok.com/canteen/api/v1/order/info/print?order_id=${id}`);
       if (res.msg === "ok") {
         this.detailForm = res.data;
         this.detailDialogVisible = true;
-        if (type != "check") {
-          setTimeout(() => {
-            this.$print(this.$refs.print);
-          }, 1000);
-          const res2 = await $axios.post(
-            "https://tonglingok.com/canteen/api/v1/order/used",
-            { ids: id }
-          );
-          if (res2.msg === "ok") {
-            this.$message.success("外卖订单完成");
-            await this.queryList();
-          } else {
-            this.$message.error(res.msg);
-          }
+        setTimeout(() => {
+          this.$print(this.$refs.print);
+        }, 1000);
+      }
+      await $axios.post("https://tonglingok.com/canteen/api/v1/order/used", { ids: id }).then(res => {
+        if (res.msg === "ok") {
+          this.$message.success("外卖订单完成");
+        } else {
+          this.$message.error(res.msg);
         }
-      }
-    },
-    saveOrderIds(val) {
-      this.orderIds = val.map(item => item.order_id).toString();
-      console.log(this.orderIds);
-    },
-    async deliverOrder() {
-      if (!this.orderIds) return;
-      const res = await $axios.post(
-        "https://tonglingok.com/canteen/api/v1/order/used",
-        { ids: this.orderIds }
-      );
-      if (res.msg == "ok") {
-        this.$message.success("操作成功");
-        await this.queryList();
-      } else {
-        this.$message.error(res.msg);
-      }
+      });
     },
     async closeDetailDialog() {
       this.detailDialogVisible = false;
