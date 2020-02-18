@@ -269,7 +269,9 @@ export default {
   components: { Pagination },
   methods: {
     async getCompanyOptions() {
-      const res = await $axios.get("https://tonglingok.com/canteen/api/v1/admin/companies");
+      const res = await $axios.get(
+        "https://tonglingok.com/canteen/api/v1/admin/companies"
+      );
       if (res.msg === "ok") {
         this.companyOptions = getAllOptions(flatten(res.data));
         this.queryForm.company_ids = this.companyOptions[0].id;
@@ -282,23 +284,33 @@ export default {
       }
     },
     async getListOptions(company_ids) {
+      this.canteenOptions = [{ name: "全部", id: 0 }];
+      this.dinnersOptions = [{ name: "全部", id: 0 }];
+      this.departmentsOptions = [{ name: "全部", id: 0 }];
+      this.queryForm.dinner_id = 0;
+      this.queryForm.canteen_id = 0;
+      this.queryForm.department_id = 0;
       await this.getCanteenOptions(company_ids);
       await this.getDepartmentOptions(company_ids);
     },
     async getDepartmentOptions(company_ids) {
-      const res = await $axios.get(`https://tonglingok.com/canteen/api/v1/departments?c_id=${company_ids}`);
+      const res = await $axios.get(
+        `https://tonglingok.com/canteen/api/v1/departments?c_id=${company_ids}`
+      );
       if (res.msg === "ok") {
-        this.departmentOptions = unshiftAllOptions(
+        this.departmentsOptions = unshiftAllOptions(
           Array.from(flatten(res.data))
         );
-        this.queryForm.department_id = this.departmentOptions[0].id;
+        this.queryForm.department_id = this.departmentsOptions[0].id;
       }
     },
     async getDepartmenOptionsWithoutCid() {
-      const res = await $axios.get("https://tonglingok.com/canteen/api/v1/admin/departments");
+      const res = await $axios.get(
+        "https://tonglingok.com/canteen/api/v1/admin/departments"
+      );
       if (res.msg === "ok") {
-        this.departmentOptions = unshiftAllOptions(Array.from(res.data));
-        this.queryForm.department_id = this.departmentOptions[0].id;
+        this.departmentsOptions = unshiftAllOptions(Array.from(res.data));
+        this.queryForm.department_id = this.departmentsOptions[0].id;
       }
     },
     async getCanteenOptions(company_ids) {
@@ -309,9 +321,13 @@ export default {
       let res;
       if (company_ids) {
         if (!Number(company_ids)) return;
-        res = await $axios.get(`https://tonglingok.com/canteen/api/v1/canteens?company_id=${company_ids}`);
+        res = await $axios.get(
+          `https://tonglingok.com/canteen/api/v1/canteens?company_id=${company_ids}`
+        );
       } else {
-        res = await $axios.get("https://tonglingok.com/canteen/api/v1/managerCanteens");
+        res = await $axios.get(
+          "https://tonglingok.com/canteen/api/v1/managerCanteens"
+        );
       }
       if (res.msg === "ok") {
         this.canteenOptions = unshiftAllOptions(Array.from(res.data));
@@ -355,7 +371,9 @@ export default {
     },
     async openDetailDialog(row) {
       let id = row.order_id;
-      const res = await $axios.get(`https://tonglingok.com/canteen/api/v1/order/info/print?order_id=${id}`);
+      const res = await $axios.get(
+        `https://tonglingok.com/canteen/api/v1/order/info/print?order_id=${id}`
+      );
       if (res.msg === "ok") {
         this.detailForm = res.data;
         this.detailDialogVisible = true;
@@ -363,13 +381,15 @@ export default {
           this.$print(this.$refs.print);
         }, 1000);
       }
-      await $axios.post("https://tonglingok.com/canteen/api/v1/order/used", { ids: id }).then(res => {
-        if (res.msg === "ok") {
-          this.$message.success("外卖订单完成");
-        } else {
-          this.$message.error(res.msg);
-        }
-      });
+      await $axios
+        .post("https://tonglingok.com/canteen/api/v1/order/used", { ids: id })
+        .then(res => {
+          if (res.msg === "ok") {
+            this.$message.success("外卖订单完成");
+          } else {
+            this.$message.error(res.msg);
+          }
+        });
     },
     async closeDetailDialog() {
       this.detailDialogVisible = false;
