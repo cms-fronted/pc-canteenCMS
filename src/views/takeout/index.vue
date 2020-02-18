@@ -21,7 +21,7 @@
                 <el-select
                   filterable
                   v-model="queryForm.company_ids"
-                  @change="getCanteenOptions"
+                  @change="getListOptions"
                   placeholder="请选择公司"
                 >
                   <el-option
@@ -178,7 +178,7 @@
 </template>
 
 <script>
-import $axios from "@https://tonglingok.com/canteen/api/index";
+import $axios from "@/api/index";
 import Pagination from "@/components/Pagination";
 import { flatten, getAllOptions, unshiftAllOptions } from "@/utils/flatternArr";
 import moment from "moment";

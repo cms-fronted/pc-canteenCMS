@@ -240,6 +240,7 @@ export default {
         formdata.canteen.cancel_modules = _cancel.join(",");
       }
       formdata.canteen = JSON.stringify(formdata.canteen);
+      return ;
       const url = "https://tonglingok.com/canteen/api/v1/module/company/update";
       const res = await $axios.post(url, formdata);
       if (res.msg === "ok") {
