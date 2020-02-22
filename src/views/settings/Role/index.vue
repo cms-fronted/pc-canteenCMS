@@ -4,18 +4,9 @@
     <el-divider></el-divider>
     <div class="main">
       <div class="main-header">
-        <el-form
-          :model="queryForm"
-          ref="queryForm"
-          :inline="true"
-          label-width="60px"
-        >
+        <el-form :model="queryForm" ref="queryForm" :inline="true" label-width="60px">
           <el-form-item label="公司" prop="c_name" v-if="companiesVisible">
-            <el-select
-              v-model="queryForm.c_name"
-              placeholder="请选择企业"
-              filterable
-            >
+            <el-select v-model="queryForm.c_name" placeholder="请选择企业" filterable>
               <el-option
                 v-for="item in companyOptions"
                 :key="item.id"
@@ -32,10 +23,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="关键字" prop="key">
-            <el-input
-              placeholder="请输入关键字"
-              v-model="queryForm.key"
-            ></el-input>
+            <el-input placeholder="请输入关键字" v-model="queryForm.key"></el-input>
           </el-form-item>
           <el-button @click="fetchList">查询</el-button>
           <el-button @click="openNewRoleDialog">新增角色</el-button>
@@ -48,16 +36,20 @@
           <el-table-column label="账号" prop="account"></el-table-column>
           <el-table-column label="可见饭堂">
             <template slot-scope="scoped">
-              <span>{{
+              <span>
+                {{
                 scoped.row.canteen.map(item => item.canteen_name).join(",")
-              }}</span>
+                }}
+              </span>
             </template>
           </el-table-column>
           <el-table-column label="状态">
             <template slot-scope="scoped">
-              <el-tag :type="scoped.row.state === 1 ? 'success' : 'danger'">{{
+              <el-tag :type="scoped.row.state === 1 ? 'success' : 'danger'">
+                {{
                 scoped.row.state === 1 ? "正常" : "停用"
-              }}</el-tag>
+                }}
+              </el-tag>
             </template>
           </el-table-column>
           <el-table-column label="备注" prop="remark"></el-table-column>
@@ -68,14 +60,9 @@
                   type="text"
                   size="mini"
                   @click="operateRoles(scoped.row)"
-                  >{{ scoped.row.state === 1 ? "停用" : "启用" }}</el-button
-                >
-                <el-button type="text" size="mini" @click="_edit(scoped.row)"
-                  >编辑</el-button
-                >
-                <el-button type="text" size="mini" @click="_delete(scoped.row)"
-                  >删除</el-button
-                >
+                >{{ scoped.row.state === 1 ? "停用" : "启用" }}</el-button>
+                <el-button type="text" size="mini" @click="_edit(scoped.row)">编辑</el-button>
+                <el-button type="text" size="mini" @click="_delete(scoped.row)">删除</el-button>
               </span>
             </template>
           </el-table-column>
@@ -97,12 +84,7 @@
     >
       <el-row :gutter="20">
         <el-col :span="6">
-          <el-form
-            :model="roleForm"
-            ref="roleForm"
-            label-width="70px"
-            label-position="left"
-          >
+          <el-form :model="roleForm" ref="roleForm" label-width="70px" label-position="left">
             <el-form-item label="公司名称" prop="c_id" v-if="!isEdit">
               <el-select
                 v-model="roleForm.c_id"
@@ -126,34 +108,20 @@
                   :value="item.id"
                   :key="item.id"
                   :label="item"
-                  >{{ item.name }}</el-checkbox
-                >
+                >{{ item.name }}</el-checkbox>
               </el-checkbox-group>
             </el-form-item>
             <el-form-item label="手机号码" prop="phone" v-if="!isEdit">
-              <el-input
-                v-model="roleForm.phone"
-                placeholder="请输入手机号"
-              ></el-input>
+              <el-input v-model="roleForm.phone" placeholder="请输入手机号"></el-input>
             </el-form-item>
             <el-form-item label="角色名称" prop="role">
-              <el-input
-                v-model="roleForm.role"
-                placeholder="请输入名称"
-              ></el-input>
+              <el-input v-model="roleForm.role" placeholder="请输入名称"></el-input>
             </el-form-item>
             <el-form-item label="角色账号" prop="account" v-if="!isEdit">
-              <el-input
-                v-model="roleForm.account"
-                placeholder="请输入账号"
-              ></el-input>
+              <el-input v-model="roleForm.account" placeholder="请输入账号"></el-input>
             </el-form-item>
             <el-form-item label="角色密码" prop="passwd" v-if="!isEdit">
-              <el-input
-                v-model="roleForm.passwd"
-                placeholder="请输入密码"
-                show-password
-              ></el-input>
+              <el-input v-model="roleForm.passwd" placeholder="请输入密码" show-password></el-input>
             </el-form-item>
             <el-form-item label="角色说明" prop="remark">
               <el-input
@@ -294,10 +262,7 @@ export default {
       let canteens = [];
       let res = null;
       let newCanteen = [];
-      delete this.roleForm.phone;
-      delete this.roleForm.company;
-      delete this.roleForm.company_id;
-      delete this.roleForm.create_time;
+
       if (!this.isConfirmRules) {
         this.$message.warning("请先确定角色模块");
         return;
@@ -307,6 +272,10 @@ export default {
         delete this.roleForm.rules;
       }
       if (this.isEdit) {
+        delete this.roleForm.phone;
+        delete this.roleForm.company;
+        delete this.roleForm.company_id;
+        delete this.roleForm.create_time;
         let canteensChecked = this.roleForm.canteens;
         let haveCanteenId = this.haveCanteen.map(item => item.canteen_id);
         canteensChecked = canteensChecked.map(item => item.id);

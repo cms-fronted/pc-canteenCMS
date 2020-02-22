@@ -24,7 +24,7 @@
       </el-form-item>
       <el-form-item label="图片">
         <el-upload
-          action="http://canteen.tonglingok.comhttps://tonglingok.com/canteen/api/v1/image/upload"
+          action="https://tonglingok.com/canteen/api/v1/image/upload"
           list-type="picture-card"
           name="image"
           :limit="limit"
