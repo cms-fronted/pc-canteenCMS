@@ -30,7 +30,7 @@ const actions = {
     return new Promise(resolve => {
       let routes = [];
       if (localStorage.isProducer) {
-        routes = producerRoutes || "";
+        routes = forSearchArr(producerRoutes, roles);
       } else {
         routes = forSearchArr(asyncRoutes, roles);
       }
