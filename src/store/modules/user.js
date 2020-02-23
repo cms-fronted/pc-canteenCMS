@@ -178,6 +178,9 @@ const actions = {
     let roles = null;
     return new Promise((resolve, reject) => {
       if (localStorage.getItem("isProducer")) {
+        let data = treeToArr(producerRoles);
+        roles = data.map(item => item.url);
+        commit("SET_ROLES", roles);
         return resolve({ roles });
       }
       getUserModules()
