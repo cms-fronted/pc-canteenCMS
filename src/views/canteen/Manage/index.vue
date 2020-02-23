@@ -6,11 +6,7 @@
       <div class="main">
         <div class="main-header">
           <span class="content-header">供应商：</span>
-          <el-select
-            v-model="supplier_id"
-            placeholder="请选择"
-            style="width:150px"
-          >
+          <el-select v-model="supplier_id" placeholder="请选择" style="width:150px">
             <el-option
               v-for="item in supplierList"
               :key="item.id"
@@ -19,11 +15,7 @@
             ></el-option>
           </el-select>
           <span class="content-header">类型：</span>
-          <el-select
-            v-model="category_id"
-            placeholder="请选择"
-            style="width:150px"
-          >
+          <el-select v-model="category_id" placeholder="请选择" style="width:150px">
             <el-option
               v-for="item in categoryList"
               :key="item.id"
@@ -31,12 +23,7 @@
               :value="item.id"
             ></el-option>
           </el-select>
-          <el-button
-            type="primary"
-            @click="fetchTableList"
-            style="margin-left:10px"
-            >查询</el-button
-          >
+          <el-button type="primary" @click="fetchTableList" style="margin-left:10px">查询</el-button>
           <el-button type="primary" @click="handleAdd">增加</el-button>
         </div>
         <div class="main-content">
@@ -50,12 +37,7 @@
             <el-table-column label="图片">
               <template slot-scope="props">
                 <div style="text-align:center">
-                  <img
-                    style="height:100px;"
-                    :src="props.row.image"
-                    :alt="props.row.name"
-                    srcset
-                  />
+                  <img style="height:100px;" :src="props.row.image" :alt="props.row.name" srcset />
                 </div>
               </template>
             </el-table-column>
@@ -67,37 +49,25 @@
             <el-table-column label="库存" prop="stock"></el-table-column>
             <el-table-column label="操作">
               <template slot-scope="props">
-                <el-button
-                  size="mini"
-                  @click="handleEdit(props.$index, props.row)"
-                  >编辑</el-button
-                >
+                <el-button size="mini" @click="handleEdit(props.$index, props.row)">编辑</el-button>
                 <el-button
                   size="mini"
                   type="danger"
                   @click="deleteGoods(props.$index, props.row)"
-                  >删除</el-button
-                >
+                >删除</el-button>
                 <el-button
                   size="mini"
                   class="option"
                   @click="upbuild(props.$index, props.row)"
                   v-if="props.row.state === 2"
-                  >上架</el-button
-                >
+                >上架</el-button>
                 <el-button
                   size="mini"
                   class="option"
                   @click="withdraw(props.$index, props.row)"
                   v-if="props.row.state === 1"
-                  >下架</el-button
-                >
-                <el-button
-                  size="mini"
-                  class="option"
-                  @click="storage(props.row)"
-                  >入库</el-button
-                >
+                >下架</el-button>
+                <el-button size="mini" class="option" @click="storage(props.row)">入库</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -111,6 +81,7 @@
       state="add"
       @closeDialog="closeAddDialog"
       @confirm="confirmAdd"
+      :categoryList="categoryList"
     ></add-dialog>
     <revise-dialog
       :title="reviseFormTitle"
@@ -118,6 +89,7 @@
       :visible="reviseVisible"
       :disabled="true"
       state="revise"
+      :categoryList="categoryList"
       :reivseParam="reivseParam"
       @closeDialog="closeReviseDialog"
       @confirm="confirmRevise"
@@ -209,13 +181,10 @@ export default {
     },
     // 封装方法 changeState 处理商品状态
     changeState(id, state) {
-      this.sendPostRequest(
-        "/api/v1/shop/product/handel",
-        {
-          id: id,
-          state: state
-        }
-      );
+      this.sendPostRequest("/api/v1/shop/product/handel", {
+        id: id,
+        state: state
+      });
     },
     // 获取相关数据列表
     getSupplierList() {
@@ -248,9 +217,7 @@ export default {
     fetchTableList() {
       $axios
         .get(
-          `/api/v1/shop/cms/products?supplier_id=${
-            this.supplier_id
-          }&category_id=${this.category_id}&page=1&size=10`
+          `/api/v1/shop/cms/products?supplier_id=${this.supplier_id}&category_id=${this.category_id}&page=1&size=10`
         )
         .then(res => {
           this.tabledata = Array.from(res.data.data);
@@ -269,11 +236,13 @@ export default {
     handleEdit(index, row) {
       this.reviseVisible = true;
       this.reviseForm = {
+        id: row.product_id,
         name: row.name,
         price: row.price,
         unit: row.unit,
         stock: row.stock,
-        image: row.image
+        image: row.image,
+        category_id: row.category_id
       };
       this.reivseParam = {
         id: row.product_id,
@@ -290,10 +259,7 @@ export default {
     },
     confirmRevise(val) {
       this.reviseVisible = false;
-      this.sendPostRequest(
-        "/api/v1/shop/product/update",
-        val
-      );
+      this.sendPostRequest("/api/v1/shop/product/update", val);
     },
     // 处理添加商品弹窗
     closeAddDialog(val) {
@@ -309,10 +275,7 @@ export default {
         },
         formData
       );
-      this.sendPostRequest(
-        "/api/v1/shop/product/save",
-        addForm
-      );
+      this.sendPostRequest("/api/v1/shop/product/save", addForm);
       this.addVisible = false;
     },
     // 入库处理
@@ -326,13 +289,10 @@ export default {
     },
     confirmStorage() {
       this.storageFormVisible = false;
-      this.sendPostRequest(
-        "/api/v1/shop/stock/save",
-        {
-          product_id: this.currentProductId,
-          count: this.storageCount
-        }
-      );
+      this.sendPostRequest("/api/v1/shop/stock/save", {
+        product_id: this.currentProductId,
+        count: this.storageCount
+      });
       this.storageCount = "";
     },
     // 下架处理

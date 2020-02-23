@@ -2,7 +2,51 @@ import { login, getInfo, producerLogin, getUserModules } from "@/api/login";
 import { Message } from "element-ui";
 import router, { resetRouter } from "@/router";
 import { treeToArr } from "@/utils/flatternArr";
-import { stat } from "fs";
+import { producerRoutes } from "../../router";
+const producerRoles = [
+  {
+    id: 1,
+    m_id: 1,
+    name: "小卖部管理",
+    parent_id: 0,
+    type: 1,
+    url: "Canteen",
+    items: [
+      {
+        id: 2,
+        m_id: 2,
+        parent_id: 1,
+        type: 1,
+        name: "商品管理",
+        url: "Canteen-manage"
+      },
+      {
+        id: 3,
+        m_id: 3,
+        parent_id: 1,
+        type: 1,
+        name: "消费订单汇总查询",
+        url: "Canteen-statistics-producer"
+      },
+      {
+        id: 4,
+        m_id: 4,
+        parent_id: 1,
+        type: 1,
+        name: "订单明细查询",
+        url: "Canteen-order-producer"
+      },
+      {
+        id: 5,
+        m_id: 5,
+        parent_id: 1,
+        type: 1,
+        name: "进销统计报表",
+        url: "Canteen-invocing-report-producer"
+      },
+    ]
+  }
+]
 const state = {
   token: localStorage.getItem("token") ? localStorage.getItem("token") : "", // 认证凭证'
   userName: "",
@@ -135,8 +179,12 @@ const actions = {
     let roles = null;
     return new Promise((resolve, reject) => {
       if (localStorage.getItem("isProducer")) {
+        let data = treeToArr(producerRoles);
+        roles = data.map(item => item.url);
+        commit("SET_ROLES", roles);
         return resolve({ roles });
       }
+      console.log(111)
       getUserModules()
         .then(res => {
           if (res.msg === "ok") {

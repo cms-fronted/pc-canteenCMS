@@ -1,6 +1,16 @@
 <template>
   <el-dialog :visible.sync="isOpen" :title="title" @close="handleClose">
     <el-form label-width="80px">
+      <el-form-item label="商品类型">
+        <el-select v-model="formdata.category_id">
+          <el-option
+            v-for="item in categoryOptions"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          ></el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item label="商品名称">
         <el-input v-model="formdata.name"></el-input>
       </el-form-item>
@@ -11,20 +21,12 @@
         <el-input v-model="formdata.price"></el-input>
       </el-form-item>
       <el-form-item label="库存">
-        <el-input
-          v-model="formdata.stock"
-          v-if="formdata.stock"
-          :disabled="disabled"
-        ></el-input>
-        <el-input
-          v-model="formdata.count"
-          v-else
-          :disabled="disabled"
-        ></el-input>
+        <el-input v-model="formdata.stock" v-if="formdata.stock" :disabled="disabled"></el-input>
+        <el-input v-model="formdata.count" v-else :disabled="disabled"></el-input>
       </el-form-item>
       <el-form-item label="图片">
         <el-upload
-          action="http://canteen.tonglingok.comhttp://canteen.tonglingok.com/api/v1/image/upload"
+          action="/api/v1/image/upload"
           list-type="picture-card"
           name="image"
           :limit="limit"
@@ -63,7 +65,11 @@ export default {
       type: Boolean,
       default: false
     },
-    state: String
+    state: String,
+    categoryList: {
+      required: true,
+      type: Array
+    }
   },
   data() {
     return {
@@ -75,7 +81,8 @@ export default {
       limit: 1,
       param: {},
       requiredParam: {},
-      fileList: []
+      fileList: [],
+      categoryOptions: []
     };
   },
   methods: {
@@ -94,13 +101,11 @@ export default {
     handleSuccess(res, file, fileList) {
       if (res.code === 200) {
         this.formdata.image = res.data.url;
-        console.log(file);
       }
     },
     handleClick() {
       if (this.state === "revise") {
-        this.requiredParam = Object.assign({}, this.param, this.formdata);
-        this.$emit("confirm", this.requiredParam);
+        this.$emit("confirm", this.formdata);
         this.formdata = {};
         this.fileList = [];
       } else if (this.state === "add") {
@@ -114,6 +119,7 @@ export default {
       imgData["url"] = imgData["image"];
       delete imgData["image"];
       this.fileList.push(imgData);
+      delete this.formdata.image;
     }
   },
   watch: {
@@ -123,6 +129,9 @@ export default {
       if (this.visible && this.state === "revise") {
         this.initImageUrl();
       }
+    },
+    categoryList(val) {
+      this.categoryOptions = val.slice(1);
     },
     reivseParam(val) {
       this.param = Object.assign({}, this.param, this.reivseParam);

@@ -501,7 +501,7 @@ export const asyncRoutes = [
   {
     path: "/takeOut",
     redirect: "/takeOut/index",
-    name:"TakeOut",
+    name: "TakeOut",
     component: Layout,
     children: [
       {
@@ -866,13 +866,17 @@ router.beforeEach(async (to, from, next) => {
   } else {
     // let res = await store.dispatch('user/_getUserModules')
     if (store.getters.token) {
-      const hasRoles = store.getters.roles.length > 0;
+      let hasRoles = store.getters.roles.length > 0;
       if (hasRoles) {
         next();
       } else if (localStorage.isProducer) {
-        const addRoutes = await store.dispatch("permission/getAsyncRoutes", []);
+        const { roles } = await store.dispatch("user/_getUserModules");
+        const addRoutes = await store.dispatch(
+          "permission/getAsyncRoutes",
+          roles
+        );
         router.addRoutes(addRoutes);
-        next();
+        next({ ...to, replace: true });
       } else {
         try {
           const { roles } = await store.dispatch("user/_getUserModules");

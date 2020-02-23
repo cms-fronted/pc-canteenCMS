@@ -104,7 +104,6 @@ export default {
       this.$store
         .dispatch("user/_producerLogin", this.ruleForm)
         .then(res => {
-          console.log(res);
           if (res.msg !== "ok") {
             this.refresh();
             this.$message.error(res.msg);

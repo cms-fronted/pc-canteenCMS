@@ -49,7 +49,7 @@
                 />
               </el-select>
             </el-form-item>
-            <el-button type="primary" @click="deriveData">导出</el-button>
+            <el-button type="primary" @click="exportFile">导出</el-button>
             <el-button type="primary" @click="fetchList(1)">查询</el-button>
           </el-form>
         </div>
@@ -160,10 +160,10 @@ export default {
         this.current_page = res.data.current_page;
       }
     },
-    handleEdit(index, row) {
-      console.log(row);
-      console.log("打印按钮被你点击啦！");
-    },
+    // handleEdit(index, row) {
+    //   console.log(row);
+    //   console.log("打印按钮被你点击啦！");
+    // },
     async exportFile() {
       await this.$exportExcel(
         "/api/v1/shop/order/exportOrderStatistic/supplier",
