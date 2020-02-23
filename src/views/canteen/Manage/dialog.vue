@@ -11,16 +11,8 @@
         <el-input v-model="formdata.price"></el-input>
       </el-form-item>
       <el-form-item label="库存">
-        <el-input
-          v-model="formdata.stock"
-          v-if="formdata.stock"
-          :disabled="disabled"
-        ></el-input>
-        <el-input
-          v-model="formdata.count"
-          v-else
-          :disabled="disabled"
-        ></el-input>
+        <el-input v-model="formdata.stock" v-if="formdata.stock" :disabled="disabled"></el-input>
+        <el-input v-model="formdata.count" v-else :disabled="disabled"></el-input>
       </el-form-item>
       <el-form-item label="图片">
         <el-upload
@@ -63,7 +55,11 @@ export default {
       type: Boolean,
       default: false
     },
-    state: String
+    state: String,
+    categoryList: {
+      required: true,
+      type: Array
+    }
   },
   data() {
     return {
@@ -75,7 +71,8 @@ export default {
       limit: 1,
       param: {},
       requiredParam: {},
-      fileList: []
+      fileList: [],
+      categoryOptions:[],
     };
   },
   methods: {
@@ -127,6 +124,9 @@ export default {
     },
     reivseParam(val) {
       this.param = Object.assign({}, this.param, this.reivseParam);
+    },
+    categoryList(val) {
+      this.categoryOptions = val.slice(1);
     }
   }
 };
