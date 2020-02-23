@@ -1,6 +1,16 @@
 <template>
   <el-dialog :visible.sync="isOpen" :title="title" @close="handleClose">
     <el-form label-width="80px">
+      <el-form-item label="商品类型">
+        <el-select v-model="formdata.category_id">
+          <el-option
+            v-for="item in categoryOptions"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id"
+          ></el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item label="商品名称">
         <el-input v-model="formdata.name"></el-input>
       </el-form-item>
@@ -72,7 +82,7 @@ export default {
       param: {},
       requiredParam: {},
       fileList: [],
-      categoryOptions:[],
+      categoryOptions: []
     };
   },
   methods: {

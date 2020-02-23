@@ -271,6 +271,7 @@ export default {
     handleEdit(index, row) {
       this.reviseVisible = true;
       this.reviseForm = {
+        id: row.product_id,
         name: row.name,
         price: row.price,
         unit: row.unit,
