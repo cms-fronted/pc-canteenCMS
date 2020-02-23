@@ -157,7 +157,7 @@ const actions = {
     commit("DEL_GRADE");
     commit("DEL_PRODUCER");
     // resetRouter();
-    if (localStorage.getItem("isProducer")) {
+    if (localStorage.getItem("isProducer") == 1) {
       router.push({
         path: "/producer",
         query: {
