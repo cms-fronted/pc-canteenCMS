@@ -862,9 +862,14 @@ router.beforeEach(async (to, from, next) => {
       if (hasRoles) {
         next();
       } else if (localStorage.isProducer) {
-        const addRoutes = await store.dispatch("permission/getAsyncRoutes", []);
+        const { roles } = await store.dispatch("user/_getUserModules");
+        const addRoutes = await store.dispatch(
+          "permission/getAsyncRoutes",
+          roles
+        );
         router.addRoutes(addRoutes);
-        next();
+        next({ ...to, replace: true });
+
       } else {
         try {
           const { roles } = await store.dispatch("user/_getUserModules");
