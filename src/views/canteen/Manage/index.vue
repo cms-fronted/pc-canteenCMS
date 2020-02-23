@@ -111,6 +111,7 @@
       state="add"
       @closeDialog="closeAddDialog"
       @confirm="confirmAdd"
+      :categoryList="categoryList"
     ></add-dialog>
     <revise-dialog
       :title="reviseFormTitle"
@@ -121,6 +122,7 @@
       :reivseParam="reivseParam"
       @closeDialog="closeReviseDialog"
       @confirm="confirmRevise"
+      :categoryList="categoryList"
     ></revise-dialog>
     <el-dialog title="入库" :visible.sync="storageFormVisible">
       <el-form>

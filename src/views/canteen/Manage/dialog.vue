@@ -114,6 +114,7 @@ export default {
       imgData["url"] = imgData["image"];
       delete imgData["image"];
       this.fileList.push(imgData);
+      delete this.formdata.imgae;
     }
   },
   watch: {
