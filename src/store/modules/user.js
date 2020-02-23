@@ -184,7 +184,6 @@ const actions = {
         commit("SET_ROLES", roles);
         return resolve({ roles });
       }
-      console.log(111)
       getUserModules()
         .then(res => {
           if (res.msg === "ok") {
