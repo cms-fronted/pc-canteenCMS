@@ -8,19 +8,14 @@
           type="primary"
           v-if="grade != 3"
           @click="() => addEnterprise({}, {})"
-          >{{ globalCid ? "新增下属企业" : "新增一级企业" }}</el-button
-        >
+        >{{ globalCid ? "新增下属企业" : "新增一级企业" }}</el-button>
       </div>
       <div class="main-content">
         <el-row :gutter="10">
           <el-col :span="6">
             <el-card>
               <div>
-                <el-input
-                  v-model="filterText"
-                  placeholder="关键字查询"
-                  size="small"
-                />
+                <el-input v-model="filterText" placeholder="关键字查询" size="small" />
                 <el-tree
                   :data="companyList"
                   :props="defaultProps"
@@ -28,17 +23,13 @@
                   ref="tree"
                   :filter-node-method="filterNode"
                 >
-                  <span
-                    class="enterprise-tree-node"
-                    slot-scope="{ node, data }"
-                  >
+                  <span class="enterprise-tree-node" slot-scope="{ node, data }">
                     <span>
                       <el-button
                         type="text"
                         size="mini"
                         @click="handleNodeClick(data)"
-                        >{{ node.label }}</el-button
-                      >
+                      >{{ node.label }}</el-button>
                     </span>
                     <span class="btns-text">
                       <el-button
@@ -46,15 +37,9 @@
                         type="text"
                         size="mini"
                         @click="() => editEnterpriseDialog(node, data)"
-                        >编辑</el-button
-                      >
+                      >编辑</el-button>
 
-                      <el-button
-                        type="text"
-                        size="mini"
-                        @click="() => addEnterprise(node, data)"
-                        >新增</el-button
-                      >
+                      <el-button type="text" size="mini" @click="() => addEnterprise(node, data)">新增</el-button>
                     </span>
                   </span>
                 </el-tree>
@@ -67,32 +52,18 @@
                 <span>{{ this.parent.name || "云饭堂" }}</span>
               </div>
               <div class="card-content">
-                <el-button @click="addCanteen" :disabled="!company_id"
-                  >新增饭堂</el-button
-                >
-                <el-button :disabled="!company_id" @click="addShop"
-                  >新增小卖部</el-button
-                >
-                <el-button :disabled="!company_id" @click="addPayConfig"
-                  >新增支付信息</el-button
-                >
+                <el-button @click="addCanteen" :disabled="!company_id">新增饭堂</el-button>
+                <el-button :disabled="!company_id" @click="addShop">新增小卖部</el-button>
+                <el-button :disabled="!company_id" @click="addPayConfig">新增支付信息</el-button>
+                <el-button :disabled="!company_id" @click="getQrCode">查看非企业人员二维码信息</el-button>
 
-                <el-table
-                  style="width:50%;margin: 0 auto"
-                  size="mini"
-                  :data="canteensLocData"
-                >
+                <el-table style="width:50%;margin: 0 auto" size="mini" :data="canteensLocData">
                   <div slot="empty">暂无饭堂</div>
                   <el-table-column label="消费地点" prop="name" />
                   <el-table-column label="操作">
                     <template slot-scope="scoped">
                       <span>
-                        <el-button
-                          type="text"
-                          size="mini"
-                          @click="_editCanteen(scoped.row)"
-                          >操作</el-button
-                        >
+                        <el-button type="text" size="mini" @click="_editCanteen(scoped.row)">操作</el-button>
                         <!-- <el-button type="text" size="mini">删除</el-button> -->
                       </span>
                     </template>
@@ -110,12 +81,7 @@
                     <template slot-scope="scoped">
                       <span>
                         <!-- <el-button type="text" size="mini">删除</el-button> -->
-                        <el-button
-                          type="text"
-                          size="mini"
-                          @click="_editShop(scoped.row)"
-                          >操作</el-button
-                        >
+                        <el-button type="text" size="mini" @click="_editShop(scoped.row)">操作</el-button>
                       </span>
                     </template>
                   </el-table-column>
@@ -145,12 +111,7 @@
       </span>
     </el-dialog>
 
-    <el-dialog
-      :visible="payConfigVisible"
-      width="40%"
-      title="新增支付方式"
-      @close="closePayConfig"
-    >
+    <el-dialog :visible="payConfigVisible" width="40%" title="新增支付方式" @close="closePayConfig">
       <el-form ref="newPayConfig" :model="payConfigForm" label-width="120px">
         <el-form-item label="公众号appId">
           <el-input v-model="payConfigForm.app_id" />
@@ -175,6 +136,7 @@
       :editAccount="editAccount"
       :machineList="machineList"
       :modules="modules"
+      :editAddressForm="editAddressForm"
       @updateMachineTable="(val, type) => getMachineList(val, type)"
       @updateCanteenList="getComsumptionLoc"
     />
@@ -195,12 +157,14 @@
       :company_id="company_id"
       @closeDialog="closeEditEnterprise"
     />
+    <qrcode-dialog :visible="qrcodeDialogVisible" @closeDialog="closeQrCode" :url="qrcodeUrl" />
   </div>
 </template>
 
 <script>
 import $axios from "@/api/index";
 import AddCanteenDialog from "./dialog";
+import QrcodeDialog from "./qrcode.vue";
 import AddShopDialog from "./addShop";
 import { Loading } from "element-ui";
 import EditEnterpriseDialog from "./editEnterprise";
@@ -208,7 +172,8 @@ export default {
   components: {
     AddCanteenDialog,
     AddShopDialog,
-    EditEnterpriseDialog
+    EditEnterpriseDialog,
+    QrcodeDialog
   },
   data() {
     return {
@@ -216,6 +181,7 @@ export default {
       globalCid: localStorage.getItem("company_id"), //全局企业id
       grade: localStorage.getItem("grade"),
       editEnterpriseDialogVisible: false,
+      qrcodeDialogVisible: false,
       addCanteenVisible: false,
       addEnterpriseVisible: false,
       addShopVisible: false,
@@ -255,7 +221,9 @@ export default {
         dinnersList: [],
         account: {}
       },
-      payConfigForm: {}
+      editAddressForm: [],
+      payConfigForm: {},
+      qrcodeUrl: ""
     };
   },
   async created() {
@@ -291,9 +259,7 @@ export default {
       }
     },
     async fetchCompanyList() {
-      const res = await $axios.get(
-        "/api/v1/admin/companies"
-      );
+      const res = await $axios.get("/api/v1/admin/companies");
       if (res.msg == "ok") {
         this.companyList = [];
         if (res.data instanceof Object) {
@@ -331,9 +297,7 @@ export default {
       let formdata = Object.assign({}, this.payConfigForm, {
         company_id: this.company_id
       });
-      const res = await $axios.post(
-        "/api/v1/company/wxConfig/save"
-      );
+      const res = await $axios.post("/api/v1/company/wxConfig/save");
       if (res.msg === "ok") {
         this.$message.success("新增支付信息成功");
         this.closePayConfig();
@@ -372,13 +336,10 @@ export default {
     },
     async _addEnterprise() {
       this.loading = Loading.service({ text: "拼命加载中..." });
-      const res = await $axios.post(
-        "/api/v1/company/save",
-        {
-          parent_id: this.parent.id || 0,
-          name: this.enterpriseForm.name
-        }
-      );
+      const res = await $axios.post("/api/v1/company/save", {
+        parent_id: this.parent.id || 0,
+        name: this.enterpriseForm.name
+      });
       if (res.msg == "ok") {
         this.addEnterpriseVisible = false;
         await this.fetchCompanyList();
@@ -395,22 +356,17 @@ export default {
     async getCanteenConfig(id) {
       let data = null;
       await $axios
-        .get(
-          `/api/v1/canteen/configuration?c_id=${id}`
-        )
+        .get(`/api/v1/canteen/configuration?c_id=${id}`)
         .then(res => {
-          data = res.data;
+          data = res;
         })
         .catch(err => console.log(err));
       return data;
     },
     async getSystemModules(id) {
-      const res = $axios.get(
-        "/api/v1/modules/canteen/withSystem",
-        {
-          c_id: id
-        }
-      );
+      const res = $axios.get("/api/v1/modules/canteen/withSystem", {
+        c_id: id
+      });
       return res;
     },
     async _editCanteen(val) {
@@ -418,14 +374,15 @@ export default {
       this.isEdit = true;
       this.editForm = val;
       this.canteenDialogTitle = "编辑饭堂";
-      const data = await this.getCanteenConfig(id);
-      await this.getMachineList(val, "canteen");
-      if (data.msg === "ok") {
-        this.editForm.dinnersList = data.dinners;
+      const res = await this.getCanteenConfig(id);
+      if (res.msg == "ok") {
+        this.editForm.dinnersList = res.data.dinners;
+        this.editAddressForm = res.data.address;
+        this.editDinnersList = Array.from(res.data.dinners);
+        this.editAccount = { ...res.data.account };
+        this.addCanteenVisible = true;
       }
-      this.editDinnersList = Array.from(data.dinners);
-      this.editAccount = { ...data.account };
-      this.addCanteenVisible = true;
+      await this.getMachineList(val, "canteen");
     },
     async _editShop(val) {
       this.editForm = val;
@@ -448,6 +405,18 @@ export default {
         })
         .catch(err => console.log(err));
       return data;
+    },
+    async getQrCode() {
+      const res = await $axios.get("/api/v1/company/qrcode", {
+        company_id: this.company_id
+      });
+      if (res.msg === "ok") {
+        this.qrcodeUrl = res.data.url;
+        this.qrcodeDialogVisible = true;
+      }
+    },
+    closeQrCode() {
+      this.qrcodeDialogVisible = false;
     }
   }
 };

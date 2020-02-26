@@ -1,12 +1,7 @@
 <template>
   <div>
-    <el-dialog
-      :visible.sync="isOpen"
-      width="45%"
-      :title="dialogTitle"
-      center
-      @close="handleClose"
-    >
+    <!-- <el-dialog :visible.sync="isOpen" width="45%" :title="dialogTitle" center @close="handleClose"> -->
+    <el-dialog :visible.sync="isOpen" width="45%" :title="dialogTitle" center @close="handleClose">
       <!-- 餐次信息对话框 -->
       <el-dialog
         center
@@ -33,29 +28,19 @@
             </el-radio-group>
           </el-form-item>
           <el-form-item label="订餐截止日期" label-width="120px">
-            <el-radio-group
-              v-model="dinnerForm.type"
-              @change="dinnerForm.type_number = ''"
-            >
+            <el-radio-group v-model="dinnerForm.type" @change="dinnerForm.type_number = ''">
               <el-radio label="day">
                 天
                 <span v-if="dinnerForm.type == 'day'">
                   提前
-                  <el-input
-                    v-model="dinnerForm.type_number"
-                    style="width:50px"
-                  />天
+                  <el-input v-model="dinnerForm.type_number" style="width:50px" />天
                 </span>
               </el-radio>
               <el-radio label="week">
                 周
                 <span v-if="dinnerForm.type == 'week'">
                   提前
-                  <el-select
-                    v-model="dinnerForm.type_number"
-                    placeholder="请选择"
-                    style="width:120px"
-                  >
+                  <el-select v-model="dinnerForm.type_number" placeholder="请选择" style="width:120px">
                     <el-option
                       v-for="item in weekOptions"
                       :key="item.value"
@@ -134,124 +119,49 @@
         </el-form>
         <div slot="footer" class="dialog-footer">
           <el-button @click="closeMachineDialog">取 消</el-button>
-          <el-button type="primary" @click="_submitMachineInfo"
-            >确 定</el-button
-          >
+          <el-button type="primary" @click="_submitMachineInfo">确 定</el-button>
         </div>
       </el-dialog>
-      <!-- <el-row :gutter="50">
-        <el-col :span="9">
-          <el-card class="box-card">
-            <div>
-              PC端
-              <el-button type="text" @click="test">测试</el-button>
-            </div>
-            <div v-for="item in pcModules" :key="item.create_time">
-              <el-checkbox
-                :indeterminate="isIndeterminate[item.id]"
-                v-model="checkAll[item.id]"
-                @change="checked => handleCheckAllChange(checked,item.id)"
-              >{{item.name}}</el-checkbox>
-              <el-checkbox-group
-                style="padding: 0 20px"
-                @change="checked => handleCheckedModulesChange(checked,item.id)"
-                v-model="checkedPCModules[item.id]"
-              >
-                <el-checkbox
-                  v-for="items in item.items"
-                  :label="items.id"
-                  :key="items.create_time"
-                >{{items.name}}</el-checkbox>
-              </el-checkbox-group>
-            </div>
-            <div>
-              微信端
-              <el-button type="text" @click="testDefault">测试</el-button>
-            </div>
-            <div v-for="item in WXModules" :key="item.create_time">
-              <el-checkbox
-                :indeterminate="isIndeterminate[item.id]"
-                v-model="checkAll[item.id]"
-                @change="checked => handleCheckAllChange(checked,item.id)"
-              >{{item.name}}</el-checkbox>
-              <el-checkbox-group
-                style="padding: 0 20px"
-                @change="checked => handleCheckedModulesChange(checked,item.id)"
-                v-model="checkedWXModules[item.id]"
-              >
-                <el-checkbox
-                  v-for="items in item.items"
-                  :label="items.id"
-                  :key="items.create_time"
-                >{{items.name}}</el-checkbox>
-              </el-checkbox-group>
-            </div>
-            <div style="textAlign:center">
-              <el-button>确定</el-button>
-            </div>
-          </el-card>
-        </el-col>
-      <el-col :span="14">-->
       <!--饭堂设置-->
       <el-card body-style="paddingBottom: 5px">
         <div slot="header" class="clearfix">
           <span>饭堂设置</span>
         </div>
         <span style="margin-right: 8px">
-          饭堂名称
-          <el-input
-            v-model="canteens"
-            size="small"
-            style="width:200px;"
-            :disabled="isEdit"
-          />
+          饭堂名称：
+          <el-input v-model="canteens" size="small" style="width:200px;" :disabled="isEdit" />
         </span>
         <el-button
           type="primary"
           size="small"
           @click="addCanteen"
           :disabled="isEdit || canteen_id"
-          >新增饭堂</el-button
-        >
-        <el-button type="primary" size="small" @click="handleClick"
-          >添加餐次</el-button
-        >
+        >新增饭堂</el-button>
+        <el-button type="primary" size="small" @click="handleClick">添加餐次</el-button>
         <el-table style="width:100%" :data="dataTable" size="small">
           <el-table-column label="餐次" width="60px" prop="name" />
           <!-- <el-table-column label="订餐单位" width="80px" prop="" ></el-table-column> -->
           <el-table-column label="订餐截止时间">
             <span slot-scope="scoped">
               {{
-                scoped.row.type === "day"
-                  ? `提前${scoped.row.type_number}天`
-                  : `周${scoped.row.type_number + 1}前`
+              scoped.row.type === "day"
+              ? `提前${scoped.row.type_number}天`
+              : `周${scoped.row.type_number + 1}前`
               }}
             </span>
           </el-table-column>
           <el-table-column label="就餐时间">
-            <span slot-scope="scoped">
-              {{ scoped.row.meal_time_begin }}-{{ scoped.row.meal_time_end }}
-            </span>
+            <span
+              slot-scope="scoped"
+            >{{ scoped.row.meal_time_begin }}-{{ scoped.row.meal_time_end }}</span>
           </el-table-column>
           <el-table-column label="消费策略">
-            <span slot-scope="scoped">
-              {{ scoped.row.fixed === 1 ? "固定" : "动态" }}
-            </span>
+            <span slot-scope="scoped">{{ scoped.row.fixed === 1 ? "固定" : "动态" }}</span>
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scoped">
-              <el-button
-                size="small"
-                type="text"
-                @click="_editDinner(scoped.row)"
-                >编辑</el-button
-              >
-              <el-button
-                size="small"
-                type="text"
-                @click="_deleteDinner(scoped.row)"
-                >删除</el-button
-              >
+              <el-button size="small" type="text" @click="_editDinner(scoped.row)">编辑</el-button>
+              <el-button size="small" type="text" @click="_deleteDinner(scoped.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -260,6 +170,9 @@
       <el-card class="box-card" body-style="paddingBottom: 5px">
         <div slot="header" class="clearfix">账户设置</div>
         <el-form ref="accountForm" :model="accountForm">
+          <el-form-item prop="out">
+            <el-checkbox v-model="accountForm.out" true-label="1" false-label="2">允许非企业人员就餐</el-checkbox>
+          </el-form-item>
           <el-form-item prop="dinningMode">
             <el-radio-group v-model="accountForm.dining_mode">
               <el-radio :label="1">堂食</el-radio>
@@ -285,6 +198,109 @@
           </el-form-item>
         </el-form>
       </el-card>
+      <!-- 外卖设置  -->
+      <el-card
+        class="box-card"
+        body-style="paddingBottom: 5px"
+        v-if="accountForm.dining_mode&&accountForm.dining_mode  != 1"
+      >
+        <div slot="header" class="clearfix">外卖设置</div>
+        <el-form ref="outConfigForm" :model="outConfigForm" label-width="90px">
+          <el-form-item prop="fee" label="配送费用：">
+            <div>
+              企业人员
+              <el-input
+                v-model="outConfigForm.in_fee"
+                size="small"
+                style="width: 50px; margin:0 5px"
+              ></el-input>元；
+              非企业人员
+              <el-input
+                v-model="outConfigForm.out_fee"
+                size="small"
+                style="width: 50px; margin:0 5px"
+              ></el-input>元；
+            </div>
+          </el-form-item>
+          <el-form-item prop="address_limit" label="配送范围：">
+            <el-radio-group v-model="outConfigForm.address_limit">
+              <el-radio label="1">仅配送指定范围</el-radio>
+              <el-radio label="2">无限制</el-radio>
+            </el-radio-group>
+            <p>
+              <el-button type="text" @click="addNewAddr">添加地址选项</el-button>
+            </p>
+            <div
+              class="address-setting"
+              v-if="outConfigForm.address_limit && outConfigForm.address_limit==1"
+            >
+              <div v-for="(item,key) in addrList" :key="key">
+                <el-select
+                  style="width:20%"
+                  size="small"
+                  :disabled="item.disabled"
+                  v-model="item.province_id"
+                  @change="(e)=>choseProvince(key,e)"
+                  placeholder="省级地区"
+                >
+                  <el-option
+                    v-for="prov in item.province_arr"
+                    :key="prov.id"
+                    :label="prov.value"
+                    :value="prov.id"
+                  ></el-option>
+                </el-select>
+                <el-select
+                  style="width:20%"
+                  size="small"
+                  :disabled="item.disabled"
+                  v-model="item.city_id"
+                  @change="(e)=>choseCity(key,e)"
+                  placeholder="市级地区"
+                >
+                  <el-option
+                    v-for="city in item.now_city_arr"
+                    :key="city.id"
+                    :label="city.value"
+                    :value="city.id"
+                  ></el-option>
+                </el-select>
+                <el-select
+                  style="width:20%"
+                  size="small"
+                  :disabled="item.disabled"
+                  v-model="item.area_id"
+                  @change="(e)=>choseBlock(key,e)"
+                  placeholder="区级地区"
+                >
+                  <el-option
+                    v-for="area in item.now_area_arr"
+                    :key="area.id"
+                    :label="area.value"
+                    :value="area.id"
+                  ></el-option>
+                </el-select>
+                <el-input v-model="item.addr" style="width:30%" size="small"></el-input>
+                <el-button
+                  @click.prevent="removeAddr(item, key)"
+                  size="small"
+                  icon="el-icon-delete"
+                  style="marginLeft:1px"
+                />
+              </div>
+            </div>
+          </el-form-item>
+          <el-form-item prop="remark" label="外送说明：">
+            <el-input
+              style="padding: 10px 0"
+              type="textarea"
+              :rows="3"
+              placeholder="请输入内容"
+              v-model="outConfigForm.remark"
+            ></el-input>
+          </el-form-item>
+        </el-form>
+      </el-card>
       <!--硬件设置-->
       <el-card class="box-card" body-style="paddingBottom: 5px">
         <div slot="header" class="clearfix">
@@ -293,8 +309,7 @@
             style="float: right; padding: 3px 0"
             type="text"
             @click="openMachineDialog"
-            >添加硬件</el-button
-          >
+          >添加硬件</el-button>
         </div>
         <el-table :data="machineTable" style="width:100%" size="mini">
           <el-table-column label="编号" prop="number" />
@@ -308,18 +323,8 @@
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scoped">
-              <el-button
-                size="small"
-                type="text"
-                @click="_editMachine(scoped.row)"
-                >编辑</el-button
-              >
-              <el-button
-                size="small"
-                type="text"
-                @click="_deleteMachine(scoped.row)"
-                >删除</el-button
-              >
+              <el-button size="small" type="text" @click="_editMachine(scoped.row)">编辑</el-button>
+              <el-button size="small" type="text" @click="_deleteMachine(scoped.row)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -334,6 +339,7 @@
 </template>
 <script>
 import $axios from "@/api/index";
+import mapJson from "../../../utils/map.json";
 import { Loading } from "element-ui";
 import { treeToArr } from "@/utils/flatternArr";
 const weekOptions = [
@@ -362,7 +368,8 @@ export default {
     "editDinnerList",
     "editAccount",
     "machineList",
-    "modules"
+    "modules",
+    "editAddressForm"
   ],
   data() {
     return {
@@ -405,10 +412,35 @@ export default {
         dining_mode: 1,
         clean_day: 1,
         clean_time: "08:00",
-        limit_money: 1
+        limit_money: 1,
+        out: 1
       },
+      outConfigForm: {
+        in_fee: "",
+        out_fee: "",
+        address_limit: "1",
+        remark: ""
+      },
+      addrList: [
+        {
+          province_id: "",
+          city_id: "",
+          area_id: "",
+          province: "",
+          city: "",
+          area: "",
+          now_city_arr: [], // 当前选中省级的市
+          now_area_arr: [], //当前选中市级的区
+          province_arr: [], // 所有省
+          city_arr: [], // 所有市
+          area_arr: [], // 所有区
+          addr: "",
+          disabled: false
+        }
+      ],
       dataTable: [],
-      machineTable: []
+      machineTable: [],
+      addressList: []
     };
   },
   watch: {
@@ -432,9 +464,30 @@ export default {
       if (this.isEdit) {
         this.machineTable = val;
       }
+    },
+    editAddressForm(val) {
+      if (this.isEdit) {
+        console.log(11);
+        val.forEach((item, index) => {
+          this.addrList[index].id = item.id;
+          this.addrList[index].province_id = item.province;
+          this.addrList[index].city_id = item.city;
+          this.addrList[index].area_id = item.area;
+          this.addrList[index].province = item.province;
+          this.addrList[index].city = item.city;
+          this.addrList[index].area = item.area;
+          this.addrList[index].addr = item.address;
+          this.addrList[index].disabled = true;
+        });
+        console.log(this.addrList);
+      }
     }
   },
-  created() {},
+  created() {
+    if (!this.isEdit) {
+      this.getCityData();
+    }
+  },
   methods: {
     handleClick() {
       this.dinnersVisible = true;
@@ -501,12 +554,9 @@ export default {
         })
           .then(async () => {
             this.dataTable = this.dataTable.filter(item => item !== row);
-            const res = await $axios.post(
-              "/api/v1/canteen/dinner/delete",
-              {
-                dinner_id: row.id
-              }
-            );
+            const res = await $axios.post("/api/v1/canteen/dinner/delete", {
+              dinner_id: row.id
+            });
 
             if (res.msg === "ok") {
               this.$message({
@@ -539,14 +589,18 @@ export default {
       this.dinnersVisible = false;
       this.isEditDinner = false;
     },
+    // 配置饭堂请求
     _submitOptions() {
+      console.log(this.address);
       let data = {};
       data.dinners = JSON.stringify(this.dataTable);
       data.account = JSON.stringify(this.accountForm);
+      data.out_config = JSON.stringify(this.outConfigForm);
       if (this.isEdit) {
         data.c_id = this.formdata.id;
       } else {
         data.c_id = this.canteen_id;
+        data.address = JSON.stringify(this.address);
       }
       const url = !this.isEdit
         ? "/api/v1/canteen/configuration/save"
@@ -568,6 +622,22 @@ export default {
     },
     handleClose() {
       this.dataTable.length = 0;
+      this.addrList = [
+        {
+          province_id: "",
+          city_id: "",
+          area_id: "",
+          province: "",
+          city: "",
+          area: "",
+          now_city_arr: [], // 当前选中省级的市
+          now_area_arr: [], //当前选中市级的区
+          province_arr: [], // 所有省
+          city_arr: [], // 所有市
+          area_arr: [], // 所有区
+          addr: ""
+        }
+      ];
       this.$refs.accountForm.resetFields();
       this.$emit("closeAdd", false);
     },
@@ -591,10 +661,9 @@ export default {
         type: "warning"
       })
         .then(async () => {
-          const res = await $axios.post(
-            "/api/v1/canteen/deleteMachine",
-            { id }
-          );
+          const res = await $axios.post("/api/v1/canteen/deleteMachine", {
+            id
+          });
           if (res.msg === "ok") {
             this.$message({
               type: "success",
@@ -638,10 +707,7 @@ export default {
         this.closeMachineDialog();
       } else {
         $axios
-          .post(
-            "/api/v1/canteen/updateMachine",
-            this.machineForm
-          )
+          .post("/api/v1/canteen/updateMachine", this.machineForm)
           .then(res => {
             this.$emit(
               "updateMachineTable",
@@ -653,6 +719,143 @@ export default {
           })
           .catch(err => console.log(err));
       }
+    },
+    // 加载china地点数据，三级
+    getCityData: function() {
+      let len = this.addrList.length;
+      let that = this;
+      let data = mapJson;
+      that.addrList[len - 1].province_arr = [];
+      that.addrList[len - 1].city_arr = [];
+      that.addrList[len - 1].area_arr = [];
+      // 省市区数据分类
+      for (let item in data) {
+        if (item.match(/0000$/)) {
+          //省
+          that.addrList[len - 1].province_arr.push({
+            id: item,
+            value: data[item],
+            children: []
+          });
+        } else if (item.match(/00$/)) {
+          //市
+          that.addrList[len - 1].city_arr.push({
+            id: item,
+            value: data[item],
+            children: []
+          });
+        } else {
+          //区
+          that.addrList[len - 1].area_arr.push({ id: item, value: data[item] });
+        }
+      }
+      // 分类市级
+      for (let index in that.addrList[0].province_arr) {
+        for (let index1 in that.addrList[0].city_arr) {
+          if (
+            that.addrList[len - 1].province_arr[index].id.slice(0, 2) ===
+            that.addrList[len - 1].city_arr[index1].id.slice(0, 2)
+          ) {
+            that.addrList[len - 1].province_arr[index].children.push(
+              that.addrList[len - 1].city_arr[index1]
+            );
+          }
+        }
+      }
+      // 分类区级
+      for (let item1 in that.addrList[len - 1].city_arr) {
+        for (let item2 in that.addrList[len - 1].area_arr) {
+          if (
+            that.addrList[len - 1].area_arr[item2].id.slice(0, 4) ===
+            that.addrList[len - 1].city_arr[item1].id.slice(0, 4)
+          ) {
+            that.addrList[len - 1].city_arr[item1].children.push(
+              that.addrList[len - 1].area_arr[item2]
+            );
+          }
+        }
+      }
+    },
+    // 选省
+    choseProvince: function(key, e) {
+      for (let index2 in this.addrList[key].province_arr) {
+        if (e === this.addrList[key].province_arr[index2].id) {
+          this.addrList[key].province = this.addrList[key].province_arr[
+            index2
+          ].value;
+          this.addrList[key].now_city_arr = this.addrList[key].province_arr[
+            index2
+          ].children;
+          this.addrList[key].city = this.addrList[key].province_arr[
+            index2
+          ].children[0].value;
+          this.addrList[key].city_id = this.addrList[key].province_arr[
+            index2
+          ].children[0].id;
+          this.addrList[key].now_area_arr = this.addrList[key].province_arr[
+            index2
+          ].children[0].children;
+          this.addrList[key].area = this.addrList[key].province_arr[
+            index2
+          ].children[0].children[0].value;
+          this.addrList[key].area_id = this.addrList[key].now_area_arr[0].id;
+        }
+      }
+    },
+    // 选市
+    choseCity: function(key, e) {
+      for (let index3 in this.addrList[key].city_arr) {
+        if (e === this.addrList[key].city_arr[index3].id) {
+          this.addrList[key].city_id = this.addrList[key].city_arr[index3].id;
+          this.addrList[key].now_area_arr = this.addrList[key].city_arr[
+            index3
+          ].children;
+          this.addrList[key].area = this.addrList[key].city_arr[
+            index3
+          ].children[0].value;
+          this.addrList[key].area_id = this.addrList[key].now_area_arr[0].id;
+        }
+      }
+    },
+    // 选区
+    choseBlock: function(key, e) {
+      this.addrList[key].area_id = e;
+    },
+    addNewAddr() {
+      this.addrList.push({
+        province_id: "",
+        city_id: "",
+        area_id: "",
+        province: "",
+        city: "",
+        area: "",
+        now_city_arr: [], // 当前选中省级的市
+        now_area_arr: [], //当前选中市级的区
+        province_arr: [], // 所有省
+        city_arr: [], // 所有市
+        area_arr: [], // 所有区
+        addr: "",
+        disabled: false
+      });
+      console.log(this.addrList);
+      console.log(this.address);
+      this.getCityData();
+    },
+    removeAddr(item, key) {
+      if (this.addrList.length === 1) return;
+      this.addrList.splice(key, 1);
+    }
+  },
+  computed: {
+    address: function() {
+      return this.addrList.map(item => {
+        return {
+          province: item.province,
+          area: item.area,
+          city: item.city,
+          address: item.addr
+        };
+      });
     }
   }
 };
