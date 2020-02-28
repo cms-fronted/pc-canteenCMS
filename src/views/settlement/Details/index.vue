@@ -231,7 +231,7 @@ export default {
     },
     async getCanteenOptions(company_ids) {
       let res;
-      if (company_ids) {
+      if (company_ids && Number(company_ids)) {
         res = await $axios.get(
           `/api/v1/canteens?company_id=${company_ids}`
         );

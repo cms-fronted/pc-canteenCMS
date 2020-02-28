@@ -137,6 +137,7 @@
       :machineList="machineList"
       :modules="modules"
       :editAddressForm="editAddressForm"
+      :editOutConfig="editOutConfig"
       @updateMachineTable="(val, type) => getMachineList(val, type)"
       @updateCanteenList="getComsumptionLoc"
     />
@@ -222,6 +223,7 @@ export default {
         account: {}
       },
       editAddressForm: [],
+      editOutConfig: {},
       payConfigForm: {},
       qrcodeUrl: ""
     };
@@ -380,6 +382,17 @@ export default {
         this.editAddressForm = res.data.address;
         this.editDinnersList = Array.from(res.data.dinners);
         this.editAccount = { ...res.data.account };
+        let out_config = res.data.out_config;
+        if (!out_config) {
+          this.editOutConfig = {
+            in_fee: "",
+            out_fee: "",
+            address_limit: 1,
+            remark: ""
+          };
+        } else {
+          this.editOutConfig = res.data.out_config;
+        }
         this.addCanteenVisible = true;
       }
       await this.getMachineList(val, "canteen");

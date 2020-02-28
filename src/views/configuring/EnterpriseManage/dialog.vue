@@ -1,6 +1,5 @@
 <template>
   <div>
-    <!-- <el-dialog :visible.sync="isOpen" width="45%" :title="dialogTitle" center @close="handleClose"> -->
     <el-dialog :visible.sync="isOpen" width="45%" :title="dialogTitle" center @close="handleClose">
       <!-- 餐次信息对话框 -->
       <el-dialog
@@ -171,7 +170,7 @@
         <div slot="header" class="clearfix">账户设置</div>
         <el-form ref="accountForm" :model="accountForm">
           <el-form-item prop="out">
-            <el-checkbox v-model="accountForm.out" true-label="1" false-label="2">允许非企业人员就餐</el-checkbox>
+            <el-checkbox v-model="accountForm.out" :true-label="1" :false-label="2">允许非企业人员就餐</el-checkbox>
           </el-form-item>
           <el-form-item prop="dinningMode">
             <el-radio-group v-model="accountForm.dining_mode">
@@ -224,8 +223,8 @@
           </el-form-item>
           <el-form-item prop="address_limit" label="配送范围：">
             <el-radio-group v-model="outConfigForm.address_limit">
-              <el-radio label="1">仅配送指定范围</el-radio>
-              <el-radio label="2">无限制</el-radio>
+              <el-radio :label="1">仅配送指定范围</el-radio>
+              <el-radio :label="2">无限制</el-radio>
             </el-radio-group>
             <p>
               <el-button type="text" @click="addNewAddr">添加地址选项</el-button>
@@ -369,7 +368,8 @@ export default {
     "editAccount",
     "machineList",
     "modules",
-    "editAddressForm"
+    "editAddressForm",
+    "editOutConfig"
   ],
   data() {
     return {
@@ -418,7 +418,7 @@ export default {
       outConfigForm: {
         in_fee: "",
         out_fee: "",
-        address_limit: "1",
+        address_limit: 1,
         remark: ""
       },
       addrList: [
@@ -438,6 +438,7 @@ export default {
           disabled: false
         }
       ],
+      cancelAddressId: [],
       dataTable: [],
       machineTable: [],
       addressList: []
@@ -445,10 +446,18 @@ export default {
   },
   watch: {
     visible(val) {
+      if (val && !this.isEdit) {
+        this.getCityData();
+      }
       this.isOpen = val;
     },
     formdata(val) {
       this.canteens = val.name;
+    },
+    machineList(val) {
+      if (this.isEdit) {
+        this.machineTable = val;
+      }
     },
     editDinnerList(val) {
       if (this.isEdit) {
@@ -460,14 +469,13 @@ export default {
         this.accountForm = val;
       }
     },
-    machineList(val) {
+    editOutConfig(val) {
       if (this.isEdit) {
-        this.machineTable = val;
+        this.outConfigForm = val;
       }
     },
     editAddressForm(val) {
       if (this.isEdit) {
-        console.log(11);
         val.forEach((item, index) => {
           this.addrList[index].id = item.id;
           this.addrList[index].province_id = item.province;
@@ -479,15 +487,24 @@ export default {
           this.addrList[index].addr = item.address;
           this.addrList[index].disabled = true;
         });
-        console.log(this.addrList);
+      }
+      if (!val.length) {
+        this.getCityData();
       }
     }
   },
   created() {
     if (!this.isEdit) {
-      this.getCityData();
     }
   },
+  // mounted() {
+  //   if (!this.isEdit) {
+  //     this.getCityData();
+  //   }
+  //   if (!editAddressForm) {
+  //     this.getCityData();
+  //   }
+  // },
   methods: {
     handleClick() {
       this.dinnersVisible = true;
@@ -591,12 +608,16 @@ export default {
     },
     // 配置饭堂请求
     _submitOptions() {
-      console.log(this.address);
       let data = {};
+      let add = [];
+      let address = {};
       data.dinners = JSON.stringify(this.dataTable);
       data.account = JSON.stringify(this.accountForm);
       data.out_config = JSON.stringify(this.outConfigForm);
       if (this.isEdit) {
+        add = this.address;
+        address = { add, cancel: this.cancelAddressId };
+        data.address = JSON.stringify(address);
         data.c_id = this.formdata.id;
       } else {
         data.c_id = this.canteen_id;
@@ -622,6 +643,7 @@ export default {
     },
     handleClose() {
       this.dataTable.length = 0;
+      this.cancelAddressId = [];
       this.addrList = [
         {
           province_id: "",
@@ -638,7 +660,13 @@ export default {
           addr: ""
         }
       ];
-      this.$refs.accountForm.resetFields();
+      (this.outConfigForm = {
+        in_fee: "",
+        out_fee: "",
+        address_limit: 1,
+        remark: ""
+      }),
+        this.$refs.accountForm.resetFields();
       this.$emit("closeAdd", false);
     },
     changeDay(val) {
@@ -837,19 +865,21 @@ export default {
         addr: "",
         disabled: false
       });
-      console.log(this.addrList);
-      console.log(this.address);
       this.getCityData();
     },
     removeAddr(item, key) {
       if (this.addrList.length === 1) return;
       this.addrList.splice(key, 1);
+      if (item.id) {
+        this.cancelAddressId.push(item.id);
+      }
     }
   },
   computed: {
     address: function() {
       return this.addrList.map(item => {
         return {
+          id: item.id,
           province: item.province,
           area: item.area,
           city: item.city,

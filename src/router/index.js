@@ -33,6 +33,7 @@ export const currencyRoutes = [
     path: "/",
     redirect: "/order"
   },
+
   {
     path: "/404",
     component: () => import("@/views/error"),
@@ -66,6 +67,14 @@ export const currencyRoutes = [
       icon: "el-icon-document"
     },
     children: [
+      {
+        path: "outsiders",
+        name: "Outsiders",
+        component: () => import("@/views/settings/Outsiders"),
+        meta: {
+          title: '外来人员权限设置'
+        }
+      },
       {
         path: "order-statistics",
         name: "Order-statistics",
