@@ -65,15 +65,6 @@
 
           <el-row>
             <el-col :span="6">
-              <el-form-item label="状态" prop="used">
-                <el-select v-model="queryForm.used">
-                  <el-option label="全部" :value="3" />
-                  <el-option label="已打印" :value="1" />
-                  <el-option label="未打印" :value="2" />
-                </el-select>
-              </el-form-item>
-            </el-col>
-            <el-col :span="6">
               <el-form-item label="部门" prop="department">
                 <el-select v-model="queryForm.department_id">
                   <el-option
@@ -82,6 +73,27 @@
                     :label="item.name"
                     :value="item.id"
                   />
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="6">
+              <el-form-item label="状态" prop="status">
+                <el-select v-model="queryForm.status">
+                  <el-option label="全部" :value="6" />
+                  <el-option label="已支付" :value="1" />
+                  <el-option label="已取消" :value="2" />
+                  <el-option label="已接单" :value="3" />
+                  <el-option label="已完成" :value="4" />
+                  <el-option label="已退回" :value="5" />
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="6">
+              <el-form-item label="人员类型" prop="user_type" label-width="100px">
+                <el-select v-model="queryForm.user_type">
+                  <el-option label="全部" :value="0" />
+                  <el-option label="外来人员" :value="1" />
+                  <el-option label="企业内部人员" :value="2" />
                 </el-select>
               </el-form-item>
             </el-col>
@@ -94,25 +106,25 @@
         <div class="clearfix"></div>
       </div>
       <div class="main-content">
-        <el-table :data="tableData" border style="width:100%">
-          <el-table-column type="selection" width="55" />
+        <el-table :data="tableData" border style="width:100%" >
+          <el-table-column type="selection" width="55" :selectable="selectable" />
           <el-table-column label="订单ID" prop="order_id" />
           <el-table-column label="日期" prop="ordering_date" />
           <el-table-column label="消费地点" prop="canteen" />
-          <el-table-column label="用户名" prop="username" />
+          <el-table-column label="用户名" prop="username" width="80px" />
           <el-table-column label="手机号码" prop="phone" />
-          <el-table-column label="餐次">
+          <el-table-column label="餐次" width="60px">
             <template slot-scope="scoped">
               <span>
                 <el-button
                   type="text"
-                  @click="openDetailDialog(scoped.row.dinner)"
+                  @click="openDetailDialog(scoped.row)"
                 >{{ scoped.row.dinner }}</el-button>
               </span>
             </template>
           </el-table-column>
-          <el-table-column label="金额" prop="money" />
-          <el-table-column label="送货地点" show-overflow-tooltip>
+          <el-table-column label="金额" prop="money" width="60px" />
+          <el-table-column label="送货地点" min-width="200px">
             <template slot-scope="scoped">
               <span>
                 {{
@@ -124,11 +136,13 @@
               </span>
             </template>
           </el-table-column>
-          <el-table-column label="状态">
+          <el-table-column label="状态" width="80px">
             <template slot-scope="scoped">
-              <el-tag
-                :type="scoped.row.used === 1 ? 'success' : 'warning'"
-              >{{ scoped.row.used === 1 ? "已派单" : "未派单" }}</el-tag>
+              <span v-if="scoped.row.status == 1">已支付</span>
+              <span v-if="scoped.row.status == 2">已取消</span>
+              <span v-if="scoped.row.status == 3">已接单</span>
+              <span v-if="scoped.row.status == 4">已完成</span>
+              <span v-if="scoped.row.status == 5">已退回</span>
             </template>
           </el-table-column>
           <el-table-column label="操作">
@@ -194,7 +208,8 @@ export default {
         dinner_id: "",
         canteen_id: "",
         department_id: "",
-        used: 3
+        status: 6,
+        user_type: 0
       },
       tableData: [],
       canteenOptions: [],
@@ -279,8 +294,8 @@ export default {
         this.queryForm.dinner_id = 0;
         this.queryForm.canteen_id = 0;
         this.queryForm.department_id = 0;
-        if(this.companyOptions.length === 1) {
-          await this.getListOptions( this.companyOptions[0].id)
+        if (this.companyOptions.length === 1) {
+          await this.getListOptions(this.companyOptions[0].id);
         }
       }
     },
@@ -382,9 +397,15 @@ export default {
     },
     async closeDetailDialog() {
       this.detailDialogVisible = false;
+    },
+    selectable(row, index) {
+      if (row.status != 1) {
+        return false;
+      }
     }
   }
 };
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+</style>

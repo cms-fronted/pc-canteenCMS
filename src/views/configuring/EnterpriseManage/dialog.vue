@@ -497,14 +497,6 @@ export default {
     if (!this.isEdit) {
     }
   },
-  // mounted() {
-  //   if (!this.isEdit) {
-  //     this.getCityData();
-  //   }
-  //   if (!editAddressForm) {
-  //     this.getCityData();
-  //   }
-  // },
   methods: {
     handleClick() {
       this.dinnersVisible = true;
@@ -778,8 +770,8 @@ export default {
         }
       }
       // 分类市级
-      for (let index in that.addrList[0].province_arr) {
-        for (let index1 in that.addrList[0].city_arr) {
+      for (let index in that.addrList[len - 1].province_arr) {
+        for (let index1 in that.addrList[len - 1].city_arr) {
           if (
             that.addrList[len - 1].province_arr[index].id.slice(0, 2) ===
             that.addrList[len - 1].city_arr[index1].id.slice(0, 2)
