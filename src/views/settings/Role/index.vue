@@ -70,7 +70,7 @@
         <pagination
           :total="total"
           :pageSize="size"
-          :currentPage="current_page"
+          :page="current_page"
           @pagination="fetchList"
         />
       </div>

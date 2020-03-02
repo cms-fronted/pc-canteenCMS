@@ -106,7 +106,7 @@
         <div class="clearfix"></div>
       </div>
       <div class="main-content">
-        <el-table :data="tableData" border style="width:100%" >
+        <el-table :data="tableData" border style="width:100%">
           <el-table-column type="selection" width="55" :selectable="selectable" />
           <el-table-column label="订单ID" prop="order_id" />
           <el-table-column label="日期" prop="ordering_date" />
@@ -116,10 +116,7 @@
           <el-table-column label="餐次" width="60px">
             <template slot-scope="scoped">
               <span>
-                <el-button
-                  type="text"
-                  @click="openDetailDialog(scoped.row)"
-                >{{ scoped.row.dinner }}</el-button>
+                <el-button type="text" @click="openDetailDialog(scoped.row)">{{ scoped.row.dinner }}</el-button>
               </span>
             </template>
           </el-table-column>
@@ -148,7 +145,11 @@
           <el-table-column label="操作">
             <template slot-scope="scoped">
               <span v-if="scoped.row.used === 2">
-                <el-button type="success" size="small" @click="openDetailDialog(scoped.row)">打印小票</el-button>
+                <el-button
+                  type="success"
+                  size="small"
+                  @click="openDetailDialog(scoped.row, 'check')"
+                >打印小票</el-button>
               </span>
             </template>
           </el-table-column>
